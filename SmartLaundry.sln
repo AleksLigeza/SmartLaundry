@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartLaundry", "SmartLaundry\SmartLaundry.csproj", "{D17FC816-598B-4FD8-BEA9-2951C4FA5A2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartLaundry.Tests", "SmartLaundry.Tests\SmartLaundry.Tests.csproj", "{3BB30F25-353D-4FF6-BD57-3A33C1CB30E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartLaundry.Tests", "SmartLaundry.Tests\SmartLaundry.Tests.csproj", "{3BB30F25-353D-4FF6-BD57-3A33C1CB30E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
