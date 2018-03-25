@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using SmartLaundry.Models;
 
-namespace SmartLaundryTests.Controllers {
+namespace SmartLaundry.Tests.Unit  {
     public class FakeSignInManager : SignInManager<ApplicationUser> {
         public FakeSignInManager() : base(
                 new Mock<FakeUserManager>().Object,

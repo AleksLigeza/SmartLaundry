@@ -16,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartLaundry.Data;
 using SmartLaundry.Models;
 
-namespace SmartLaundryTests.Controllers {
+namespace SmartLaundry.Tests.Integration {
     public class TestFixture<TStartup> : IDisposable {
 
         private readonly TestServer _server;

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using SmartLaundry.Models;
 
-namespace SmartLaundryTests.Controllers {
+namespace SmartLaundry.Tests.Unit {
     public class FakeUserManager : UserManager<ApplicationUser> {
         public FakeUserManager() : base(
             new Mock<IUserStore<ApplicationUser>>().Object,

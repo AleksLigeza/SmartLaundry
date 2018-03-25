@@ -1,17 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SmartLaundry.Data;
 using SmartLaundry.Models;
-using SmartLaundryTests.Controllers;
+using SmartLaundry.Models.AccountViewModels;
 using Xunit;
 
-namespace SmartLaundry.Tests.Controllers { 
+namespace SmartLaundry.Tests.Integration {
     public class AccountControllerTests : IClassFixture<TestFixture<Startup>> {
 
         private readonly HttpClient _client;
@@ -26,32 +30,20 @@ namespace SmartLaundry.Tests.Controllers {
 
         [Fact]
         [Trait("Category", "Integration")]
-        public async void Test1() {
+        public async Task UserCantRegisterWithoutVerificationToken() {
             //Arrange
             var fixture = TestFixture<Startup>.CreateLocalFixture();
-            var user = new ApplicationUser { UserName = "aaa", Email = "aa@aa.aa" };
-            var result = await fixture.UserManager.CreateAsync(user, "aaaaa1");
-
+            var content = new {
+                ConfirmPassword = "abcd123",
+                Password = "abcd123",
+                Email = "abc@abc.pl",
+            };
+            
             //Act
-            var finding = _globalContext.Users.FirstOrDefault();
+            var response = await fixture.Client.PostAsJsonAsync("/account/register", content);
 
             //Assert
-            Assert.True(result.Succeeded);
-        }
-
-        [Fact]
-        [Trait("Category", "Integration")]
-        public async void Test2() {
-            //Arrange
-            var fixture = TestFixture<Startup>.CreateLocalFixture();
-            var user = new ApplicationUser { UserName = "aaa", Email = "aa@aa.aa" };
-            var result = await fixture.UserManager.CreateAsync(user, "aaaaa1");
-
-            //Act
-            var finding = _globalContext.Users.FirstOrDefault();
-
-            //Assert
-            Assert.True(result.Succeeded);
+            Assert.False(response.IsSuccessStatusCode);
         }
     }
 }

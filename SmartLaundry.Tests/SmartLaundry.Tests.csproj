@@ -7,8 +7,23 @@
 
     <AssemblyName>SmartLaundry.Tests</AssemblyName>
 
-    <RootNamespace>SmartLaundryTests</RootNamespace>
+    <RootNamespace>SmartLaundry.Tests</RootNamespace>
   </PropertyGroup>
+
+<!-- https://github.com/NuGet/Home/issues/4412. -->
+
+  <Target Name="CopyDepsFiles" AfterTargets="Build" Condition="'$(TargetFramework)'!=''">
+
+    <ItemGroup>
+
+      <DepsFilePaths Include="$([System.IO.Path]::ChangeExtension('%(_ResolvedProjectReferencePaths.FullPath)', '.deps.json'))" />
+
+    </ItemGroup>
+
+
+    <Copy SourceFiles="%(DepsFilePaths.FullPath)" DestinationFolder="$(OutputPath)" Condition="Exists('%(DepsFilePaths.FullPath)')" />
+
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.2" />
@@ -28,6 +43,12 @@
     <Reference Include="Microsoft.Extensions.Identity.Core">
       <HintPath>..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.identity.core\2.0.2\lib\netstandard2.0\Microsoft.Extensions.Identity.Core.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
