@@ -6,13 +6,13 @@ using SmartLaundry.Models;
 using Xunit;
 
 namespace SmartLaundry.Tests.Integration {
-    public class HomeControllerTests : IClassFixture<TestFixture<Startup>> {
+    public class HomeControllerTests : IClassFixture<TestFixture> {
 
         private readonly HttpClient _client;
         private readonly ApplicationDbContext _globalContext;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeControllerTests(TestFixture<Startup> fixture) {
+        public HomeControllerTests(TestFixture fixture) {
             _client = fixture.Client;
             _globalContext = fixture.Context;
             _userManager = fixture.UserManager;
