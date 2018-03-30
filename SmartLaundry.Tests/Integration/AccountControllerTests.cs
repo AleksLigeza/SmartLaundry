@@ -52,8 +52,9 @@ namespace SmartLaundry.Tests.Integration {
         [Trait("Category", "Integration")]
         public async Task UserCanRegisterWithValidVerificationToken() {
             //Arrange
-            var initialResponse = await _fixture.Client.GetAsync("/account/register");
-            var antiForgeryValues = await _fixture.ExtractAntiForgeryValues(initialResponse);
+            var fixture = TestFixture.CreateLocalFixture();
+            var initialResponse = await fixture.Client.GetAsync("/account/register");
+            var antiForgeryValues = await fixture.ExtractAntiForgeryValues(initialResponse);
             var formData = new Dictionary<string, string>
             {
                 {TestFixture.AntiForgeryFieldName, antiForgeryValues.fieldValue},
@@ -66,10 +67,68 @@ namespace SmartLaundry.Tests.Integration {
             postRequest.Content = new FormUrlEncodedContent(formData);
 
             //Act
-            var postResponse = await _fixture.Client.SendAsync(postRequest);
+            var postResponse = await fixture.Client.SendAsync(postRequest);
         
             //Assert
             Assert.True(postResponse.StatusCode == HttpStatusCode.Found);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public async Task UserCanLoginIntoAccount() {
+            //Arrange
+            var fixture = TestFixture.CreateLocalFixture();
+
+            var user = new ApplicationUser { UserName = "abcd123", Email = "abc@abc.pl" };
+            var result = await fixture.UserManager.CreateAsync(user, "abcd123");
+
+            var initialResponse = await _fixture.Client.GetAsync("/account/login");
+            var antiForgeryValues = await _fixture.ExtractAntiForgeryValues(initialResponse);
+            var formData = new Dictionary<string, string>
+            {
+                {TestFixture.AntiForgeryFieldName, antiForgeryValues.fieldValue},
+                {"Password", "abcd123"},
+                {"Email", "abc@abc.pl"},
+                { "RememberMe", "true" }
+            };
+            var postRequest = new HttpRequestMessage(HttpMethod.Post, "/account/login");
+            postRequest.Headers.Add("Cookie", new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
+            postRequest.Content = new FormUrlEncodedContent(formData);
+
+            //Act
+            var postResponse = await _fixture.Client.SendAsync(postRequest);
+
+            //Assert
+            Assert.True(postResponse.StatusCode == HttpStatusCode.OK);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public async Task UserCanForgotPassword() {
+            //Arrange
+            var fixture = TestFixture.CreateLocalFixture();
+
+            var user = new ApplicationUser { UserName = "abcd123", Email = "abc@abc.pl" };
+            var result = await fixture.UserManager.CreateAsync(user, "abcd123");
+
+            var initialResponse = await _fixture.Client.GetAsync("/account/login");
+            var antiForgeryValues = await _fixture.ExtractAntiForgeryValues(initialResponse);
+            var formData = new Dictionary<string, string>
+            {
+                {TestFixture.AntiForgeryFieldName, antiForgeryValues.fieldValue},
+                {"Password", "abcd123"},
+                {"Email", "abc@abc.pl"},
+                { "RememberMe", "true" }
+            };
+            var postRequest = new HttpRequestMessage(HttpMethod.Post, "/account/login");
+            postRequest.Headers.Add("Cookie", new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
+            postRequest.Content = new FormUrlEncodedContent(formData);
+
+            //Act
+            var postResponse = await _fixture.Client.SendAsync(postRequest);
+
+            //Assert
+            Assert.True(postResponse.StatusCode == HttpStatusCode.OK);
         }
     }
 }

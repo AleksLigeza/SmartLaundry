@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using SmartLaundry.Models;
 using SmartLaundry.Models.AccountViewModels;
 using SmartLaundry.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace SmartLaundry.Controllers {
     [Authorize]
@@ -22,16 +23,19 @@ namespace SmartLaundry.Controllers {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
+        private readonly IConfiguration _configuration;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
-            ILogger<AccountController> logger) {
+            ILogger<AccountController> logger,
+            IConfiguration configuration) {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
+            _configuration = configuration;
         }
 
         [TempData]
@@ -53,8 +57,6 @@ namespace SmartLaundry.Controllers {
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null) {
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid) {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded) {
                     _logger.LogInformation("User logged in.");
@@ -64,8 +66,6 @@ namespace SmartLaundry.Controllers {
                     return View(model);
                 }
             }
-
-            // If we got this far, something failed, redisplay form
             return View(model);
         }
 
@@ -91,7 +91,7 @@ namespace SmartLaundry.Controllers {
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    //await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation("User created a new account with password.");
                     return RedirectToLocal(returnUrl);
                 }
