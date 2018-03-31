@@ -29,9 +29,13 @@ namespace SmartLaundry {
                     optionsBuilder
                         .UseInMemoryDatabase(CurrentEnvironment.EnvironmentName)
                     );
+
+                services.AddTransient<IEmailSender, FakeEmailSender>();
             } else {
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+                services.AddTransient<IEmailSender, EmailSender>();
             }
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options => {
@@ -46,7 +50,7 @@ namespace SmartLaundry {
                 .AddDefaultTokenProviders();
 
             // Add application services.
-            services.AddTransient<IEmailSender, EmailSender>();
+
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddMvc();

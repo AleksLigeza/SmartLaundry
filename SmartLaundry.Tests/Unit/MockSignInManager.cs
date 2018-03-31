@@ -10,16 +10,15 @@ using Moq;
 using SmartLaundry.Models;
 
 namespace SmartLaundry.Tests.Unit  {
-    public class FakeSignInManager : SignInManager<ApplicationUser> {
-        public FakeSignInManager() : base(
-                new Mock<FakeUserManager>().Object,
+    public class MockSignInManager : SignInManager<ApplicationUser> {
+        public MockSignInManager() : base(
+                new Mock<MockUserManager>().Object,
                 new HttpContextAccessor(),
                 new Mock<IUserClaimsPrincipalFactory<ApplicationUser>>().Object,
                 new Mock<IOptions<IdentityOptions>>().Object,
                 new Mock<ILogger<SignInManager<ApplicationUser>>>().Object,
                 new Mock<IAuthenticationSchemeProvider>().Object
             ) {
-
         }
     }
 }

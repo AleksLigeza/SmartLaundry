@@ -8,8 +8,8 @@ using Moq;
 using SmartLaundry.Models;
 
 namespace SmartLaundry.Tests.Unit {
-    public class FakeUserManager : UserManager<ApplicationUser> {
-        public FakeUserManager() : base(
+    public class MockUserManager : UserManager<ApplicationUser> {
+        public MockUserManager() : base(
             new Mock<IUserStore<ApplicationUser>>().Object,
             new Mock<IOptions<IdentityOptions>>().Object,
             new Mock<IPasswordHasher<ApplicationUser>>().Object, 

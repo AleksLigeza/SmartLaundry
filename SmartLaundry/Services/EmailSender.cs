@@ -17,7 +17,6 @@ namespace SmartLaundry.Services
         public AuthMessageSenderOptions Options { get; }
 
         public Task SendEmailAsync(string email, string subject, string message) {
-            Console.WriteLine(Options.SendGridKey); 
             return Execute(Options.SendGridKey, subject, message, email);
         }
 

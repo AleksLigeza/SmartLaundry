@@ -75,11 +75,11 @@ namespace SmartLaundry.Tests.Integration {
 
         [Fact]
         [Trait("Category", "Integration")]
-        public async Task UserCanLoginIntoAccount() {
+        public async Task UserCantLoginWithoutVerifiedEmail() {
             //Arrange
             var fixture = TestFixture.CreateLocalFixture();
 
-            var user = new ApplicationUser { UserName = "abcd123", Email = "abc@abc.pl" };
+            var user = new ApplicationUser { UserName = "abc@abc.pl", Email = "abc@abc.pl" };
             var result = await fixture.UserManager.CreateAsync(user, "abcd123");
 
             var initialResponse = await _fixture.Client.GetAsync("/account/login");
@@ -96,20 +96,27 @@ namespace SmartLaundry.Tests.Integration {
             postRequest.Content = new FormUrlEncodedContent(formData);
 
             //Act
-            var postResponse = await _fixture.Client.SendAsync(postRequest);
+            var postResponse = await fixture.Client.SendAsync(postRequest);
 
             //Assert
-            Assert.True(postResponse.StatusCode == HttpStatusCode.OK);
+            string content = await postResponse.Content.ReadAsStringAsync();
+            Assert.Contains("Please verify your email", content);
         }
+
 
         [Fact]
         [Trait("Category", "Integration")]
-        public async Task UserCanForgotPassword() {
+        public async Task UserCanLoginWithVerifiedEmail() {
             //Arrange
             var fixture = TestFixture.CreateLocalFixture();
 
-            var user = new ApplicationUser { UserName = "abcd123", Email = "abc@abc.pl" };
+            var user = new ApplicationUser { UserName = "abc@abc.pl", Email = "abc@abc.pl" };
             var result = await fixture.UserManager.CreateAsync(user, "abcd123");
+
+            var userToConfirm = fixture.Context.Users.Where(u => u.UserName == "abc@abc.pl").SingleOrDefault();
+            userToConfirm.EmailConfirmed = true;
+            fixture.Context.Users.Update(userToConfirm);
+            fixture.Context.SaveChanges();
 
             var initialResponse = await _fixture.Client.GetAsync("/account/login");
             var antiForgeryValues = await _fixture.ExtractAntiForgeryValues(initialResponse);
@@ -125,10 +132,11 @@ namespace SmartLaundry.Tests.Integration {
             postRequest.Content = new FormUrlEncodedContent(formData);
 
             //Act
-            var postResponse = await _fixture.Client.SendAsync(postRequest);
+            var postResponse = await fixture.Client.SendAsync(postRequest);
 
             //Assert
-            Assert.True(postResponse.StatusCode == HttpStatusCode.OK);
+            string content = await postResponse.Content.ReadAsStringAsync();
+            Assert.DoesNotContain("Please verify your email", content);
         }
     }
 }

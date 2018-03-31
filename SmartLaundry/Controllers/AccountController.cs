@@ -23,19 +23,16 @@ namespace SmartLaundry.Controllers {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
-        private readonly IConfiguration _configuration;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
-            ILogger<AccountController> logger,
-            IConfiguration configuration) {
+            ILogger<AccountController> logger) {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
-            _configuration = configuration;
         }
 
         [TempData]
@@ -44,10 +41,12 @@ namespace SmartLaundry.Controllers {
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null) {
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
             ViewData["ReturnUrl"] = returnUrl;
+
+            if (_signInManager.IsSignedIn(User)) {
+                return RedirectToAction("Index", "Home");
+            }   
+
             return View();
         }
 
@@ -59,9 +58,11 @@ namespace SmartLaundry.Controllers {
             if (ModelState.IsValid) {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded) {
-                    _logger.LogInformation("User logged in.");
                     return RedirectToLocal(returnUrl);
-                } else {
+                } else if (result.IsNotAllowed) {
+                    ModelState.AddModelError(string.Empty, "Please verify your email");
+                    return View(model);
+                } else { 
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(model);
                 }
@@ -91,9 +92,8 @@ namespace SmartLaundry.Controllers {
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
 
-                    //await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation("User created a new account with password.");
-                    return RedirectToLocal(returnUrl);
+                    return RedirectToAction(nameof(RegisterConfirmation));
                 }
                 AddErrors(result);
             }
@@ -141,8 +141,6 @@ namespace SmartLaundry.Controllers {
                     return RedirectToAction(nameof(ForgotPasswordConfirmation));
                 }
 
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
                 await _emailSender.SendEmailAsync(model.Email, "Reset Password",
@@ -193,6 +191,12 @@ namespace SmartLaundry.Controllers {
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPasswordConfirmation() {
+            return View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult RegisterConfirmation() {
             return View();
         }
 
