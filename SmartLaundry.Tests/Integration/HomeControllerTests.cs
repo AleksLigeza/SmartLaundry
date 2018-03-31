@@ -19,6 +19,7 @@ namespace SmartLaundry.Tests.Integration {
         }
 
         [Fact]
+        [Trait("Category", "Integration")]
         public async Task EmptyPathReturnsIndexPage() {
             // Arrange
             // ---

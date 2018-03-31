@@ -40,7 +40,7 @@ namespace SmartLaundry.Controllers {
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl = null) {
+        public IActionResult Login(string returnUrl = null) {
             ViewData["ReturnUrl"] = returnUrl;
 
             if (_signInManager.IsSignedIn(User)) {
@@ -74,6 +74,11 @@ namespace SmartLaundry.Controllers {
         [AllowAnonymous]
         public IActionResult Register(string returnUrl = null) {
             ViewData["ReturnUrl"] = returnUrl;
+
+            if (_signInManager.IsSignedIn(User)) {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
 
@@ -215,7 +220,7 @@ namespace SmartLaundry.Controllers {
         }
 
         private IActionResult RedirectToLocal(string returnUrl) {
-            if (Url.IsLocalUrl(returnUrl)) {
+            if (returnUrl != null && Url.IsLocalUrl(returnUrl)) {
                 return Redirect(returnUrl);
             } else {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
