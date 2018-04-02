@@ -23,6 +23,7 @@ namespace SmartLaundry.Controllers {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
+        private readonly Helpers _helpers;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -33,6 +34,8 @@ namespace SmartLaundry.Controllers {
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
+
+            _helpers = new Helpers();
         }
 
         [TempData]
@@ -94,8 +97,8 @@ namespace SmartLaundry.Controllers {
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                    await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
+                    var callbackUrl = _helpers.EmailConfirmationLink(Url, user.Id, code, Request.Scheme);
+                    await _helpers.SendEmailConfirmationAsync(_emailSender, model.Email, callbackUrl);
 
                     _logger.LogInformation("User created a new account with password.");
                     return RedirectToAction(nameof(RegisterConfirmation));
@@ -147,7 +150,7 @@ namespace SmartLaundry.Controllers {
                 }
 
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
+                var callbackUrl = _helpers.ResetPasswordCallbackLink(Url, user.Id, code, Request.Scheme);
                 await _emailSender.SendEmailAsync(model.Email, "Reset Password",
                    $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
