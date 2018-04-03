@@ -19,7 +19,6 @@ namespace SmartLaundry.Tests.Unit {
         private readonly AccountController _controller;
         private readonly Mock<MockSignInManager> _signInManager;
         private readonly Mock<MockUserManager> _userManager;
-        private readonly Mock<FakeEmailSender> _emailSender;
         private readonly ILogger<AccountController> _logger;
 
         public AccountControllerTests() {

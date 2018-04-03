@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartLaundry.Data;
 using SmartLaundry.Models;
 using SmartLaundry.Services;
+using SmartLaundry.Data.Interfaces;
+using SmartLaundry.Data.Repositories;
 
 namespace SmartLaundry {
     public class Startup {
@@ -50,7 +52,7 @@ namespace SmartLaundry {
                 .AddDefaultTokenProviders();
 
             // Add application services.
-
+            services.AddTransient<IDormitoryRepository, DormitoryRepository>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddMvc();

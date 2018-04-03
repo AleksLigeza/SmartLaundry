@@ -5,6 +5,11 @@
     <UserSecretsId>aspnet-SmartLaundry-72BAF21A-4F30-460E-8271-B9116EF8C6D2</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20180402122521_DormitoryAdd.cs" />
+    <Compile Remove="Data\Migrations\20180402122521_DormitoryAdd.Designer.cs" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
