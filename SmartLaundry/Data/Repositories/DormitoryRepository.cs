@@ -29,12 +29,12 @@ namespace SmartLaundry.Data.Repositories {
             return Dormitories.OrderBy(x => x.Name).ToList();
         }
 
-        public Dormitory GetSingleByID(int id) {
+        public Dormitory GetSingleById(int id) {
             return _context.Dormitories.Find(id);
         }
 
         public Dormitory UpdateSingle(Dormitory source) {
-            var result = _context.Update(source);
+            var result = _context.Dormitories.Update(source);
             _context.SaveChanges();
             return result.Entity;
         }

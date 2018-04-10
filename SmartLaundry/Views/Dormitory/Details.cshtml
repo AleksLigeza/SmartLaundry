@@ -1,4 +1,5 @@
-﻿@model SmartLaundry.Models.Dormitory
+﻿@using Microsoft.CodeAnalysis.CSharp
+@model SmartLaundry.Models.DormitoryViewModels.DormitoryDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -11,32 +12,48 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Dormitory.Name)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Dormitory.Name)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Address)
+            @Html.DisplayNameFor(model => model.Dormitory.Address)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Address)
+            @Html.DisplayFor(model => model.Dormitory.Address)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.ZipCode)
+            @Html.DisplayNameFor(model => model.Dormitory.ZipCode)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.ZipCode)
+            @Html.DisplayFor(model => model.Dormitory.ZipCode)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.City)
+            @Html.DisplayNameFor(model => model.Dormitory.City)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.City)
+            @Html.DisplayFor(model => model.Dormitory.City)
         </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Manager)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Manager.Email)
+        </dd>
+        <dt>
+            Porters
+        </dt>
+        @foreach (var item in Model.Porters) {
+            
+            <dd>
+                @item.Email
+            </dd>
+        }
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.DormitoryID">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryID">Edit</a> |
+    <a asp-action="ManageUsers" asp-route-id="@Model.Dormitory.DormitoryID">Manage users</a> |
     <a asp-action="Index">Back to List</a>
 </div>

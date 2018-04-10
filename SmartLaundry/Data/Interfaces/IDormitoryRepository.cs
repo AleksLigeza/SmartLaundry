@@ -11,7 +11,7 @@ namespace SmartLaundry.Data.Interfaces
         IEnumerable<Dormitory> Dormitories { get; }
 
         List<Dormitory> GetAll();
-        Dormitory GetSingleByID(int id);
+        Dormitory GetSingleById(int id);
         Dormitory AddSingle(Dormitory source);
         Dormitory UpdateSingle(Dormitory source);
         void DeleteSingle(Dormitory source);

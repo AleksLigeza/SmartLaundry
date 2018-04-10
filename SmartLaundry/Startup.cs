@@ -53,6 +53,7 @@ namespace SmartLaundry {
 
             // Add application services.
             services.AddTransient<IDormitoryRepository, DormitoryRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddMvc();

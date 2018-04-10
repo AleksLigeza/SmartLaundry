@@ -29,7 +29,7 @@ namespace SmartLaundry.Data.Mock {
             return Dormitories.ToList();
         }
 
-        public Dormitory GetSingleByID(int id) {
+        public Dormitory GetSingleById(int id) {
             throw new NotImplementedException();
         }
 
