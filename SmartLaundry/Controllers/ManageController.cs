@@ -25,7 +25,7 @@ namespace SmartLaundry.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
-        private readonly Helpers _helpers;
+        private readonly Helpers.Helpers _helpers;
 
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
@@ -42,7 +42,7 @@ namespace SmartLaundry.Controllers
             _logger = logger;
             _urlEncoder = urlEncoder;
 
-            _helpers = new Helpers();
+            _helpers = new Helpers.Helpers();
         }
 
         [TempData]

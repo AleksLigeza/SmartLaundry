@@ -27,12 +27,12 @@ namespace SmartLaundry.Data
             builder.Entity<Dormitory>()
                 .HasOne(d => d.Manager)
                 .WithOne(u => u.DormitoryManager)
-                .HasForeignKey<ApplicationUser>(u => u.DormitoryManagerID);
+                .HasForeignKey<Dormitory>(d => d.ManagerId);
 
             builder.Entity<ApplicationUser>()
                 .HasOne(u => u.DormitoryPorter)
                 .WithMany(d => d.Porters)
-                .HasForeignKey(u => u.DormitoryPorterID);
+                .HasForeignKey(u => u.DormitoryPorterId);
 
 
         }

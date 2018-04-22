@@ -38,5 +38,13 @@ namespace SmartLaundry.Data.Repositories {
             _context.SaveChanges();
             return result.Entity;
         }
+
+
+        public Dormitory AssignManager(ApplicationUser user, Dormitory dormitory) {
+            dormitory.ManagerId = user.Id;
+            _context.Dormitories.Update(dormitory);
+            _context.SaveChanges();
+            return _context.Users.Find(user.Id).DormitoryManager;
+        }
     }
 }

@@ -1,0 +1,82 @@
+﻿@using SmartLaundry.Models.DormitoryViewModels
+@model ManageDormitoryUsersViewModel
+
+@{
+    ViewBag.Title = "Manage Dormitory Users";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<form asp-action="ManageDormitoryUsers" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="ManageDormitoryUsers">Back to Full List</a>
+        </p>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Dormitory: @Model.Dormitory.Name
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model.Users) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @if (item.Id != @Model.Dormitory.ManagerId) {
+                <form method="POST" asp-action="AssignManager">
+                    <input type="hidden" name="managerEmail" value="@item.Email" />
+                    <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
+                    <input type="submit" value="Assign manager" />
+                </form>
+                }
+                @if (item.DormitoryPorterId == null && item.Id != Model.Dormitory.ManagerId) {
+                <form method="POST" asp-action="AssignPorter">
+                    <input type="hidden" name="porterEmail" value="@item.Email" />
+                    <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
+                    <input type="submit" value="Assign porter" />
+                </form>
+                }
+                @if (item.DormitoryPorterId == Model.Dormitory.DormitoryID) {
+                <form method="POST" asp-action="RemovePorter">
+                    <input type="hidden" name="porterEmail" value="@item.Email" />
+                    <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
+                    <input type="submit" value="Remove porter" />
+                </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+
+@{
+    var prevDisabled = !Model.Users.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.Users.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="ManageDormitoryUsers"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-page="@(Model.Users.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="ManageDormitoryUsers"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-page="@(Model.Users.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

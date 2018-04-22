@@ -9,9 +9,8 @@ namespace SmartLaundry.Models
     // Add profile data for application users by adding properties to the ApplicationUser class
     public class ApplicationUser : IdentityUser
     {
-        public int? DormitoryManagerID { get; set; }
         public virtual Dormitory DormitoryManager { get; set; }
-        public int? DormitoryPorterID { get; set; }
+        public int? DormitoryPorterId { get; set; }
         public virtual Dormitory DormitoryPorter { get; set; }
     }
 }

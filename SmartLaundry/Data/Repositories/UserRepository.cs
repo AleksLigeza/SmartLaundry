@@ -3,6 +3,7 @@ using SmartLaundry.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace SmartLaundry.Data.Repositories {
@@ -18,19 +19,24 @@ namespace SmartLaundry.Data.Repositories {
         
         public ApplicationUser GetUserByEmail(string email) => Users.SingleOrDefault(x => x.Email == email);
 
-        public List<ApplicationUser> GetUsersWithEmailLike(string email) => Users.Where(x => x.Email.Contains(email)).ToList();
+        public List<ApplicationUser> GetUsersWithEmailLike(string email) => Users.Where(x => x.Email.Contains(email)).OrderBy(x => x.Email).ToList();
 
-        public Dormitory AssignDormitoryAsManager(ApplicationUser user, Dormitory dormitory) {
-            user.DormitoryManagerID = dormitory.DormitoryID;
+        public Dormitory AssignDormitoryAsPorter(ApplicationUser user, Dormitory dormitory) {
+            user.DormitoryPorterId = dormitory.DormitoryID;
             _context.Users.Update(user);
             _context.SaveChanges();
-            return _context.Users.Find(user.Id).DormitoryManager;
+            return _context.Users.Find(user.Id).DormitoryPorter;
         }
 
-        public ApplicationUser FindDormitoryManager(int dormitoryId) => _context.Users.SingleOrDefault(x => x.DormitoryManagerID == dormitoryId);
-
+        public void RemoveDormitoryPorter(ApplicationUser user, Dormitory dormitory) {
+            user.DormitoryPorterId = null;
+            _context.Users.Update(user);
+            _context.SaveChanges();
+        }
 
         public List<ApplicationUser> FindDormitoryPorters(int dormitoryId) =>
-            _context.Users.Where(x => x.DormitoryPorterID == dormitoryId).ToList();
+            _context.Users.Where(x => x.DormitoryPorterId == dormitoryId).OrderBy(x => x.Email).ToList();
+
+        public ApplicationUser GetUserById(string id) => _context.Users.Find(id);
     }
 }

@@ -12,8 +12,9 @@ namespace SmartLaundry.Data.Interfaces
         List<ApplicationUser> GetAll();
         ApplicationUser GetUserByEmail(string email);
         List<ApplicationUser> GetUsersWithEmailLike(string email);
-        Dormitory AssignDormitoryAsManager(ApplicationUser user, Dormitory dormitory);
-        ApplicationUser FindDormitoryManager(int dormitoryId);
+        Dormitory AssignDormitoryAsPorter(ApplicationUser user, Dormitory dormitory);
+        void RemoveDormitoryPorter(ApplicationUser user, Dormitory dormitory);
         List<ApplicationUser> FindDormitoryPorters(int dormitoryId);
+        ApplicationUser GetUserById(string id);
     }
 }

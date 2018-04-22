@@ -16,6 +16,7 @@ namespace SmartLaundry.Models
         public string ZipCode { get; set; }
         public string City { get; set; }
 
+        public string ManagerId { get; set; }
         public virtual ApplicationUser Manager { get; set; }
         public virtual ICollection<ApplicationUser> Porters { get; set; }
     }

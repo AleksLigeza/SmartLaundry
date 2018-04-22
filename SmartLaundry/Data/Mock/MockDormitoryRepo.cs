@@ -21,6 +21,10 @@ namespace SmartLaundry.Data.Mock {
             throw new NotImplementedException();
         }
 
+        public Dormitory AssignManager(ApplicationUser user, Dormitory dormitory) {
+            throw new NotImplementedException();
+        }
+
         public void DeleteSingle(Dormitory source) {
             throw new NotImplementedException();
         }

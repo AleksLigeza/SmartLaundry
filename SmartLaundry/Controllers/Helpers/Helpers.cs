@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
-namespace SmartLaundry.Controllers
+namespace SmartLaundry.Controllers.Helpers
 {
     public class Helpers
     {

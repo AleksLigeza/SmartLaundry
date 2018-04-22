@@ -26,39 +26,71 @@ namespace SmartLaundry.Controllers {
         }
 
         [HttpGet]
-        public IActionResult ManageUsers(int? id) {
-            if(id == null) {
+        public IActionResult ManageDormitoryUsers(
+            int id,
+            string currentFilter,
+            string searchString,
+            int? page) {
+
+            if(searchString != null) {
+                page = 1;
+            } else {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            List<ApplicationUser> users;
+            if(!String.IsNullOrEmpty(searchString)) {
+                users = _userRepo.GetUsersWithEmailLike(searchString);
+            } else {
+                users = _userRepo.Users.ToList();
+            }
+
+            var dormitory = _dormitoryRepo.GetSingleById(id);
+
+            if (dormitory == null) {
                 return NotFound();
             }
 
-            var model = new ManageUsersViewModel();
-            model.Users = _userRepo.GetAll();
-            model.DormitoryId = id.Value;
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public IActionResult ManageUsers(int dormitoryId, string managerEmail) {
-            var model = new ManageUsersViewModel();
-            model.Users = _userRepo.GetUsersWithEmailLike(managerEmail);
-            model.DormitoryId = dormitoryId;
-
-            return View(model);
+            int pageSize = 10;
+            return View(new ManageDormitoryUsersViewModel(new PaginatedList<ApplicationUser>(users, users.Count, page ?? 1, pageSize), dormitory));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddManager(int dormitoryId, string managerEmail) {
+        public IActionResult AssignManager(int dormitoryId, string managerEmail) {
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
             var user = _userRepo.GetUserByEmail(managerEmail);
-            user.DormitoryManagerID = dormitoryId;
 
-            _userRepo.AssignDormitoryAsManager(user, dormitory);
+            _dormitoryRepo.AssignManager(user, dormitory);
 
             return RedirectToAction("Details", new { id = dormitoryId });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AssignPorter(int dormitoryId, string porterEmail) {
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var user = _userRepo.GetUserByEmail(porterEmail);
+            user.DormitoryPorterId = dormitoryId;
+
+            _userRepo.AssignDormitoryAsPorter(user, dormitory);
+
+            return RedirectToAction("Details", new { id = dormitoryId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RemovePorter(int dormitoryId, string porterEmail) {
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var user = _userRepo.GetUserByEmail(porterEmail);
+            user.DormitoryPorterId = dormitoryId;
+
+            _userRepo.RemoveDormitoryPorter(user, dormitory);
+
+            return RedirectToAction("Details", new { id = dormitoryId });
+        }
 
         [HttpGet]
         public IActionResult Details(int? id) {
@@ -73,7 +105,7 @@ namespace SmartLaundry.Controllers {
 
             var model = new DormitoryDetailsViewModel();
             model.Dormitory = dormitory;
-            model.Manager = _userRepo.FindDormitoryManager(dormitory.DormitoryID);
+            model.Manager = _userRepo.GetUserById(dormitory.ManagerId);
             model.Porters = _userRepo.FindDormitoryPorters(dormitory.DormitoryID);
 
             return View(model);

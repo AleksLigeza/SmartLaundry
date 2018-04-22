@@ -16,19 +16,19 @@ namespace SmartLaundry.Controllers {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
-        private readonly Helpers _helpers;
+        private readonly Helpers.Helpers _helpers;
 
         public AccountController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender,
-            ILogger<AccountController> logger) {
+                UserManager<ApplicationUser> userManager,
+                SignInManager<ApplicationUser> signInManager,
+                IEmailSender emailSender,
+                ILogger<AccountController> logger) {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
 
-            _helpers = new Helpers();
+            _helpers = new Helpers.Helpers();
         }
 
         [TempData]
@@ -39,9 +39,9 @@ namespace SmartLaundry.Controllers {
         public IActionResult Login(string returnUrl = null) {
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (_signInManager.IsSignedIn(User)) {
+            if(_signInManager.IsSignedIn(User)) {
                 return RedirectToAction("Index", "Home");
-            }   
+            }
 
             return View();
         }
@@ -51,14 +51,14 @@ namespace SmartLaundry.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null) {
             ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid) {
+            if(ModelState.IsValid) {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded) {
+                if(result.Succeeded) {
                     return RedirectToLocal(returnUrl);
-                } else if (result.IsNotAllowed) {
+                } else if(result.IsNotAllowed) {
                     ModelState.AddModelError(string.Empty, "Please verify your email");
                     return View(model);
-                } else { 
+                } else {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(model);
                 }
@@ -71,7 +71,7 @@ namespace SmartLaundry.Controllers {
         public IActionResult Register(string returnUrl = null) {
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (_signInManager.IsSignedIn(User)) {
+            if(_signInManager.IsSignedIn(User)) {
                 return RedirectToAction("Index", "Home");
             }
 
@@ -83,10 +83,10 @@ namespace SmartLaundry.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null) {
             ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid) {
+            if(ModelState.IsValid) {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded) {
+                if(result.Succeeded) {
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -114,11 +114,11 @@ namespace SmartLaundry.Controllers {
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code) {
-            if (userId == null || code == null) {
+            if(userId == null || code == null) {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
             var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) {
+            if(user == null) {
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
@@ -135,9 +135,9 @@ namespace SmartLaundry.Controllers {
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model) {
-            if (ModelState.IsValid) {
+            if(ModelState.IsValid) {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user))) {
+                if(user == null || !(await _userManager.IsEmailConfirmedAsync(user))) {
                     // Don't reveal that the user does not exist or is not confirmed
                     return RedirectToAction(nameof(ForgotPasswordConfirmation));
                 }
@@ -162,7 +162,7 @@ namespace SmartLaundry.Controllers {
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPassword(string code = null) {
-            if (code == null) {
+            if(code == null) {
                 throw new ApplicationException("A code must be supplied for password reset.");
             }
             var model = new ResetPasswordViewModel { Code = code };
@@ -173,16 +173,16 @@ namespace SmartLaundry.Controllers {
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model) {
-            if (!ModelState.IsValid) {
+            if(!ModelState.IsValid) {
                 return View(model);
             }
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null) {
+            if(user == null) {
                 // Don't reveal that the user does not exist
                 return RedirectToAction(nameof(ResetPasswordConfirmation));
             }
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-            if (result.Succeeded) {
+            if(result.Succeeded) {
                 return RedirectToAction(nameof(ResetPasswordConfirmation));
             }
             AddErrors(result);
@@ -210,13 +210,13 @@ namespace SmartLaundry.Controllers {
         #region Helpers
 
         private void AddErrors(IdentityResult result) {
-            foreach (var error in result.Errors) {
+            foreach(var error in result.Errors) {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
 
         private IActionResult RedirectToLocal(string returnUrl) {
-            if (returnUrl != null && Url.IsLocalUrl(returnUrl)) {
+            if(returnUrl != null && Url.IsLocalUrl(returnUrl)) {
                 return Redirect(returnUrl);
             } else {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
