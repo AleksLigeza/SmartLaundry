@@ -27,10 +27,10 @@ namespace SmartLaundry.Controllers {
 
         [HttpGet]
         public IActionResult ManageDormitoryUsers(
-            int id,
-            string currentFilter,
-            string searchString,
-            int? page) {
+                int id,
+                string currentFilter,
+                string searchString,
+                int? page) {
 
             if(searchString != null) {
                 page = 1;
@@ -62,6 +62,7 @@ namespace SmartLaundry.Controllers {
         public IActionResult AssignManager(int dormitoryId, string managerEmail) {
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
             var user = _userRepo.GetUserByEmail(managerEmail);
+            user.DormitoryPorterId = null;
 
             _dormitoryRepo.AssignManager(user, dormitory);
 
@@ -98,15 +99,16 @@ namespace SmartLaundry.Controllers {
                 return NotFound();
             }
 
-            var dormitory = _dormitoryRepo.GetSingleById(id.Value);
+            var dormitory = _dormitoryRepo.GetSingleWithIncludes(id.Value);
             if(dormitory == null) {
                 return NotFound();
             }
 
             var model = new DormitoryDetailsViewModel();
             model.Dormitory = dormitory;
-            model.Manager = _userRepo.GetUserById(dormitory.ManagerId);
-            model.Porters = _userRepo.FindDormitoryPorters(dormitory.DormitoryID);
+            model.Manager = dormitory.Manager;
+            model.Porters = dormitory.Porters.ToList();
+            model.Laundries = dormitory.Laundries.ToList();
 
             return View(model);
         }

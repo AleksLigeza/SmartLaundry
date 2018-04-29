@@ -1,4 +1,5 @@
-﻿using SmartLaundry.Data.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
 using System;
 using System.Collections.Generic;
@@ -33,12 +34,19 @@ namespace SmartLaundry.Data.Repositories {
             return _context.Dormitories.Find(id);
         }
 
+        public Dormitory GetSingleWithIncludes(int id)
+        {
+            return _context.Dormitories
+                .Include(x=>x.Laundries).Include(x=>x.Manager)
+                .Include(x=>x.Porters).Include(x=>x.Rooms)
+                .Where(x=>x.DormitoryID == id).SingleOrDefault();
+        }
+
         public Dormitory UpdateSingle(Dormitory source) {
             var result = _context.Dormitories.Update(source);
             _context.SaveChanges();
             return result.Entity;
         }
-
 
         public Dormitory AssignManager(ApplicationUser user, Dormitory dormitory) {
             dormitory.ManagerId = user.Id;

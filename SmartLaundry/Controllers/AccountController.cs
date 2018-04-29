@@ -84,7 +84,13 @@ namespace SmartLaundry.Controllers {
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null) {
             ViewData["ReturnUrl"] = returnUrl;
             if(ModelState.IsValid) {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    Firstname = model.Firstname,
+                    Lastname = model.Lastname
+                };
+
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if(result.Succeeded) {
                     _logger.LogInformation("User created a new account with password.");

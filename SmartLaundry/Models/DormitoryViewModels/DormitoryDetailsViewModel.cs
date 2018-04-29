@@ -9,5 +9,6 @@ namespace SmartLaundry.Models.DormitoryViewModels
         public Dormitory Dormitory;
         public ApplicationUser Manager;
         public List<ApplicationUser> Porters;
+        public List<Laundry> Laundries;
     }
 }

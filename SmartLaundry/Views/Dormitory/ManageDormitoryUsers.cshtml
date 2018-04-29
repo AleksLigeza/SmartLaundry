@@ -35,27 +35,36 @@
                 @Html.DisplayFor(modelItem => item.Email)
             </td>
             <td>
-                @if (item.Id != @Model.Dormitory.ManagerId) {
-                <form method="POST" asp-action="AssignManager">
-                    <input type="hidden" name="managerEmail" value="@item.Email" />
-                    <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
-                    <input type="submit" value="Assign manager" />
-                </form>
-                }
-                @if (item.DormitoryPorterId == null && item.Id != Model.Dormitory.ManagerId) {
-                <form method="POST" asp-action="AssignPorter">
-                    <input type="hidden" name="porterEmail" value="@item.Email" />
-                    <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
-                    <input type="submit" value="Assign porter" />
-                </form>
-                }
-                @if (item.DormitoryPorterId == Model.Dormitory.DormitoryID) {
-                <form method="POST" asp-action="RemovePorter">
-                    <input type="hidden" name="porterEmail" value="@item.Email" />
-                    <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
-                    <input type="submit" value="Remove porter" />
-                </form>
-                }
+                @Html.DisplayFor(modelItem => item.Firstname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Lastname)
+            </td>
+            <td>
+                @if (item.Id != @Model.Dormitory.ManagerId)
+        {
+            <form method="POST" asp-action="AssignManager">
+                <input type="hidden" name="managerEmail" value="@item.Email" />
+                <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
+                <input type="submit" value="Assign manager" />
+            </form>
+}
+                @if (item.DormitoryPorterId == null && item.Id != Model.Dormitory.ManagerId)
+        {
+            <form method="POST" asp-action="AssignPorter">
+                <input type="hidden" name="porterEmail" value="@item.Email" />
+                <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
+                <input type="submit" value="Assign porter" />
+            </form>
+}
+                @if (item.DormitoryPorterId == Model.Dormitory.DormitoryID)
+        {
+            <form method="POST" asp-action="RemovePorter">
+                <input type="hidden" name="porterEmail" value="@item.Email" />
+                <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
+                <input type="submit" value="Remove porter" />
+            </form>
+}
             </td>
         </tr>
     }

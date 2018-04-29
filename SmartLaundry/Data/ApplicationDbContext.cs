@@ -14,6 +14,7 @@ namespace SmartLaundry.Data
         public DbSet<Laundry> Laundries { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<WashingMachine> WashingMachines { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

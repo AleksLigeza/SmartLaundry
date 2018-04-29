@@ -37,6 +37,11 @@ namespace SmartLaundry.Data.Mock {
             throw new NotImplementedException();
         }
 
+        public Dormitory GetSingleWithIncludes(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public Dormitory UpdateSingle(Dormitory source) {
             throw new NotImplementedException();
         }

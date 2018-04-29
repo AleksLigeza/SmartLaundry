@@ -39,15 +39,24 @@
             @Html.DisplayNameFor(model => model.Manager)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Manager.Email)
+            @Model.Manager.Firstname @Model.Manager.Lastname
         </dd>
         <dt>
             Porters
         </dt>
-        @foreach (var item in Model.Porters) {
-            
+        @foreach (var item in Model.Porters)
+        {
             <dd>
-                @item.Email
+                @item.Firstname @item.Lastname
+            </dd>
+        }
+        <dt>
+            Laundries
+        </dt>
+        @foreach (var item in Model.Laundries)
+        {
+            <dd>
+                @item.Id
             </dd>
         }
     </dl>
