@@ -8,10 +8,28 @@
   <ItemGroup>
     <Compile Remove="Data\Migrations\20180402122521_DormitoryAdd.cs" />
     <Compile Remove="Data\Migrations\20180402122521_DormitoryAdd.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180429110420_AddLaundryAndRooms.cs" />
+    <Compile Remove="Data\Migrations\20180429110420_AddLaundryAndRooms.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180429111634_AddForeignKeysForLaundry.cs" />
+    <Compile Remove="Data\Migrations\20180429111634_AddForeignKeysForLaundry.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180429112119_AddLaundryAndRooms.cs" />
+    <Compile Remove="Data\Migrations\20180429112119_AddLaundryAndRooms.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180429125907_AddLaundryAndRooms.cs" />
+    <Compile Remove="Data\Migrations\20180429125907_AddLaundryAndRooms.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180429130032_AddLaundryAndRooms.cs" />
+    <Compile Remove="Data\Migrations\20180429130032_AddLaundryAndRooms.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180429131305_AddLaundryAndRooms.cs" />
+    <Compile Remove="Data\Migrations\20180429131305_AddLaundryAndRooms.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180429131534_AddLaundryAndRooms.cs" />
+    <Compile Remove="Data\Migrations\20180429131534_AddLaundryAndRooms.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180429132523_AddLaundryAndRooms.cs" />
+    <Compile Remove="Data\Migrations\20180429132523_AddLaundryAndRooms.Designer.cs" />
   </ItemGroup>
 
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="6.2.2" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="3.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.0.1" />

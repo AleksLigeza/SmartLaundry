@@ -11,6 +11,9 @@ namespace SmartLaundry.Data
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Dormitory> Dormitories { get; set; }
+        public DbSet<Laundry> Laundries { get; set; }
+        public DbSet<Room> Rooms { get; set; }
+        public DbSet<WashingMachine> WashingMachines { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -34,7 +37,35 @@ namespace SmartLaundry.Data
                 .WithMany(d => d.Porters)
                 .HasForeignKey(u => u.DormitoryPorterId);
 
+            builder.Entity<ApplicationUser>()
+                .HasOne(x => x.Room)
+                .WithMany(x => x.Occupants)
+                .HasForeignKey(x => x.RoomId);
 
+            builder.Entity<Room>()
+                .HasOne(x => x.Dormitory)
+                .WithMany(x => x.Rooms)
+                .HasForeignKey(x => x.DormitoryId);
+
+            builder.Entity<Reservation>()
+                .HasOne(x => x.Room)
+                .WithMany(x => x.Reservations)
+                .HasForeignKey(x => x.RoomId);
+
+            builder.Entity<Reservation>()
+                .HasOne(x => x.WashingMachine)
+                .WithMany(x => x.Reservations)
+                .HasForeignKey(x => x.WashingMachineId);
+    
+            builder.Entity<WashingMachine>()
+                .HasOne(x => x.Laundry)
+                .WithMany(x => x.WashingMachines)
+                .HasForeignKey(x => x.LaundryId);
+
+            builder.Entity<Laundry>()
+                .HasOne(x => x.Dormitory)
+                .WithMany(x => x.Laundries)
+                .HasForeignKey(x => x.DormitoryId);
         }
     }
 }

@@ -13,6 +13,8 @@ using SmartLaundry.Models;
 using SmartLaundry.Services;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Data.Repositories;
+using AutoMapper;
+using System.Reflection;
 
 namespace SmartLaundry {
     public class Startup {
@@ -50,6 +52,10 @@ namespace SmartLaundry {
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddAutoMapper(
+                opt => opt.CreateMissingTypeMaps = true,
+                Assembly.GetEntryAssembly());
 
             // Add application services.
             services.AddTransient<IDormitoryRepository, DormitoryRepository>();

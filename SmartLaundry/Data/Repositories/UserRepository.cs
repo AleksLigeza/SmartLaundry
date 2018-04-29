@@ -37,6 +37,6 @@ namespace SmartLaundry.Data.Repositories {
         public List<ApplicationUser> FindDormitoryPorters(int dormitoryId) =>
             _context.Users.Where(x => x.DormitoryPorterId == dormitoryId).OrderBy(x => x.Email).ToList();
 
-        public ApplicationUser GetUserById(string id) => _context.Users.Find(id);
+        public ApplicationUser GetUserById(string id) => _context.Users.FirstOrDefault(x => x.Id == id);
     }
 }

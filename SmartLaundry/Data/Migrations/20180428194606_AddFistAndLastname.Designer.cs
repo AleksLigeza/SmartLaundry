@@ -11,9 +11,10 @@ using System;
 namespace SmartLaundry.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180428194606_AddFistAndLastname")]
+    partial class AddFistAndLastname
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,8 +170,6 @@ namespace SmartLaundry.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed");
 
-                    b.Property<int?>("RoomId");
-
                     b.Property<string>("SecurityStamp");
 
                     b.Property<bool>("TwoFactorEnabled");
@@ -189,8 +188,6 @@ namespace SmartLaundry.Data.Migrations
                         .IsUnique()
                         .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("RoomId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -224,76 +221,6 @@ namespace SmartLaundry.Data.Migrations
                         .HasFilter("[ManagerId] IS NOT NULL");
 
                     b.ToTable("Dormitories");
-                });
-
-            modelBuilder.Entity("SmartLaundry.Models.Laundry", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("DormitoryId");
-
-                    b.Property<int>("Position");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DormitoryId");
-
-                    b.ToTable("Laundries");
-                });
-
-            modelBuilder.Entity("SmartLaundry.Models.Reservation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("EndTime");
-
-                    b.Property<bool>("Fault");
-
-                    b.Property<int?>("RoomId");
-
-                    b.Property<DateTime>("StartTime");
-
-                    b.Property<int?>("WashingMachineId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
-
-                    b.HasIndex("WashingMachineId");
-
-                    b.ToTable("Reservation");
-                });
-
-            modelBuilder.Entity("SmartLaundry.Models.Room", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("DormitoryId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DormitoryId");
-
-                    b.ToTable("Rooms");
-                });
-
-            modelBuilder.Entity("SmartLaundry.Models.WashingMachine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("LaundryId");
-
-                    b.Property<int>("Position");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LaundryId");
-
-                    b.ToTable("WashingMachines");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -346,10 +273,6 @@ namespace SmartLaundry.Data.Migrations
                     b.HasOne("SmartLaundry.Models.Dormitory", "DormitoryPorter")
                         .WithMany("Porters")
                         .HasForeignKey("DormitoryPorterId");
-
-                    b.HasOne("SmartLaundry.Models.Room", "Room")
-                        .WithMany("Occupants")
-                        .HasForeignKey("RoomId");
                 });
 
             modelBuilder.Entity("SmartLaundry.Models.Dormitory", b =>
@@ -357,41 +280,6 @@ namespace SmartLaundry.Data.Migrations
                     b.HasOne("SmartLaundry.Models.ApplicationUser", "Manager")
                         .WithOne("DormitoryManager")
                         .HasForeignKey("SmartLaundry.Models.Dormitory", "ManagerId");
-                });
-
-            modelBuilder.Entity("SmartLaundry.Models.Laundry", b =>
-                {
-                    b.HasOne("SmartLaundry.Models.Dormitory", "Dormitory")
-                        .WithMany("Laundries")
-                        .HasForeignKey("DormitoryId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("SmartLaundry.Models.Reservation", b =>
-                {
-                    b.HasOne("SmartLaundry.Models.Room", "Room")
-                        .WithMany("Reservations")
-                        .HasForeignKey("RoomId");
-
-                    b.HasOne("SmartLaundry.Models.WashingMachine", "WashingMachine")
-                        .WithMany("Reservations")
-                        .HasForeignKey("WashingMachineId");
-                });
-
-            modelBuilder.Entity("SmartLaundry.Models.Room", b =>
-                {
-                    b.HasOne("SmartLaundry.Models.Dormitory", "Dormitory")
-                        .WithMany("Rooms")
-                        .HasForeignKey("DormitoryId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("SmartLaundry.Models.WashingMachine", b =>
-                {
-                    b.HasOne("SmartLaundry.Models.Laundry", "Laundry")
-                        .WithMany("WashingMachines")
-                        .HasForeignKey("LaundryId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
