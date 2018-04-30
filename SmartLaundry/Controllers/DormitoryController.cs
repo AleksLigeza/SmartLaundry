@@ -186,6 +186,12 @@ namespace SmartLaundry.Controllers {
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet("[controller]/{id}/[action]/")]
+        public IActionResult Rooms(int id) {
+            var dormitory = _dormitoryRepo.GetDormitoryWithRooms(id);
+            return View(dormitory);
+        }
+
         private bool DormitoryExists(int id) {
             return _dormitoryRepo.Dormitories.Any(e => e.DormitoryID == id);
         }

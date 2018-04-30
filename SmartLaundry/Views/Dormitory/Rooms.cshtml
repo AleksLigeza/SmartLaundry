@@ -1,0 +1,57 @@
+﻿@model Dormitory
+
+@{
+    ViewData["Title"] = "Rooms";
+}
+
+<h2>Rooms</h2>
+
+<a asp-action="Details" asp-route-id=@Model.DormitoryID>Back to details</a>
+<a asp-action="ManageOccupants" asp-route-id=@Model.DormitoryID>Manage occupants</a>
+
+<form method="POST" asp-action="AddRoom">
+    <input type="number" name="roomNumber" />
+    <input type="hidden" name="dormitoryId" value="@Model.DormitoryID" />
+    <input type="submit" value="Add room" />
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Dormitory: @Model.Name
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Rooms)
+        {
+            <tr>
+                <td rowspan="@(@item.Occupants.Count)">
+                    @Html.DisplayFor(modelItem => item.Number)
+                </td>
+                <td colspan="2">
+                    <form method="delete" asp-action="DeleteRoom">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input type="submit" value="Remove occupant" />
+                    </form>
+
+                </td>
+                @foreach (var occupant in item.Occupants)
+                {
+                    <td>
+                        @occupant.Firstname @occupant.Lastname
+                    </td>
+                    <td>
+                        <form method="POST" asp-action="RemoveOccupant">
+                            <input type="hidden" name="id" value="@occupant.Id" />
+                            <input type="submit" value="Remove occupant" />
+                        </form>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+

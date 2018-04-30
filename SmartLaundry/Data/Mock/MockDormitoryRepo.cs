@@ -33,6 +33,11 @@ namespace SmartLaundry.Data.Mock {
             return Dormitories.ToList();
         }
 
+        public Dormitory GetDormitoryWithRooms(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public Dormitory GetSingleById(int id) {
             throw new NotImplementedException();
         }
