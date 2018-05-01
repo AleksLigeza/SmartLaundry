@@ -64,6 +64,7 @@
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryID">Edit</a> |
     <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryID">Rooms</a> |
+    <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryID">Laundries</a> |
     <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryID">Manage users</a> |
     <a asp-action="Index">Back to List</a>
 </div>

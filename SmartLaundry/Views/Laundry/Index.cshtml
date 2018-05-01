@@ -1,0 +1,83 @@
+﻿@model SmartLaundry.Models.LaundryViewModels.IndexViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Laundries</h2>
+
+<form method="POST" asp-action="AddLaundry">
+    <input type="number" name="laundryPosition" min="1" max="100" />
+    <input type="hidden" name="dormitoryId" value="@Model.DormitoryId" />
+    <input type="submit" value="Add laundry" />
+</form>
+
+@foreach (var laundry in Model.Laundries)
+{
+
+    <form method="post" asp-action="DeleteLaundry">
+        <input type="hidden" name="id" value="@laundry.Id" />
+        <input type="submit" value="Remove laundry" />
+    </form>
+    <form method="post" asp-action="AddWashingMachine">
+        <input type="hidden" name="id" value="@laundry.Id" />
+        <input type="number" name="machinePosition" min="1" max="100" />
+        <input type="submit" value="Add washing machine" />
+    </form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Laundry @laundry.Position
+                </th>
+                @foreach (var item in laundry.WashingMachines)
+                {
+                    <th>
+                        @item.Position
+
+                        <form method="POST" asp-action="RemoveWashingMachine">
+                            <input type="hidden" name="machineId" value="@item.Id" />
+                            <input type="submit" value="Remove washing machine" />
+                        </form>
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (int hour = 15; hour < 23; hour += 2)
+            {
+                <tr>
+                    <td>
+                        @hour:00 - @(hour + 2):00
+                    </td>
+                    @foreach (var item in laundry.WashingMachines)
+                    {
+                        <td>
+                            @{ var reservation = item.Reservations
+                   .Where(x => x.StartTime.Date == DateTime.Today && x.StartTime.Hour == hour)
+                   .SingleOrDefault();
+                            }
+                            @if (reservation != null)
+                            {
+                                <b>@reservation.Room.Number</b>
+
+                                <form method="POST" asp-action="CancelReservation">
+                                    <input type="hidden" name="hour" value="@hour" />
+                                    <input type="hidden" name="machineId" value="@item.Id" />
+                                    <input type="submit" value="Cancel reservation" />
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="POST" asp-action="Reserve">
+                                    <input type="hidden" name="hour" value="@hour" />
+                                    <input type="hidden" name="machineId" value="@item.Id" />
+                                    <input type="submit" value="Reserve" />
+                                </form>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -65,6 +65,9 @@ namespace SmartLaundry
             services.AddTransient<IDormitoryRepository, DormitoryRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IRoomRepository, RoomRepository>();
+            services.AddTransient<IReservationRepository, ReservationRepository>();
+            services.AddTransient<ILaundryRepository, LaundryRepository>();
+
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddMvc();
