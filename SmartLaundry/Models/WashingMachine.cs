@@ -14,7 +14,7 @@ namespace SmartLaundry.Models
         [Range(1, 10)]
         public int Position { get; set; }
 
-        public int LaundryId { get; set; }
+        public int? LaundryId { get; set; }
         public virtual Laundry Laundry { get; set; }
 
         public virtual ICollection<Reservation> Reservations { get; set; }

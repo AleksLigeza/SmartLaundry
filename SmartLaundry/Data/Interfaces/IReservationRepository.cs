@@ -12,6 +12,7 @@ namespace SmartLaundry.Data.Interfaces
 
         Reservation GetReservationById(int id);
         List<Reservation> GetRoomReservations(int roomId);
+        Reservation GetRoomTodaysReservation(int roomId);
         void AddReservation(Reservation reservation);
         void RemoveReservation(Reservation reservation);
         void UpdateRescervation(Reservation reservation);

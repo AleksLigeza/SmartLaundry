@@ -9,5 +9,6 @@ namespace SmartLaundry.Models.LaundryViewModels
     {
         public List<Laundry> Laundries;
         public int DormitoryId;
+        public Reservation currentRoomReservation;
     }
 }

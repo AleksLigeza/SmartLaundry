@@ -44,5 +44,11 @@ namespace SmartLaundry.Data.Repositories
             _context.Reservations.Update(reservation);
             _context.SaveChanges();
         }
+
+        public Reservation GetRoomTodaysReservation(int roomId)
+        {
+            return _context.Reservations.FirstOrDefault(x => x.RoomId == roomId && x.StartTime.Date == DateTime.Today.Date);
+
+        }
     }
 }

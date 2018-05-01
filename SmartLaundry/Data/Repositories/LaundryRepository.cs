@@ -20,11 +20,17 @@ namespace SmartLaundry.Data.Repositories
 
         public Laundry AddLaundry(int dormitoryId, int position)
         {
+            if (_context.Laundries.Any(x => x.DormitoryId == dormitoryId && x.Position == position))
+            {
+                return null;
+            }
+
             var laundry = new Laundry()
             {
                 DormitoryId = dormitoryId,
                 Position = position
             };
+            
             _context.Laundries.Add(laundry);
             _context.SaveChanges();
             return laundry;
@@ -32,6 +38,11 @@ namespace SmartLaundry.Data.Repositories
 
         public WashingMachine AddWashingMachine(int laundryId, int position)
         {
+            if (_context.WashingMachines.Any(x => x.LaundryId == laundryId && x.Position == position))
+            {
+                return null;
+            }
+
             var machine = new WashingMachine()
             {
                 LaundryId = laundryId,
@@ -70,7 +81,12 @@ namespace SmartLaundry.Data.Repositories
                 .Include(x => x.WashingMachines)
                 .ThenInclude(x => x.Reservations)
                 .ThenInclude(x => x.Room)
+                .OrderBy(x=>x.Position)
                 .ToList();
         }
+
+        public Laundry GetLaundryById(int id) => _context.Laundries.FirstOrDefault(x => x.Id == id);
+        public WashingMachine GetWashingMachineById(int id) => _context.WashingMachines.FirstOrDefault(x => x.Id == id);
+
     }
 }
