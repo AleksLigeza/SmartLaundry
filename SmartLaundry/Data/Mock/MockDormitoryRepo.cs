@@ -17,20 +17,29 @@ namespace SmartLaundry.Data.Mock {
             }
         }
 
-        public Dormitory AddSingle(Dormitory source) {
+        public Dormitory AddSingle(Dormitory source)
+        {
             throw new NotImplementedException();
         }
 
-        public Dormitory AssignManager(ApplicationUser user, Dormitory dormitory) {
+        public Dormitory AssignManager(ApplicationUser user, Dormitory dormitory)
+        {
             throw new NotImplementedException();
         }
 
-        public void DeleteSingle(Dormitory source) {
+        public void DeleteSingle(Dormitory source)
+        {
             throw new NotImplementedException();
         }
 
-        public List<Dormitory> GetAll() {
-            return Dormitories.ToList();
+        public bool DormitoryHasRoom(int roomNumber, int dormitoryId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Dormitory> GetAll()
+        {
+            throw new NotImplementedException();
         }
 
         public Dormitory GetDormitoryWithRooms(int id)
@@ -38,7 +47,8 @@ namespace SmartLaundry.Data.Mock {
             throw new NotImplementedException();
         }
 
-        public Dormitory GetSingleById(int id) {
+        public Dormitory GetSingleById(int id)
+        {
             throw new NotImplementedException();
         }
 
@@ -47,7 +57,8 @@ namespace SmartLaundry.Data.Mock {
             throw new NotImplementedException();
         }
 
-        public Dormitory UpdateSingle(Dormitory source) {
+        public Dormitory UpdateSingle(Dormitory source)
+        {
             throw new NotImplementedException();
         }
     }

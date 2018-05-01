@@ -18,5 +18,6 @@ namespace SmartLaundry.Data.Interfaces
         Dormitory AssignManager(ApplicationUser user, Dormitory dormitory);
         Dormitory GetSingleWithIncludes(int id);
         Dormitory GetDormitoryWithRooms(int id);
+        bool DormitoryHasRoom(int roomNumber, int dormitoryId);
     }
 }

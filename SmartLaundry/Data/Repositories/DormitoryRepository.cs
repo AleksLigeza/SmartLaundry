@@ -68,5 +68,11 @@ namespace SmartLaundry.Data.Repositories
         {
             return _context.Dormitories.Include(x => x.Rooms).ThenInclude(x => x.Occupants).SingleOrDefault();
         }
+
+        public bool DormitoryHasRoom(int roomNumber, int dormiotryId)
+        {
+            var room = _context.Rooms.Where(x => x.DormitoryId == dormiotryId && x.Number == roomNumber).SingleOrDefault();
+            return room != null;
+        }
     }
 }

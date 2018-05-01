@@ -10,8 +10,11 @@ namespace SmartLaundry.Models
     {
         [Key]
         public int Id { get; set; }
+
+        [Required, Range(1,2000)]
         public int Number { get; set; }
 
+        [Required]
         public int DormitoryId { get; set; }
         public virtual Dormitory Dormitory { get; set; }
 

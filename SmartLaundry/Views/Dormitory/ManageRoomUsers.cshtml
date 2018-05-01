@@ -1,0 +1,88 @@
+﻿@using SmartLaundry.Models.DormitoryViewModels
+@model ManageRoomUsersViewModel
+
+@{
+    ViewBag.Title = "Manage Room Users";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<form asp-action="ManageRoomUsers" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="ManageRoomUsers">Back to Full List</a>
+        </p>
+    </div>
+</form>
+
+<a asp-action="Rooms" asp-route-id=@Model.Room.DormitoryId>Back to rooms list</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Room: @Model.Room.Number
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Users)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Firstname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Lastname)
+                </td>
+                <td>
+                    @if (Model.Room.Occupants.Where(x => x.Id == item.Id).SingleOrDefault() != null)
+                    {
+                        <form method="POST" asp-action="RemoveOccupant">
+                            <input type="hidden" name="userId" value="@item.Id" />
+                            <input type="hidden" name="roomId" value="@Model.Room.Id" />
+                            <input type="submit" value="Remove occupant" />
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="POST" asp-action="AssignOccupant">
+                            <input type="hidden" name="userId" value="@item.Id" />
+                            <input type="hidden" name="roomId" value="@Model.Room.Id" />
+                            <input type="submit" value="Assign occupant" />
+                        </form>
+                    }
+
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@{
+    var prevDisabled = !Model.Users.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.Users.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="ManageDormitoryUsers"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-page="@(Model.Users.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="ManageDormitoryUsers"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-page="@(Model.Users.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

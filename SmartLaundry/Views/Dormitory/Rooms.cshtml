@@ -7,10 +7,9 @@
 <h2>Rooms</h2>
 
 <a asp-action="Details" asp-route-id=@Model.DormitoryID>Back to details</a>
-<a asp-action="ManageOccupants" asp-route-id=@Model.DormitoryID>Manage occupants</a>
 
 <form method="POST" asp-action="AddRoom">
-    <input type="number" name="roomNumber" />
+    <input type="number" name="roomNumber" min="1" max="2000" />
     <input type="hidden" name="dormitoryId" value="@Model.DormitoryID" />
     <input type="submit" value="Add room" />
 </form>
@@ -21,36 +20,41 @@
             <th>
                 Dormitory: @Model.Name
             </th>
-            <th></th>
+            <th colspan="2"></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Rooms)
         {
             <tr>
-                <td rowspan="@(@item.Occupants.Count)">
+                <td rowspan="@(1 + @item.Occupants.Count)">
                     @Html.DisplayFor(modelItem => item.Number)
                 </td>
                 <td colspan="2">
-                    <form method="delete" asp-action="DeleteRoom">
+                    <form method="post" asp-action="DeleteRoom">
                         <input type="hidden" name="id" value="@item.Id" />
-                        <input type="submit" value="Remove occupant" />
+                        <input type="submit" value="Remove room" />
                     </form>
-
+                    |
+                    <a asp-action="ManageRoomUsers" asp-route-id="@item.Id">Manage occupants</a>
                 </td>
-                @foreach (var occupant in item.Occupants)
-                {
+            </tr>
+            @foreach (var occupant in item.Occupants)
+            {
+
+                <tr>
                     <td>
                         @occupant.Firstname @occupant.Lastname
                     </td>
                     <td>
                         <form method="POST" asp-action="RemoveOccupant">
-                            <input type="hidden" name="id" value="@occupant.Id" />
+                            <input type="hidden" name="userId" value="@occupant.Id" />
+                            <input type="hidden" name="roomId" value="@item.Id" />
                             <input type="submit" value="Remove occupant" />
                         </form>
                     </td>
-                }
-            </tr>
+                </tr>
+            }
         }
     </tbody>
 </table>
