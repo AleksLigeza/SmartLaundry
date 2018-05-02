@@ -39,6 +39,14 @@
                             <input type="hidden" name="machineId" value="@item.Id" />
                             <input type="submit" value="Remove washing machine" />
                         </form>
+
+                        @if (Model.isCurrentlyFault(item.Id))
+                        {
+                            <form method="POST" asp-action="EnableWashingMachine">
+                                <input type="hidden" name="machineId" value="@item.Id" />
+                                <input type="submit" value="Enable washing machine" />
+                            </form>
+                        }
                     </th>
                 }
             </tr>
@@ -54,24 +62,40 @@
                     {
                         <td>
                             @{ var reservation = item.Reservations
-              .Where(x => x.StartTime.Date == DateTime.Today && x.StartTime.Hour == hour)
-              .SingleOrDefault();
+                     .Where(x => x.StartTime.Date == DateTime.Today
+                         && x.StartTime.Hour == hour
+                         && x.Fault == false)
+                     .SingleOrDefault();
                             }
-                            @if (reservation == Model.currentRoomReservation && reservation != null)
+                            @if (reservation != null)
                             {
                                 <b>@reservation.Room.Number</b>
-
-                                <form method="POST" asp-action="CancelReservation">
-                                    <input type="hidden" name="reservationId" value="@reservation.Id" />
-                                    <input type="submit" value="Cancel reservation" />
-                                </form>
                             }
-                            else if (Model.currentRoomReservation == null)
+                            @if ((true || hour > DateTime.Now.Hour) && !Model.isFaultAtTimeToday(item.Id, hour))
                             {
-                                <form method="POST" asp-action="Reserve">
-                                    <input type="hidden" name="hour" value="@hour" />
+                                if (reservation == Model.currentRoomReservation && reservation != null)
+                                {
+
+                                    <form method="POST" asp-action="CancelReservation">
+                                        <input type="hidden" name="reservationId" value="@reservation.Id" />
+                                        <input type="submit" value="Cancel reservation" />
+                                    </form>
+                                }
+                                else if (Model.currentRoomReservation == null && reservation == null)
+                                {
+                                    <form method="POST" asp-action="Reserve">
+                                        <input type="hidden" name="hour" value="@hour" />
+                                        <input type="hidden" name="machineId" value="@item.Id" />
+                                        <input type="submit" value="Reserve" />
+                                    </form>
+                                }
+                            }
+                            @if (!Model.isCurrentlyFault(item.Id) && !Model.isFaultAtTimeToday(item.Id, hour))
+                            {
+                                <form method="POST" asp-action="DisableWashingMachine">
+                                    <input type="hidden" name="startHour" value="@hour" />
                                     <input type="hidden" name="machineId" value="@item.Id" />
-                                    <input type="submit" value="Reserve" />
+                                    <input type="submit" value="Disable washing machine" />
                                 </form>
                             }
                         </td>

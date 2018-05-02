@@ -11,9 +11,10 @@ using System;
 namespace SmartLaundry.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180502162656_NotNullReservationMachineId")]
+    partial class NotNullReservationMachineId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -247,15 +248,13 @@ namespace SmartLaundry.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime?>("EndTime");
+                    b.Property<DateTime>("EndTime");
 
                     b.Property<bool>("Fault");
 
                     b.Property<int?>("RoomId");
 
                     b.Property<DateTime>("StartTime");
-
-                    b.Property<bool>("ToRenew");
 
                     b.Property<int>("WashingMachineId");
 
@@ -288,6 +287,8 @@ namespace SmartLaundry.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Enabled");
 
                     b.Property<int>("LaundryId");
 

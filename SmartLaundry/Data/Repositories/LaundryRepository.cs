@@ -30,27 +30,10 @@ namespace SmartLaundry.Data.Repositories
                 DormitoryId = dormitoryId,
                 Position = position
             };
-            
+
             _context.Laundries.Add(laundry);
             _context.SaveChanges();
             return laundry;
-        }
-
-        public WashingMachine AddWashingMachine(int laundryId, int position)
-        {
-            if (_context.WashingMachines.Any(x => x.LaundryId == laundryId && x.Position == position))
-            {
-                return null;
-            }
-
-            var machine = new WashingMachine()
-            {
-                LaundryId = laundryId,
-                Position = position
-            };
-            _context.WashingMachines.Add(machine);
-            _context.SaveChanges();
-            return machine;
         }
 
         public Laundry GetLaundryWithIncludedEntities(int laundryId)
@@ -64,13 +47,12 @@ namespace SmartLaundry.Data.Repositories
 
         public void RemoveLaundry(Laundry laundry)
         {
+            laundry = _context.Laundries.
+                Where(x => x.Id == laundry.Id)
+                .Include(x => x.WashingMachines)
+                .ThenInclude(x => x.Reservations)
+                .Single();
             _context.Laundries.Remove(laundry);
-            _context.SaveChanges();
-        }
-
-        public void RemoveWashingMachine(WashingMachine washingMachine)
-        {
-            _context.WashingMachines.Remove(washingMachine);
             _context.SaveChanges();
         }
 
@@ -81,12 +63,10 @@ namespace SmartLaundry.Data.Repositories
                 .Include(x => x.WashingMachines)
                 .ThenInclude(x => x.Reservations)
                 .ThenInclude(x => x.Room)
-                .OrderBy(x=>x.Position)
+                .OrderBy(x => x.Position)
                 .ToList();
         }
 
         public Laundry GetLaundryById(int id) => _context.Laundries.FirstOrDefault(x => x.Id == id);
-        public WashingMachine GetWashingMachineById(int id) => _context.WashingMachines.FirstOrDefault(x => x.Id == id);
-
     }
 }

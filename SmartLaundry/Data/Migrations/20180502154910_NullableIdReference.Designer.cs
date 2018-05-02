@@ -11,9 +11,10 @@ using System;
 namespace SmartLaundry.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180502154910_NullableIdReference")]
+    partial class NullableIdReference
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -247,7 +248,7 @@ namespace SmartLaundry.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime?>("EndTime");
+                    b.Property<DateTime>("EndTime");
 
                     b.Property<bool>("Fault");
 
@@ -255,9 +256,7 @@ namespace SmartLaundry.Data.Migrations
 
                     b.Property<DateTime>("StartTime");
 
-                    b.Property<bool>("ToRenew");
-
-                    b.Property<int>("WashingMachineId");
+                    b.Property<int?>("WashingMachineId");
 
                     b.HasKey("Id");
 
@@ -289,7 +288,7 @@ namespace SmartLaundry.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("LaundryId");
+                    b.Property<int?>("LaundryId");
 
                     b.Property<int>("Position");
 
@@ -379,8 +378,7 @@ namespace SmartLaundry.Data.Migrations
 
                     b.HasOne("SmartLaundry.Models.WashingMachine", "WashingMachine")
                         .WithMany("Reservations")
-                        .HasForeignKey("WashingMachineId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("WashingMachineId");
                 });
 
             modelBuilder.Entity("SmartLaundry.Models.Room", b =>
@@ -395,8 +393,7 @@ namespace SmartLaundry.Data.Migrations
                 {
                     b.HasOne("SmartLaundry.Models.Laundry", "Laundry")
                         .WithMany("WashingMachines")
-                        .HasForeignKey("LaundryId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("LaundryId");
                 });
 #pragma warning restore 612, 618
         }

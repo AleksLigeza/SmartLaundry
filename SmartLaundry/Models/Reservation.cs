@@ -13,9 +13,10 @@ namespace SmartLaundry.Models
 
         public bool Fault { get; set; }
         public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public bool ToRenew { get; set; }
 
-        public int? WashingMachineId { get; set; }
+        public int WashingMachineId { get; set; }
         public virtual WashingMachine WashingMachine { get; set; }
 
         public int? RoomId { get; set; }

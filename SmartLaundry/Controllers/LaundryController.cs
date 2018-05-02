@@ -15,19 +15,21 @@ namespace SmartLaundry.Controllers
         private readonly ILaundryRepository _laundryRepo;
         private readonly IReservationRepository _resetvationRepo;
         private readonly IUserRepository _userRepo;
+        private readonly IWashingMachineRepository _washingMachineRepo;
         private readonly UserManager<ApplicationUser> _userManager;
-
 
         public LaundryController(
             ILaundryRepository laundryRepository,
             IReservationRepository reservationRepository,
             IUserRepository userRepository,
+            IWashingMachineRepository washingMachineRepo,
             UserManager<ApplicationUser> userManager)
         {
             _laundryRepo = laundryRepository;
             _resetvationRepo = reservationRepository;
             _userRepo = userRepository;
             _userManager = userManager;
+            _washingMachineRepo = washingMachineRepo;
         }
 
         [HttpGet]
@@ -47,9 +49,10 @@ namespace SmartLaundry.Controllers
             {
                 Laundries = laundries,
                 DormitoryId = id,
-                currentRoomReservation = _resetvationRepo.GetRoomTodaysReservation(roomId.Value)
-            };
-
+                currentRoomReservation = _resetvationRepo.GetRoomTodaysReservation(roomId.Value),
+                isFaultAtTimeToday = _resetvationRepo.IsFaultAtTimeToday,
+                isCurrentlyFault = _resetvationRepo.IsCurrentlyFault
+        };
             return View(model);
         }
 
@@ -63,67 +66,69 @@ namespace SmartLaundry.Controllers
                 return BadRequest();
             }
 
-            return RedirectToAction(nameof(Index), new { id = dormitoryId });
+            return redirectToIndex(laundry.Id);
+
         }
 
         [HttpPost]
         public IActionResult DeleteLaundry(int id)
         {
             var laundry = _laundryRepo.GetLaundryById(id);
-            var dormitoryId = laundry.DormitoryId;
             if (laundry == null)
             {
                 return null;
             }
 
             _laundryRepo.RemoveLaundry(laundry);
-            return RedirectToAction(nameof(Index), new { id = dormitoryId });
+            return redirectToIndex(laundry.Id);
         }
 
         [HttpPost]
         public IActionResult AddWashingMachine(int id, int machinePosition)
         {
-            var machine = _laundryRepo.AddWashingMachine(id, machinePosition);
-            var dormitoryId = _laundryRepo.GetLaundryById(id).DormitoryId;
+            var machine = _washingMachineRepo.AddWashingMachine(id, machinePosition);
             if (machine == null)
             {
                 return BadRequest();
             }
 
-            return RedirectToAction(nameof(Index), new { id = dormitoryId });
+            return redirectToIndex(machine.LaundryId);
         }
 
         [HttpPost]
         public IActionResult RemoveWashingMachine(int machineId)
         {
-            var machine = _laundryRepo.GetWashingMachineById(machineId);
+            var machine = _washingMachineRepo.GetWashingMachineById(machineId);
 
             if (machine == null)
             {
                 return BadRequest();
             }
-            var dormitoryId = _laundryRepo.GetLaundryById(machine.LaundryId.Value).DormitoryId;
 
-            _laundryRepo.RemoveWashingMachine(machine);
-            return RedirectToAction(nameof(Index), new { id = dormitoryId });
+            _washingMachineRepo.RemoveWashingMachine(machine);
+            return redirectToIndex(machine.LaundryId);
+
         }
 
         [HttpPost]
         public IActionResult CancelReservation(int reservationId)
         {
             var reservation = _resetvationRepo.GetReservationById(reservationId);
-                
-            if (reservation == null)
+
+            if (reservation == null
+                || _resetvationRepo.GetHourReservation(reservation.WashingMachineId, reservation.StartTime) == null
+                || _resetvationRepo.IsFaultAtTime(reservation.WashingMachineId, reservation.StartTime)
+                )//|| reservation.StartTime < DateTime.Now)
             {
                 return BadRequest();
             }
 
-            var laundryId = _laundryRepo.GetWashingMachineById(reservation.WashingMachineId.Value).LaundryId;
-            var dormitoryId = _laundryRepo.GetLaundryById(laundryId.Value).DormitoryId;
+            var laundryId = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId).LaundryId;
 
             _resetvationRepo.RemoveReservation(reservation);
 
-            return RedirectToAction(nameof(Index), new { id = dormitoryId });
+            return redirectToIndex(laundryId);
+
         }
 
         [HttpPost]
@@ -132,24 +137,78 @@ namespace SmartLaundry.Controllers
             var userId = _userManager.GetUserId(User);
             var roomId = _userRepo.GetUserById(userId).RoomId;
 
-            var today = DateTime.Today;
+            var startTime = DateTime.Today;
+            startTime = startTime.AddHours(hour);
+
             var reservation = new Reservation()
             {
-                StartTime = new DateTime(today.Year, today.Month, today.Day, hour, 0, 0),
+                StartTime = startTime,
                 RoomId = roomId,
-                WashingMachineId = machineId
+                WashingMachineId = machineId,
+                Fault = false
             };
 
-            if (reservation == null)
+            var reservationAtHour = _resetvationRepo.GetHourReservation(machineId, startTime);
+            var faultAtTime = _resetvationRepo.IsFaultAtTime(machineId, startTime);
+
+            if (reservation == null 
+                || reservationAtHour != null
+                || faultAtTime
+                )//|| reservation.StartTime < DateTime.Now)
+            {
+                return BadRequest();
+            }
+
+            var machine = _washingMachineRepo.GetWashingMachineById(machineId);
+
+            if (_resetvationRepo.IsCurrentlyFault(machineId))
             {
                 return BadRequest();
             }
 
             _resetvationRepo.AddReservation(reservation);
 
-            var laundryId = _laundryRepo.GetWashingMachineById(machineId).LaundryId.Value;
-            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
+            return redirectToIndex(machine.LaundryId);
 
+        }
+
+        [HttpPost]
+        public IActionResult EnableWashingMachine(int machineId)
+        {
+            if (!_resetvationRepo.IsCurrentlyFault(machineId))
+            {
+                return BadRequest();
+            }
+
+            var machine = _washingMachineRepo.EnableWashingMachine(machineId);
+            if (machine == null)
+            {
+                return BadRequest();
+            }
+
+            return redirectToIndex(machine.LaundryId);
+        }
+
+        [HttpPost]
+        public IActionResult DisableWashingMachine(int machineId, int startHour)
+        {
+            if (_resetvationRepo.IsCurrentlyFault(machineId))
+            {
+                return BadRequest();
+            }
+
+            var machine = _washingMachineRepo.DisableWashingMachine(machineId, startHour);
+            if (machine == null)
+            {
+                return BadRequest();
+            }
+
+            return redirectToIndex(machine.LaundryId);
+        }
+
+        private IActionResult redirectToIndex(int laundryId)
+        {
+            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
             return RedirectToAction(nameof(Index), new { id = dormitoryId });
         }
     }
