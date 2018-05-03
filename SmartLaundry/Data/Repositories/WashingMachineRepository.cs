@@ -52,12 +52,17 @@ namespace SmartLaundry.Data.Repositories
 
         public WashingMachine DisableWashingMachine(int id)
         {
-            var startTime = DateTime.Now;
-            startTime = LaundryTimeHelper.GetClosestStartTime(startTime);
-            
             var machine = _context.WashingMachines.Where(x => x.Id == id)
                 .Include(x => x.Reservations)
+                .Include(x => x.Laundry)
                 .SingleOrDefault();
+
+            var startTime = DateTime.Now;
+            startTime = LaundryTimeHelper.GetClosestStartTime(
+                startTime, machine.Laundry.startTime,
+                machine.Laundry.shiftTime,
+                machine.Laundry.shiftCount
+            );
 
             var toRenew = machine.Reservations.Where(y => y.StartTime >= startTime && y.Fault == false).ToList();
             if (machine == null)
@@ -68,7 +73,6 @@ namespace SmartLaundry.Data.Repositories
             foreach (var reservation in toRenew)
             {
                 reservation.ToRenew = true;
-                reservation.Confirmed = false;
             }
 
             var faultReservation = new Reservation
@@ -76,8 +80,7 @@ namespace SmartLaundry.Data.Repositories
                 Fault = true,
                 StartTime = startTime,
                 WashingMachineId = id,
-                ToRenew = false,
-                Confirmed = true
+                ToRenew = false
             };
             _context.Reservations.Add(faultReservation);
 

@@ -28,12 +28,21 @@ namespace SmartLaundry.Data.Repositories
             var laundry = new Laundry()
             {
                 DormitoryId = dormitoryId,
-                Position = position
+                Position = position,
+                startTime = new TimeSpan(15,0,0),
+                shiftTime = new TimeSpan(2, 0, 0),
+                shiftCount = 4
             };
 
             _context.Laundries.Add(laundry);
             _context.SaveChanges();
             return laundry;
+        }
+
+        public void UpdateLaundry(Laundry laundry)
+        {
+            _context.Laundries.Update(laundry);
+            _context.SaveChanges();
         }
 
         public Laundry GetLaundryWithIncludedEntities(int laundryId)

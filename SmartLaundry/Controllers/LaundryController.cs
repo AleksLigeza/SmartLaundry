@@ -71,6 +71,26 @@ namespace SmartLaundry.Controllers
         }
 
         [HttpPost]
+        public IActionResult ChangeShifts(int laundryId, TimeSpan startTime, TimeSpan shiftTime, int shiftCount)
+        {
+            TimeSpan wholeWorkingTime = startTime + shiftTime * shiftCount;
+            if (wholeWorkingTime.TotalHours > 24)
+            {
+                return BadRequest();
+            }
+
+            var laundry = _laundryRepo.GetLaundryById(laundryId);
+
+            laundry.startTime = startTime;
+            laundry.shiftCount = shiftCount;
+            laundry.shiftTime = shiftTime;
+
+            _laundryRepo.UpdateLaundry(laundry);
+
+            return redirectToIndex(laundryId);
+        }
+
+        [HttpPost]
         public IActionResult DeleteLaundry(int id)
         {
             var laundry = _laundryRepo.GetLaundryById(id);
@@ -78,9 +98,12 @@ namespace SmartLaundry.Controllers
             {
                 return null;
             }
+            var dormitoryId = _laundryRepo.GetLaundryById(laundry.Id).DormitoryId;
 
             _laundryRepo.RemoveLaundry(laundry);
-            return redirectToIndex(laundry.Id);
+
+            return RedirectToAction(nameof(Index), new { id = dormitoryId });
+
         }
 
         [HttpPost]
@@ -118,7 +141,7 @@ namespace SmartLaundry.Controllers
             if (reservation == null
                 || _resetvationRepo.GetHourReservation(reservation.WashingMachineId, reservation.StartTime) == null
                 || _resetvationRepo.IsFaultAtTime(reservation.WashingMachineId, reservation.StartTime)
-                )//|| reservation.StartTime < DateTime.Now)
+                || reservation.StartTime < DateTime.Now)
             {
                 return BadRequest();
             }
@@ -132,21 +155,20 @@ namespace SmartLaundry.Controllers
         }
 
         [HttpPost]
-        public IActionResult Reserve(int hour, int machineId)
+        public IActionResult Reserve(TimeSpan hour, int machineId)
         {
             var userId = _userManager.GetUserId(User);
             var roomId = _userRepo.GetUserById(userId).RoomId;
 
             var startTime = DateTime.Today;
-            startTime = startTime.AddHours(hour);
+            startTime = startTime.Add(hour);
 
             var reservation = new Reservation()
             {
                 StartTime = startTime,
                 RoomId = roomId,
                 WashingMachineId = machineId,
-                Fault = false,
-                Confirmed = true
+                Fault = false
             };
 
             var reservationAtHour = _resetvationRepo.GetHourReservation(machineId, startTime);
@@ -155,7 +177,7 @@ namespace SmartLaundry.Controllers
             if (reservation == null
                 || reservationAtHour != null
                 || faultAtTime
-                )//|| reservation.StartTime < DateTime.Now)
+                || reservation.StartTime < DateTime.Now)
             {
                 return BadRequest();
             }
@@ -230,7 +252,6 @@ namespace SmartLaundry.Controllers
                 return BadRequest();
             }
 
-            reservation.Confirmed = true;
             reservation.ToRenew = false;
             _resetvationRepo.UpdateReservation(reservation);
 

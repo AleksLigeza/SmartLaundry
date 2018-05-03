@@ -24,6 +24,13 @@
         <input type="number" name="machinePosition" min="1" max="100" />
         <input type="submit" value="Add washing machine" />
     </form>
+    <form method="post" asp-action="ChangeShifts">
+        <input type="hidden" name="laundryId" value="@laundry.Id" />
+        <input type="time" name="startTime" min="00:00" max="23:00" value="@laundry.startTime.Hours.ToString("00"):@laundry.startTime.Minutes.ToString("00")" />
+        <input type="time" name="shiftTime" min="01:00" max="03:00" value="@laundry.shiftTime.Hours.ToString("00"):@laundry.shiftTime.Minutes.ToString("00")" />
+        <input type="number" name="shiftCount" min="1" max="24" value="@laundry.shiftCount" />
+        <input type="submit" value="Change shifts" />
+    </form>
     <table class="table">
         <thead>
             <tr>
@@ -59,11 +66,13 @@
             </tr>
         </thead>
         <tbody>
-            @for (int hour = 15; hour < 23; hour += 2)
+            @for (int shit = 0; shit < laundry.shiftCount; shit++)
             {
+                TimeSpan startTime = laundry.startTime + laundry.shiftTime * shit;
+                TimeSpan endTime = laundry.startTime + laundry.shiftTime * (shit + 1);
                 <tr>
                     <td>
-                        @hour:00 - @(hour + 2):00
+                        @startTime.Hours.ToString("00"):@startTime.Minutes.ToString("00") - @endTime.Hours.ToString("00"):@endTime.Minutes.ToString("00")
                     </td>
                     @foreach (var item in washingMachines)
                     {
@@ -71,13 +80,17 @@
                             @{
                                 var reservation = item.Reservations
                                     .Where(x => x.StartTime.Date == DateTime.Today
-                                        && x.StartTime.Hour == hour && x.Fault == false && x.ToRenew == false)
+                                        && x.StartTime.Hour == @startTime.Hours
+                                        && x.StartTime.Minute == @startTime.Minutes
+                                        && x.Fault == false && x.ToRenew == false)
                                     .SingleOrDefault();
                                 var reservationToConfirm = item.Reservations
                                     .Where(x => x.StartTime.Date == DateTime.Today
-                                        && x.StartTime.Hour == hour
+                                        && x.StartTime.Hour == @startTime.Hours
+                                        && x.StartTime.Minute == @startTime.Minutes
                                         && x.Fault == false
                                         && x.ToRenew == true
+                                        && x.Confirmed == false
                                         && (x.StartTime - DateTime.Now).TotalMinutes > 15)
                                     .SingleOrDefault();
                             }
@@ -85,11 +98,11 @@
                             {
                                 <b>@reservation.Room.Number</b>
                             }
-                            @if (Model.isFaultAtTimeToday(item.Id, hour))
+                            @if (Model.isFaultAtTimeToday(item.Id, startTime))
                             {
                                 <b>FAULT</b>
                             }
-                            else if (true || hour > DateTime.Now.Hour)
+                            else if (DateTime.Now.Subtract(DateTime.Now.Date) < startTime)
                             {
                                 if (reservationToConfirm != null)
                                 {
@@ -115,7 +128,7 @@
                                         && reservation == null)
                                     {
                                         <form method="POST" asp-action="Reserve">
-                                            <input type="hidden" name="hour" value="@hour" />
+                                            <input type="hidden" name="hour" value="@startTime" />
                                             <input type="hidden" name="machineId" value="@item.Id" />
                                             <input type="submit" value="Reserve" />
                                         </form>

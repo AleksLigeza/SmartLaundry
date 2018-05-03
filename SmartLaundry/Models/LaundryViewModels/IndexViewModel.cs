@@ -7,7 +7,7 @@ namespace SmartLaundry.Models.LaundryViewModels
 {
     public class IndexViewModel
     {
-        public delegate bool IsFaultAtTimeToday(int machineId, int hour);
+        public delegate bool IsFaultAtTimeToday(int machineId, TimeSpan startTime);
         public delegate bool IsCurrentlyFault(int machineId);
 
         public List<Laundry> Laundries;

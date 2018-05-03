@@ -1,4 +1,5 @@
-﻿using SmartLaundry.Controllers.Helpers;
+﻿using Microsoft.EntityFrameworkCore;
+using SmartLaundry.Controllers.Helpers;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
 using System;
@@ -62,7 +63,8 @@ namespace SmartLaundry.Data.Repositories
                 .FirstOrDefault(
                     x => x.WashingMachineId == machineId
                     && x.StartTime == startTime
-                    && x.Fault == false);
+                    && x.Fault == false
+                    && x.Confirmed == true);
         }
 
         public bool IsFaultAtTime(int machineId, DateTime time)
@@ -80,11 +82,12 @@ namespace SmartLaundry.Data.Repositories
                 .Any();
         }
 
-        public bool IsFaultAtTimeToday(int machineId, int hour)
+        public bool IsFaultAtTimeToday(int machineId, TimeSpan startTime)
         {
             var dateTime = DateTime.Today;
-            dateTime = dateTime.AddHours(hour);
-            dateTime = LaundryTimeHelper.GetClosestStartTime(dateTime);
+            dateTime = dateTime.Add(startTime);
+            var machine = _context.WashingMachines.Where(x => x.Id == machineId).Include(x => x.Laundry).SingleOrDefault();
+            dateTime = LaundryTimeHelper.GetClosestStartTime(dateTime, machine.Laundry.startTime, machine.Laundry.shiftTime, machine.Laundry.shiftCount);
 
             return IsFaultAtTime(machineId, dateTime);
         }

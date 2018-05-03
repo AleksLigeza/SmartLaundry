@@ -7,55 +7,30 @@ namespace SmartLaundry.Controllers.Helpers
 {
     public static class LaundryTimeHelper
     {
-        public static DateTime GetLastEndTime(DateTime time)
+        public static DateTime GetClosestStartTime(DateTime searchDateTime, TimeSpan startTime, TimeSpan shiftTime, int shiftCount)
         {
-            if (time.Hour < 15)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 14, 59, 59, 999);
-            }
-            else if (time.Hour < 17)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 16, 59, 59, 999);
-            }
-            else if (time.Hour < 19)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 18, 59, 59, 999);
-            }
-            else if (time.Hour < 21)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 20, 59, 59, 999);
-            }
-            else
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 22, 59, 59, 999);
-            }
-        }
+            DateTime date = searchDateTime.Date;
+            TimeSpan time = searchDateTime.Subtract(date);
 
-        public static DateTime GetClosestStartTime(DateTime time)
-        {
-            DateTime dataTime;
-            if (time.Hour >= 23)
+            for (int shift = shiftCount - 1; shift >= 0; shift--)
             {
-                dataTime = new DateTime(time.Year, time.Month, time.Day, 15, 0, 0, 0);
-                dataTime.Add(new TimeSpan(24, 0, 0));
+                TimeSpan shiftStartTime = startTime + shiftTime * shift;
+                TimeSpan shiftEndTime = startTime + shiftTime * (shift + 1);
+                if (time >= shiftStartTime && time < shiftEndTime)
+                {
+                    return date.Add(shiftStartTime);
+                }
             }
-            else if (time.Hour >= 21)
+
+            TimeSpan minShiftStartTime = startTime;
+            TimeSpan maxShiftEndTime = startTime + shiftTime * shiftCount;
+
+            if (time < minShiftStartTime)
             {
-                dataTime = new DateTime(time.Year, time.Month, time.Day, 21, 0, 0, 0);
+                return date.Add(minShiftStartTime);
             }
-            else if (time.Hour >= 19)
-            {
-                dataTime = new DateTime(time.Year, time.Month, time.Day, 19, 0, 0, 0);
-            }
-            else if (time.Hour >= 17)
-            {
-                dataTime = new DateTime(time.Year, time.Month, time.Day, 17, 0, 0, 0);
-            }
-            else
-            {
-                dataTime = new DateTime(time.Year, time.Month, time.Day, 15, 0, 0, 0);
-            }
-            return dataTime;
+
+            return date.AddDays(1).Add(minShiftStartTime);
         }
     }
 }

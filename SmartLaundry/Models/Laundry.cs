@@ -16,9 +16,21 @@ namespace SmartLaundry.Models
         public int Position { get; set; }
 
         [Required]
+        [DataType(DataType.Time)]
+        public TimeSpan startTime { get; set; }
+
+        [Required]
+        [DataType(DataType.Time)]
+        public TimeSpan shiftTime { get; set; }
+
+        [Required]
+        [Range(1, 24)]
+        public int shiftCount { get; set; }
+
+        [Required]
         public int DormitoryId { get; set; }
         public virtual Dormitory Dormitory { get; set; }
-
+    
         public virtual ICollection<WashingMachine> WashingMachines { get; set; }
     }
 }

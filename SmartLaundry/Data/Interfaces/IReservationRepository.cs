@@ -18,7 +18,7 @@ namespace SmartLaundry.Data.Interfaces
         void UpdateReservation(Reservation reservation);
         Reservation GetHourReservation(int machineId, DateTime startTime);
         bool IsFaultAtTime(int machineId, DateTime time);
-        bool IsFaultAtTimeToday(int machineId, int hour);
+        bool IsFaultAtTimeToday(int machineId, TimeSpan startTime);
         bool IsCurrentlyFault(int machineId);
         Reservation GetRoomToRenewReservation(int roomId);
     }

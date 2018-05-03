@@ -26,6 +26,8 @@
     <Compile Remove="Data\Migrations\20180429132523_AddLaundryAndRooms.Designer.cs" />
     <Compile Remove="Data\Migrations\20180501204859_SetNullAfterDeleteMachine.cs" />
     <Compile Remove="Data\Migrations\20180501204859_SetNullAfterDeleteMachine.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180503150415_ChangeShiftsLimitTo24.cs" />
+    <Compile Remove="Data\Migrations\20180503150415_ChangeShiftsLimitTo24.Designer.cs" />
   </ItemGroup>
 
 

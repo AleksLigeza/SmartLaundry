@@ -18,8 +18,14 @@ namespace SmartLaundry.Models
         public DateTime? EndTime { get; set; }
         [Required]
         public bool ToRenew { get; set; }
-        [Required]
-        public bool Confirmed { get; set; }
+
+        public bool Confirmed
+        {
+            get
+            {
+                return !ToRenew;
+            }
+        }
 
         [Required]
         public int WashingMachineId { get; set; }
