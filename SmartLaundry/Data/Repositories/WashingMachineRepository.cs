@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SmartLaundry.Controllers.Helpers;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
 using System;
@@ -49,24 +50,25 @@ namespace SmartLaundry.Data.Repositories
             _context.SaveChanges();
         }
 
-        public WashingMachine DisableWashingMachine(int id, int startHour)
+        public WashingMachine DisableWashingMachine(int id)
         {
-            var startTime = DateTime.Today;
-            startTime = startTime.AddHours(startHour);
-
+            var startTime = DateTime.Now;
+            startTime = LaundryTimeHelper.GetClosestStartTime(startTime);
+            
             var machine = _context.WashingMachines.Where(x => x.Id == id)
                 .Include(x => x.Reservations)
                 .SingleOrDefault();
 
-            machine.Reservations = machine.Reservations.Where(y => y.StartTime >= startTime).ToList();
+            var toRenew = machine.Reservations.Where(y => y.StartTime >= startTime && y.Fault == false).ToList();
             if (machine == null)
             {
                 return machine;
             }
 
-            foreach (var reservation in machine.Reservations)
+            foreach (var reservation in toRenew)
             {
                 reservation.ToRenew = true;
+                reservation.Confirmed = false;
             }
 
             var faultReservation = new Reservation
@@ -74,7 +76,8 @@ namespace SmartLaundry.Data.Repositories
                 Fault = true,
                 StartTime = startTime,
                 WashingMachineId = id,
-                ToRenew = false
+                ToRenew = false,
+                Confirmed = true
             };
             _context.Reservations.Add(faultReservation);
 
@@ -97,7 +100,8 @@ namespace SmartLaundry.Data.Repositories
                 .Where(y => y.Fault == true)
                 .Max(y => y.StartTime);
 
-            var lastReservation = machine.Reservations.First(x => x.StartTime == maxStartTime && x.Fault == true);
+            var lastReservation = machine.Reservations
+                .SingleOrDefault(x => x.StartTime == maxStartTime && x.Fault == true && x.EndTime == null);
 
             lastReservation.EndTime = DateTime.Now;
             _context.SaveChanges();

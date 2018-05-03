@@ -52,7 +52,7 @@ namespace SmartLaundry.Controllers
                 currentRoomReservation = _resetvationRepo.GetRoomTodaysReservation(roomId.Value),
                 isFaultAtTimeToday = _resetvationRepo.IsFaultAtTimeToday,
                 isCurrentlyFault = _resetvationRepo.IsCurrentlyFault
-        };
+            };
             return View(model);
         }
 
@@ -145,13 +145,14 @@ namespace SmartLaundry.Controllers
                 StartTime = startTime,
                 RoomId = roomId,
                 WashingMachineId = machineId,
-                Fault = false
+                Fault = false,
+                Confirmed = true
             };
 
             var reservationAtHour = _resetvationRepo.GetHourReservation(machineId, startTime);
             var faultAtTime = _resetvationRepo.IsFaultAtTime(machineId, startTime);
 
-            if (reservation == null 
+            if (reservation == null
                 || reservationAtHour != null
                 || faultAtTime
                 )//|| reservation.StartTime < DateTime.Now)
@@ -166,10 +167,20 @@ namespace SmartLaundry.Controllers
                 return BadRequest();
             }
 
+            var toRenew = _resetvationRepo.GetRoomToRenewReservation(roomId.Value);
+            var roomReservation = _resetvationRepo.GetRoomTodaysReservation(roomId.Value);
+            if (toRenew != null)
+            {
+                _resetvationRepo.RemoveReservation(toRenew);
+            }
+            else if (roomReservation != null)
+            {
+                return BadRequest();
+            }
+
             _resetvationRepo.AddReservation(reservation);
 
             return redirectToIndex(machine.LaundryId);
-
         }
 
         [HttpPost]
@@ -190,14 +201,14 @@ namespace SmartLaundry.Controllers
         }
 
         [HttpPost]
-        public IActionResult DisableWashingMachine(int machineId, int startHour)
+        public IActionResult DisableWashingMachine(int machineId)
         {
             if (_resetvationRepo.IsCurrentlyFault(machineId))
             {
                 return BadRequest();
             }
 
-            var machine = _washingMachineRepo.DisableWashingMachine(machineId, startHour);
+            var machine = _washingMachineRepo.DisableWashingMachine(machineId);
             if (machine == null)
             {
                 return BadRequest();
@@ -205,6 +216,28 @@ namespace SmartLaundry.Controllers
 
             return redirectToIndex(machine.LaundryId);
         }
+
+        [HttpPost]
+        public IActionResult ConfirmReservation(int reservationId)
+        {
+            var reservation = _resetvationRepo.GetReservationById(reservationId);
+
+            if (reservation == null
+                || _resetvationRepo.IsFaultAtTime(reservation.WashingMachineId, reservation.StartTime)
+                || reservation.Confirmed == true
+                || reservation.StartTime < DateTime.Now)
+            {
+                return BadRequest();
+            }
+
+            reservation.Confirmed = true;
+            reservation.ToRenew = false;
+            _resetvationRepo.UpdateReservation(reservation);
+
+            var laundryId = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId).LaundryId;
+            return redirectToIndex(laundryId);
+        }
+
 
         private IActionResult redirectToIndex(int laundryId)
         {

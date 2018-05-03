@@ -1,4 +1,5 @@
-﻿using SmartLaundry.Data.Interfaces;
+﻿using SmartLaundry.Controllers.Helpers;
+using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace SmartLaundry.Data.Repositories
             _context.SaveChanges();
         }
 
-        public void UpdateRescervation(Reservation reservation)
+        public void UpdateReservation(Reservation reservation)
         {
             _context.Reservations.Update(reservation);
             _context.SaveChanges();
@@ -52,7 +53,7 @@ namespace SmartLaundry.Data.Repositories
                     x => x.RoomId == roomId
                     && x.StartTime.Date == DateTime.Today.Date
                     && x.Fault == false
-                    && x.ToRenew == false);
+                    && (!x.ToRenew || x.ToRenew && (x.StartTime - DateTime.Now).TotalMinutes > 15));
         }
 
         public Reservation GetHourReservation(int machineId, DateTime startTime)
@@ -68,70 +69,33 @@ namespace SmartLaundry.Data.Repositories
         {
             return _context.Reservations
                 .Where(x => x.Fault == true && x.WashingMachineId == machineId
-                    && x.StartTime <= time && (x.EndTime == null || x.EndTime > time))
+                    && x.StartTime <= time && (x.EndTime == null || x.EndTime >= time))
                 .Any();
         }
 
         public bool IsCurrentlyFault(int machineId)
         {
-            return IsFaultAtTime(machineId, DateTime.Now);
+            return _context.Reservations
+                .Where(x => x.Fault == true && x.WashingMachineId == machineId && x.EndTime == null)
+                .Any();
         }
 
         public bool IsFaultAtTimeToday(int machineId, int hour)
         {
             var dateTime = DateTime.Today;
             dateTime = dateTime.AddHours(hour);
-            dateTime = GetLastStartTime(dateTime);
+            dateTime = LaundryTimeHelper.GetClosestStartTime(dateTime);
 
             return IsFaultAtTime(machineId, dateTime);
         }
 
-        private DateTime GetLastEndTime(DateTime time)
+        public Reservation GetRoomToRenewReservation(int roomId)
         {
-            if (time.Hour < 15)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 14, 59, 59, 999);
-            }
-            else if (time.Hour < 17)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 16, 59, 59, 999);
-            }
-            else if (time.Hour < 19)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 18, 59, 59, 999);
-            }
-            else if (time.Hour < 21)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 20, 59, 59, 999);
-            }
-            else
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 22, 59, 59, 999);
-            }
-        }
-
-        private DateTime GetLastStartTime(DateTime time)
-        {
-            if (time.Hour < 23)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 21, 0, 0, 0);
-            }
-            else if (time.Hour < 21)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 19, 0, 0, 0);
-            }
-            else if (time.Hour < 19)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 17, 0, 0, 0);
-            }
-            else if (time.Hour < 17)
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 15, 0, 0, 0);
-            }
-            else
-            {
-                return new DateTime(time.Year, time.Month, time.Day, 21, 0, 0, 0);
-            }
+            return _context.Reservations
+                .Where(x => x.RoomId == roomId
+                    && x.ToRenew
+                    && x.StartTime > DateTime.UtcNow.Subtract(new TimeSpan(48, 0, 0)))
+                .SingleOrDefault();
         }
     }
 }

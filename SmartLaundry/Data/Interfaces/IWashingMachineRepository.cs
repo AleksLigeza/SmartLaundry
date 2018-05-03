@@ -13,6 +13,6 @@ namespace SmartLaundry.Data.Interfaces
         void RemoveWashingMachine(WashingMachine washingMachine);
         WashingMachine GetWashingMachineById(int id);
         WashingMachine EnableWashingMachine(int id);
-        WashingMachine DisableWashingMachine(int id, int startHour);
+        WashingMachine DisableWashingMachine(int id);
     }
 }
