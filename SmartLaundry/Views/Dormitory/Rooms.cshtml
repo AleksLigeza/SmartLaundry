@@ -1,5 +1,8 @@
 ﻿@model Dormitory
 
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
 @{
     ViewData["Title"] = "Rooms";
 }
@@ -8,12 +11,14 @@
 
 <a asp-action="Details" asp-route-id=@Model.DormitoryID>Back to details</a>
 
-<form method="POST" asp-action="AddRoom">
-    <input type="number" name="roomNumber" min="1" max="2000" />
-    <input type="hidden" name="dormitoryId" value="@Model.DormitoryID" />
-    <input type="submit" value="Add room" />
-</form>
-
+@if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+{
+    <form method="POST" asp-action="AddRoom">
+        <input type="number" name="roomNumber" min="1" max="2000" />
+        <input type="hidden" name="dormitoryId" value="@Model.DormitoryID" />
+        <input type="submit" value="Add room" />
+    </form>
+}
 <table class="table">
     <thead>
         <tr>

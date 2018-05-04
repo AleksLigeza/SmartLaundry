@@ -35,12 +35,14 @@ namespace SmartLaundry.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "MinimumOccupant")]
         public IActionResult Index(int id)
         {
             return redirectToDay(id, DateTime.Now.Date);
         }
 
         [HttpGet("/[controller]/[action]/{id}/{year}/{month}/{day}")]
+        [Authorize(Policy = "MinimumOccupant")]
         public IActionResult Day(int id, int year, int month, int day)
         {
             var date = new DateTime(year, month, day);
@@ -68,6 +70,7 @@ namespace SmartLaundry.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Policy = "MinimumManager")]
         public IActionResult AddLaundry(int laundryPosition, int dormitoryId, TimeSpan startTime, TimeSpan shiftTime, int shiftCount)
         {
             TimeSpan wholeWorkingTime = startTime + shiftTime * shiftCount;
@@ -95,6 +98,7 @@ namespace SmartLaundry.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Policy = "MinimumManager")]
         public IActionResult DeleteLaundry(int id)
         {
             var laundry = _laundryRepo.GetLaundryById(id);
@@ -112,6 +116,7 @@ namespace SmartLaundry.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Policy = "MinimumManager")]
         public IActionResult AddWashingMachine(int id, int machinePosition)
         {
             var machine = _washingMachineRepo.AddWashingMachine(id, machinePosition);
@@ -125,6 +130,7 @@ namespace SmartLaundry.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Policy = "MinimumManager")]
         public IActionResult RemoveWashingMachine(int machineId)
         {
             var machine = _washingMachineRepo.GetWashingMachineById(machineId);
@@ -141,6 +147,7 @@ namespace SmartLaundry.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Policy = "MinimumOccupant")]
         public IActionResult CancelReservation(int reservationId)
         {
             var reservation = _resetvationRepo.GetReservationById(reservationId);
@@ -163,6 +170,7 @@ namespace SmartLaundry.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Policy = "MinimumOccupant")]
         public IActionResult Reserve(DateTime startTime, int machineId)
         {
             var userId = _userManager.GetUserId(User);
@@ -212,6 +220,7 @@ namespace SmartLaundry.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Policy = "MinimumPorter")]
         public IActionResult EnableWashingMachine(int machineId)
         {
             if (!_resetvationRepo.IsCurrentlyFault(machineId))
@@ -230,6 +239,7 @@ namespace SmartLaundry.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Policy = "MinimumPorter")]
         public IActionResult DisableWashingMachine(int machineId)
         {
             if (_resetvationRepo.IsCurrentlyFault(machineId))
@@ -248,6 +258,7 @@ namespace SmartLaundry.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Policy = "MinimumOccupant")]
         public IActionResult ConfirmReservation(int reservationId)
         {
             var reservation = _resetvationRepo.GetReservationById(reservationId);

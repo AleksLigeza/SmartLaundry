@@ -61,7 +61,6 @@ namespace SmartLaundry
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            // Add application services.
             services.AddTransient<IDormitoryRepository, DormitoryRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IRoomRepository, RoomRepository>();
@@ -72,6 +71,13 @@ namespace SmartLaundry
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddMvc();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("MinimumOccupant", policy => policy.RequireRole("Administrator", "Manager", "Porter", "Occupant"));
+                options.AddPolicy("MinimumPorter", policy => policy.RequireRole("Administrator", "Manager", "Porter"));
+                options.AddPolicy("MinimumManager", policy => policy.RequireRole("Administrator", "Manager"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -98,6 +104,8 @@ namespace SmartLaundry
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            RolesData.SeedRoles(app.ApplicationServices).Wait();
         }
     }
 }

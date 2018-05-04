@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,23 +20,27 @@ namespace SmartLaundry.Controllers
         private readonly IDormitoryRepository _dormitoryRepo;
         private readonly IUserRepository _userRepo;
         private readonly IRoomRepository _roomRepo;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public DormitoryController(
             IDormitoryRepository dormitoryRepository,
             IUserRepository userRepository,
-            IRoomRepository roomRepository)
+            IRoomRepository roomRepository,
+            UserManager<ApplicationUser> userManager)
         {
             _dormitoryRepo = dormitoryRepository;
             _userRepo = userRepository;
             _roomRepo = roomRepository;
+            _userManager = userManager;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View(_dormitoryRepo.GetAll());
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpGet]
         public IActionResult ManageDormitoryUsers(
                 int id,
@@ -76,6 +81,7 @@ namespace SmartLaundry.Controllers
             return View(new ManageDormitoryUsersViewModel(new PaginatedList<ApplicationUser>(users, users.Count, page ?? 1, pageSize), dormitory));
         }
 
+        [Authorize(Policy = "MinimumManager")]
         [HttpGet]
         public IActionResult ManageRoomUsers(
                 int id,
@@ -122,32 +128,52 @@ namespace SmartLaundry.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         [ValidateAntiForgeryToken]
-        public IActionResult AssignManager(int dormitoryId, string managerEmail)
+        public async Task<IActionResult> AssignManager(int dormitoryId, string managerEmail)
         {
-            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var dormitory = _dormitoryRepo.GetSingleWithIncludes(dormitoryId);
+
+            if (dormitory.Manager != null)
+            {
+                await _userManager.RemoveFromRoleAsync(dormitory.Manager, "Manager");
+            }
+
             var user = _userRepo.GetUserByEmail(managerEmail);
             user.DormitoryPorterId = null;
+            if (await _userManager.IsInRoleAsync(user, "Porter"))
+            {
+                await _userManager.RemoveFromRoleAsync(user, "Porter");
+            }
 
             _dormitoryRepo.AssignManager(user, dormitory);
-
+            if (await _userManager.IsInRoleAsync(user, "Manager") == false)
+            {
+                await _userManager.AddToRoleAsync(user, "Manager");
+            }
             return RedirectToAction("Details", new { id = dormitoryId });
         }
 
         [HttpPost]
+        [Authorize(Policy = "MinimumManager")]
         [ValidateAntiForgeryToken]
-        public IActionResult AssignPorter(int dormitoryId, string porterEmail)
+        public async Task<IActionResult> AssignPorter(int dormitoryId, string porterEmail)
         {
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
             var user = _userRepo.GetUserByEmail(porterEmail);
             user.DormitoryPorterId = dormitoryId;
 
             _userRepo.AssignDormitoryAsPorter(user, dormitory);
+            if (await _userManager.IsInRoleAsync(user, "Porter") == false)
+            {
+                await _userManager.AddToRoleAsync(user, "Porter");
+            }
 
             return RedirectToAction("Details", new { id = dormitoryId });
         }
 
         [HttpPost]
+        [Authorize(Policy = "MinimumManager")]
         [ValidateAntiForgeryToken]
         public IActionResult RemovePorter(int dormitoryId, string porterEmail)
         {
@@ -156,6 +182,7 @@ namespace SmartLaundry.Controllers
             user.DormitoryPorterId = dormitoryId;
 
             _userRepo.RemoveDormitoryPorter(user, dormitory);
+            _userManager.RemoveFromRoleAsync(user, "Porter");
 
             return RedirectToAction("Details", new { id = dormitoryId });
         }
@@ -184,6 +211,7 @@ namespace SmartLaundry.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             return View();
@@ -191,6 +219,7 @@ namespace SmartLaundry.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("DormitoryID,Name,Address,ZipCode,City")] Dormitory dormitory)
         {
@@ -203,6 +232,7 @@ namespace SmartLaundry.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "MinimumManager")]
         public IActionResult Edit(int? id)
         {
             if (id == null)
@@ -219,6 +249,7 @@ namespace SmartLaundry.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "MinimumManager")]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, [Bind("DormitoryID,Name,Address,ZipCode,City")] Dormitory dormitory)
         {
@@ -250,6 +281,7 @@ namespace SmartLaundry.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public IActionResult Delete(int? id)
         {
             if (id == null)
@@ -267,14 +299,33 @@ namespace SmartLaundry.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Administrator")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var dormitory = _dormitoryRepo.GetSingleById(id);
+            var dormitory = _dormitoryRepo.GetSingleWithIncludes(id);
+
+            _userManager.RemoveFromRoleAsync(dormitory.Manager, "Manager");
+
+            foreach (var porter in dormitory.Porters)
+            {
+                _userManager.RemoveFromRoleAsync(porter, "Porter");
+            }
+
+            foreach (var room in dormitory.Rooms)
+            {
+                foreach (var user in room.Occupants)
+                {
+                    _userManager.RemoveFromRoleAsync(user, "Occupant");
+                }
+            }
+
             _dormitoryRepo.DeleteSingle(dormitory);
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        [Authorize(Policy = "MinimumPorter")]
         public IActionResult Rooms(int id)
         {
             var dormitory = _dormitoryRepo.GetDormitoryWithRooms(id);
@@ -282,6 +333,7 @@ namespace SmartLaundry.Controllers
         }
 
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "MinimumManager")]
         [HttpPost]
         public IActionResult AddRoom(int roomNumber, int dormitoryId)
         {
@@ -296,8 +348,21 @@ namespace SmartLaundry.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Policy = "MinimumManager")]
         public IActionResult DeleteRoom(int id)
         {
+            var room = _roomRepo.GetRoomWithOccupants(id);
+
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            foreach (var user in room.Occupants)
+            {
+                _userManager.RemoveFromRoleAsync(user, "Occupant");
+            }
+
             var dormitoryId = _roomRepo.DeleteRoom(id);
 
             if (dormitoryId == null)
@@ -310,24 +375,31 @@ namespace SmartLaundry.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AssignOccupant(string userId, int roomId)
+        [Authorize(Policy = "MinimumManager")]
+        public async Task<IActionResult> AssignOccupant(string userId, int roomId)
         {
             var room = _roomRepo.GetRoomById(roomId);
             var user = _userRepo.GetUserById(userId);
 
             _roomRepo.AssignOccupant(room, user);
+            if (await _userManager.IsInRoleAsync(user, "Occupant") == false)
+            {
+                await _userManager.AddToRoleAsync(user, "Occupant");
+            }
 
             return RedirectToAction("Rooms", new { id = room.DormitoryId });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "MinimumManager")]
         public IActionResult RemoveOccupant(string userId, int roomId)
         {
             var room = _roomRepo.GetRoomById(roomId);
             var user = _userRepo.GetUserById(userId);
 
             _roomRepo.RemoveOccupant(room, user);
+            _userManager.RemoveFromRoleAsync(user, "Occupant");
 
             return RedirectToAction("Rooms", new { id = room.DormitoryId });
         }

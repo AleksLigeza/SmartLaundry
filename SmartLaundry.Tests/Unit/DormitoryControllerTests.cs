@@ -23,8 +23,9 @@ namespace SmartLaundry.Tests.Unit {
             var _dormitoryRepo = new MockDormitoryRepo();
             var _userRepo = new Mock<IUserRepository>().Object;
             var _roomRepo = new Mock<IRoomRepository>().Object;
+            var _userManager = new Mock<UserManager<ApplicationUser>>().Object;
 
-            _controller = new DormitoryController(_dormitoryRepo, _userRepo, _roomRepo);
+            _controller = new DormitoryController(_dormitoryRepo, _userRepo, _roomRepo, _userManager);
         }
 
         [Fact]
