@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using SmartLaundry.Models.DormitoryViewModels;
 
 namespace SmartLaundry.Controllers
 {
+    [Authorize]
     public class DormitoryController : Controller
     {
         private readonly IDormitoryRepository _dormitoryRepo;
@@ -279,6 +281,7 @@ namespace SmartLaundry.Controllers
             return View(dormitory);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult AddRoom(int roomNumber, int dormitoryId)
         {
@@ -291,6 +294,7 @@ namespace SmartLaundry.Controllers
             return RedirectToAction(nameof(Rooms), new { id = dormitoryId });
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult DeleteRoom(int id)
         {

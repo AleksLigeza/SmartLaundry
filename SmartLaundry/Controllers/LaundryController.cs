@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SmartLaundry.Data.Interfaces;
@@ -10,6 +11,7 @@ using SmartLaundry.Models.LaundryViewModels;
 
 namespace SmartLaundry.Controllers
 {
+    [Authorize]
     public class LaundryController : Controller
     {
         private readonly ILaundryRepository _laundryRepo;
@@ -64,6 +66,7 @@ namespace SmartLaundry.Controllers
             return View(model);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult AddLaundry(int laundryPosition, int dormitoryId, TimeSpan startTime, TimeSpan shiftTime, int shiftCount)
         {
@@ -90,6 +93,7 @@ namespace SmartLaundry.Controllers
 
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult DeleteLaundry(int id)
         {
@@ -106,6 +110,7 @@ namespace SmartLaundry.Controllers
 
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult AddWashingMachine(int id, int machinePosition)
         {
@@ -118,6 +123,7 @@ namespace SmartLaundry.Controllers
             return redirectToDayByLaundryId(machine.LaundryId, DateTime.Now.Date);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult RemoveWashingMachine(int machineId)
         {
@@ -133,6 +139,7 @@ namespace SmartLaundry.Controllers
 
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult CancelReservation(int reservationId)
         {
@@ -154,6 +161,7 @@ namespace SmartLaundry.Controllers
 
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult Reserve(DateTime startTime, int machineId)
         {
@@ -202,6 +210,7 @@ namespace SmartLaundry.Controllers
             return redirectToDayByLaundryId(machine.LaundryId, startTime);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult EnableWashingMachine(int machineId)
         {
@@ -219,6 +228,7 @@ namespace SmartLaundry.Controllers
             return redirectToDayByLaundryId(machine.LaundryId, DateTime.Now.Date);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult DisableWashingMachine(int machineId)
         {
@@ -236,6 +246,7 @@ namespace SmartLaundry.Controllers
             return redirectToDayByLaundryId(machine.LaundryId, DateTime.Now.Date);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult ConfirmReservation(int reservationId)
         {

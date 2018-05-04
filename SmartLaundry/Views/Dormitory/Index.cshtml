@@ -27,7 +27,10 @@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.DormitoryID">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.DormitoryID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.DormitoryID">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.DormitoryID">Delete</a> |
+                <a asp-action="Rooms" asp-route-id="item.DormitoryID">Rooms</a> |
+                <a asp-controller="Laundry" asp-action="Index" asp-route-id="@item.DormitoryID">Laundries</a> |
+                <a asp-action="ManageDormitoryUsers" asp-route-id="@item.DormitoryID">Manage users</a>
             </td>
         </tr>
 }
