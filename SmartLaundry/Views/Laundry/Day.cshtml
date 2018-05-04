@@ -1,13 +1,26 @@
-﻿@model SmartLaundry.Models.LaundryViewModels.IndexViewModel
+﻿@model SmartLaundry.Models.LaundryViewModels.DayViewModel
 @{
     ViewData["Title"] = "Index";
 }
 
 <h2>Laundries</h2>
 
+@{ var firstFreeLaundryNumber = 1;
+    for (int i = 1; i < 100; i++)
+    {
+        if (!Model.Laundries.Any(x => x.Position == i))
+        {
+            firstFreeLaundryNumber = i;
+            break;
+        }
+    }
+}
 <form method="POST" asp-action="AddLaundry">
-    <input type="number" name="laundryPosition" min="1" max="100" />
+    <input type="number" name="laundryPosition" value="@firstFreeLaundryNumber" min="1" max="100" />
     <input type="hidden" name="dormitoryId" value="@Model.DormitoryId" />
+    <input type="time" name="startTime" min="00:00" max="23:00" value="15:00" />
+    <input type="time" name="shiftTime" min="01:00" max="03:00" value="02:00" />
+    <input type="number" name="shiftCount" min="1" max="24" value="4" />
     <input type="submit" value="Add laundry" />
 </form>
 
@@ -19,17 +32,21 @@
         <input type="hidden" name="id" value="@laundry.Id" />
         <input type="submit" value="Remove laundry" />
     </form>
+
+    var firstFreeWashingMachineNumber = 1;
+    for (int i = 1; i < 100; i++)
+    {
+        if (!laundry.WashingMachines.Any(x => x.Position == i))
+        {
+            firstFreeWashingMachineNumber = i;
+            break;
+        }
+    }
+
     <form method="post" asp-action="AddWashingMachine">
         <input type="hidden" name="id" value="@laundry.Id" />
-        <input type="number" name="machinePosition" min="1" max="100" />
+        <input type="number" name="machinePosition" min="1" max="100" value="@firstFreeWashingMachineNumber" />
         <input type="submit" value="Add washing machine" />
-    </form>
-    <form method="post" asp-action="ChangeShifts">
-        <input type="hidden" name="laundryId" value="@laundry.Id" />
-        <input type="time" name="startTime" min="00:00" max="23:00" value="@laundry.startTime.Hours.ToString("00"):@laundry.startTime.Minutes.ToString("00")" />
-        <input type="time" name="shiftTime" min="01:00" max="03:00" value="@laundry.shiftTime.Hours.ToString("00"):@laundry.shiftTime.Minutes.ToString("00")" />
-        <input type="number" name="shiftCount" min="1" max="24" value="@laundry.shiftCount" />
-        <input type="submit" value="Change shifts" />
     </form>
     <table class="table">
         <thead>
@@ -66,28 +83,24 @@
             </tr>
         </thead>
         <tbody>
-            @for (int shit = 0; shit < laundry.shiftCount; shit++)
+            @for (int shift = 0; shift < laundry.shiftCount; shift++)
             {
-                TimeSpan startTime = laundry.startTime + laundry.shiftTime * shit;
-                TimeSpan endTime = laundry.startTime + laundry.shiftTime * (shit + 1);
+                DateTime startTime = Model.date.Add(laundry.startTime + laundry.shiftTime * shift);
+                DateTime endTime = Model.date.Add(laundry.startTime + laundry.shiftTime * (shift + 1));
                 <tr>
                     <td>
-                        @startTime.Hours.ToString("00"):@startTime.Minutes.ToString("00") - @endTime.Hours.ToString("00"):@endTime.Minutes.ToString("00")
+                        @startTime.Hour.ToString("00"):@startTime.Minute.ToString("00") - @endTime.Hour.ToString("00"):@endTime.Minute.ToString("00")
                     </td>
                     @foreach (var item in washingMachines)
                     {
                         <td>
                             @{
                                 var reservation = item.Reservations
-                                    .Where(x => x.StartTime.Date == DateTime.Today
-                                        && x.StartTime.Hour == @startTime.Hours
-                                        && x.StartTime.Minute == @startTime.Minutes
+                                    .Where(x => x.StartTime == startTime
                                         && x.Fault == false && x.ToRenew == false)
                                     .SingleOrDefault();
                                 var reservationToConfirm = item.Reservations
-                                    .Where(x => x.StartTime.Date == DateTime.Today
-                                        && x.StartTime.Hour == @startTime.Hours
-                                        && x.StartTime.Minute == @startTime.Minutes
+                                    .Where(x => x.StartTime == startTime
                                         && x.Fault == false
                                         && x.ToRenew == true
                                         && x.Confirmed == false
@@ -98,16 +111,16 @@
                             {
                                 <b>@reservation.Room.Number</b>
                             }
-                            @if (Model.isFaultAtTimeToday(item.Id, startTime))
+                            @if (Model.IsFaultAtTime(item, startTime))
                             {
                                 <b>FAULT</b>
                             }
-                            else if (DateTime.Now.Subtract(DateTime.Now.Date) < startTime)
+                            else if (DateTime.Now < startTime)
                             {
                                 if (reservationToConfirm != null)
                                 {
                                     <b>@reservationToConfirm.Room.Number - to confirm</b>
-                                    if (Model.currentRoomReservation == reservationToConfirm)
+                                    if (Model.currentRoomReservation != null && Model.currentRoomReservation.Id == reservationToConfirm.Id)
                                     {
                                         <form method="POST" asp-action="ConfirmReservation">
                                             <input type="hidden" name="reservationId" value="@reservationToConfirm.Id" />
@@ -117,7 +130,7 @@
                                 }
                                 else
                                 {
-                                    if (reservation == Model.currentRoomReservation && reservation != null)
+                                    if (Model.currentRoomReservation != null && reservation != null && reservation.Id == Model.currentRoomReservation.Id)
                                     {
                                         <form method="POST" asp-action="CancelReservation">
                                             <input type="hidden" name="reservationId" value="@reservation.Id" />
@@ -125,10 +138,13 @@
                                         </form>
                                     }
                                     else if ((Model.currentRoomReservation == null || !Model.currentRoomReservation.Confirmed)
-                                        && reservation == null)
+                                        && reservation == null
+                                        && (Model.date == DateTime.Now.Date
+                                            || Model.date == DateTime.Now.Date.AddDays(1) && Model.hasReservationToRenew)
+                                        )
                                     {
                                         <form method="POST" asp-action="Reserve">
-                                            <input type="hidden" name="hour" value="@startTime" />
+                                            <input type="hidden" name="startTime" value="@startTime" />
                                             <input type="hidden" name="machineId" value="@item.Id" />
                                             <input type="submit" value="Reserve" />
                                         </form>

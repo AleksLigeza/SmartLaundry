@@ -65,15 +65,46 @@ namespace SmartLaundry.Data.Repositories
             _context.SaveChanges();
         }
 
-        public List<Laundry> GetDormitoryLaundriesWithEntities(int dormitoryId)
+        public List<Laundry> GetDormitoryLaundriesWithEntitiesAtDay(int dormitoryId, DateTime date)
         {
+            //return _context.Laundries
+            //    .Where(x => x.DormitoryId == dormitoryId)
+            //    .Include(x => x.WashingMachines)
+            //    .ThenInclude(x => x.Reservations)
+            //    .ThenInclude(x => x.Room)
+            //    .OrderBy(x => x.Position)
+            //    .ToList();
+
             return _context.Laundries
-                .Where(x => x.DormitoryId == dormitoryId)
-                .Include(x => x.WashingMachines)
-                .ThenInclude(x => x.Reservations)
-                .ThenInclude(x => x.Room)
-                .OrderBy(x => x.Position)
-                .ToList();
+                 .Select(n => new Laundry
+                 {
+                     DormitoryId = n.DormitoryId,
+                     Id = n.Id,
+                     Position = n.Position,
+                     shiftCount = n.shiftCount,
+                     shiftTime = n.shiftTime,
+                     startTime = n.startTime,
+                     Dormitory = n.Dormitory,
+                     WashingMachines = n.WashingMachines.Select(w => new WashingMachine
+                     {
+                         Id = w.Id,
+                         LaundryId = w.LaundryId,
+                         Position = w.Position,
+                         Laundry = w.Laundry,
+                         Reservations = w.Reservations.Select(r=> new Reservation
+                         {
+                             Id = r.Id,
+                             Room = r.Room,
+                             RoomId = r.RoomId,
+                             ToRenew = r.ToRenew,
+                             EndTime = r.EndTime,
+                             Fault = r.Fault,
+                             StartTime = r.StartTime,
+                             WashingMachine = r.WashingMachine,
+                             WashingMachineId = r.WashingMachineId
+                         }).Where(r => r.StartTime.Date == date.Date).ToList()
+                     }).ToList()
+                 }).OrderBy(x=>x.Position).ToList();
         }
 
         public Laundry GetLaundryById(int id) => _context.Laundries.FirstOrDefault(x => x.Id == id);

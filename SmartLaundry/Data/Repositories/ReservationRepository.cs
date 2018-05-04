@@ -49,13 +49,21 @@ namespace SmartLaundry.Data.Repositories
 
         public Reservation GetRoomTodaysReservation(int roomId)
         {
+            return GetRoomDailyReservation(roomId, DateTime.Now.Date);
+        }
+
+        public Reservation GetRoomDailyReservation(int roomId, DateTime date)
+        {
             return _context.Reservations
                 .FirstOrDefault(
                     x => x.RoomId == roomId
-                    && x.StartTime.Date == DateTime.Today.Date
+                    && x.StartTime.Date == date.Date
                     && x.Fault == false
-                    && (!x.ToRenew || x.ToRenew && (x.StartTime - DateTime.Now).TotalMinutes > 15));
+                    && (!x.ToRenew || x.ToRenew
+                    && (x.StartTime - DateTime.Now).TotalMinutes > 15)
+                );
         }
+
 
         public Reservation GetHourReservation(int machineId, DateTime startTime)
         {
@@ -86,6 +94,11 @@ namespace SmartLaundry.Data.Repositories
         {
             var dateTime = DateTime.Today;
             dateTime = dateTime.Add(startTime);
+            return IsFaultAtTimeAtDay(machineId, dateTime);
+        }
+
+        public bool IsFaultAtTimeAtDay(int machineId, DateTime dateTime)
+        {
             var machine = _context.WashingMachines.Where(x => x.Id == machineId).Include(x => x.Laundry).SingleOrDefault();
             dateTime = LaundryTimeHelper.GetClosestStartTime(dateTime, machine.Laundry.startTime, machine.Laundry.shiftTime, machine.Laundry.shiftCount);
 
@@ -99,6 +112,55 @@ namespace SmartLaundry.Data.Repositories
                     && x.ToRenew
                     && x.StartTime > DateTime.UtcNow.Subtract(new TimeSpan(48, 0, 0)))
                 .SingleOrDefault();
+        }
+
+        public bool HasReservationToRenew(int roomId)
+        {
+            return _context.Reservations
+                .Where(x => x.RoomId == roomId
+                    && x.ToRenew == true
+                    && x.StartTime > DateTime.Now.AddHours(-48))
+                .Any();
+        }
+
+        public Dictionary<int, Reservation> GetDormitoryWashingMachineStates(int id)
+        {
+            var dictionary = new Dictionary<int, Reservation>();
+            var laundires = _context.Laundries
+                .Where(x => x.DormitoryId == id)
+                .Include(x => x.WashingMachines)
+                .ThenInclude(x => x.Reservations)
+                .ToList();
+            foreach (Laundry laundry in laundires)
+            {
+                foreach (WashingMachine machine in laundry.WashingMachines)
+                {
+                    if (machine.Reservations.Any(x => x.Fault))
+                    {
+                        var lastFaultTime = machine.Reservations.Where(x => x.Fault).Max(x => x.StartTime);
+                        var lastFaults = machine.Reservations.Where(x => x.StartTime == lastFaultTime && x.Fault == true).ToList();
+                        if (lastFaults.Count > 1)
+                        {
+                            if (lastFaults.Any(x=>x.EndTime == null))
+                            {
+                                dictionary.Add(machine.Id, lastFaults.Single(x => x.EndTime == null));
+                            } else
+                            {
+                                dictionary.Add(machine.Id, lastFaults.OrderByDescending(x => x.EndTime).ToList()[0]);
+                            }
+                        }
+                        else
+                        {
+                            dictionary.Add(machine.Id, lastFaults[0]);
+                        }
+                    }
+                    else
+                    {
+                        dictionary.Add(machine.Id, null);
+                    }
+                }
+            }
+            return dictionary;
         }
     }
 }

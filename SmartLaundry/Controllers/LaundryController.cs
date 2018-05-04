@@ -35,7 +35,14 @@ namespace SmartLaundry.Controllers
         [HttpGet]
         public IActionResult Index(int id)
         {
-            var laundries = _laundryRepo.GetDormitoryLaundriesWithEntities(id);
+            return redirectToDay(id, DateTime.Now.Date);
+        }
+
+        [HttpGet("/[controller]/[action]/{id}/{year}/{month}/{day}")]
+        public IActionResult Day(int id, int year, int month, int day)
+        {
+            var date = new DateTime(year, month, day);
+            var laundries = _laundryRepo.GetDormitoryLaundriesWithEntitiesAtDay(id, date);
 
             if (laundries == null)
             {
@@ -45,33 +52,20 @@ namespace SmartLaundry.Controllers
             var userId = _userManager.GetUserId(User);
             var roomId = _userRepo.GetUserById(userId).RoomId;
 
-            var model = new IndexViewModel()
+            var model = new DayViewModel()
             {
                 Laundries = laundries,
                 DormitoryId = id,
-                currentRoomReservation = _resetvationRepo.GetRoomTodaysReservation(roomId.Value),
-                isFaultAtTimeToday = _resetvationRepo.IsFaultAtTimeToday,
-                isCurrentlyFault = _resetvationRepo.IsCurrentlyFault
+                currentRoomReservation = _resetvationRepo.GetRoomDailyReservation(roomId.Value, date),
+                hasReservationToRenew = _resetvationRepo.HasReservationToRenew(roomId.Value),
+                washingMachineState = _resetvationRepo.GetDormitoryWashingMachineStates(id),
+                date = date
             };
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult AddLaundry(int laundryPosition, int dormitoryId)
-        {
-            var laundry = _laundryRepo.AddLaundry(dormitoryId, laundryPosition);
-
-            if (laundry == null)
-            {
-                return BadRequest();
-            }
-
-            return redirectToIndex(laundry.Id);
-
-        }
-
-        [HttpPost]
-        public IActionResult ChangeShifts(int laundryId, TimeSpan startTime, TimeSpan shiftTime, int shiftCount)
+        public IActionResult AddLaundry(int laundryPosition, int dormitoryId, TimeSpan startTime, TimeSpan shiftTime, int shiftCount)
         {
             TimeSpan wholeWorkingTime = startTime + shiftTime * shiftCount;
             if (wholeWorkingTime.TotalHours > 24)
@@ -79,7 +73,12 @@ namespace SmartLaundry.Controllers
                 return BadRequest();
             }
 
-            var laundry = _laundryRepo.GetLaundryById(laundryId);
+            var laundry = _laundryRepo.AddLaundry(dormitoryId, laundryPosition);
+
+            if (laundry == null)
+            {
+                return BadRequest();
+            }
 
             laundry.startTime = startTime;
             laundry.shiftCount = shiftCount;
@@ -87,7 +86,8 @@ namespace SmartLaundry.Controllers
 
             _laundryRepo.UpdateLaundry(laundry);
 
-            return redirectToIndex(laundryId);
+            return redirectToDayByLaundryId(laundry.Id, DateTime.Now.Date);
+
         }
 
         [HttpPost]
@@ -115,7 +115,7 @@ namespace SmartLaundry.Controllers
                 return BadRequest();
             }
 
-            return redirectToIndex(machine.LaundryId);
+            return redirectToDayByLaundryId(machine.LaundryId, DateTime.Now.Date);
         }
 
         [HttpPost]
@@ -129,7 +129,7 @@ namespace SmartLaundry.Controllers
             }
 
             _washingMachineRepo.RemoveWashingMachine(machine);
-            return redirectToIndex(machine.LaundryId);
+            return redirectToDayByLaundryId(machine.LaundryId, DateTime.Now.Date);
 
         }
 
@@ -150,18 +150,15 @@ namespace SmartLaundry.Controllers
 
             _resetvationRepo.RemoveReservation(reservation);
 
-            return redirectToIndex(laundryId);
+            return redirectToDayByLaundryId(laundryId, reservation.StartTime);
 
         }
 
         [HttpPost]
-        public IActionResult Reserve(TimeSpan hour, int machineId)
+        public IActionResult Reserve(DateTime startTime, int machineId)
         {
             var userId = _userManager.GetUserId(User);
             var roomId = _userRepo.GetUserById(userId).RoomId;
-
-            var startTime = DateTime.Today;
-            startTime = startTime.Add(hour);
 
             var reservation = new Reservation()
             {
@@ -190,7 +187,7 @@ namespace SmartLaundry.Controllers
             }
 
             var toRenew = _resetvationRepo.GetRoomToRenewReservation(roomId.Value);
-            var roomReservation = _resetvationRepo.GetRoomTodaysReservation(roomId.Value);
+            var roomReservation = _resetvationRepo.GetRoomDailyReservation(roomId.Value, startTime);
             if (toRenew != null)
             {
                 _resetvationRepo.RemoveReservation(toRenew);
@@ -202,7 +199,7 @@ namespace SmartLaundry.Controllers
 
             _resetvationRepo.AddReservation(reservation);
 
-            return redirectToIndex(machine.LaundryId);
+            return redirectToDayByLaundryId(machine.LaundryId, startTime);
         }
 
         [HttpPost]
@@ -219,7 +216,7 @@ namespace SmartLaundry.Controllers
                 return BadRequest();
             }
 
-            return redirectToIndex(machine.LaundryId);
+            return redirectToDayByLaundryId(machine.LaundryId, DateTime.Now.Date);
         }
 
         [HttpPost]
@@ -236,7 +233,7 @@ namespace SmartLaundry.Controllers
                 return BadRequest();
             }
 
-            return redirectToIndex(machine.LaundryId);
+            return redirectToDayByLaundryId(machine.LaundryId, DateTime.Now.Date);
         }
 
         [HttpPost]
@@ -256,14 +253,27 @@ namespace SmartLaundry.Controllers
             _resetvationRepo.UpdateReservation(reservation);
 
             var laundryId = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId).LaundryId;
-            return redirectToIndex(laundryId);
+            return redirectToDayByLaundryId(laundryId, reservation.StartTime.Date);
         }
 
 
-        private IActionResult redirectToIndex(int laundryId)
+        private IActionResult redirectToDayByLaundryId(int laundryId, DateTime day)
         {
             var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
-            return RedirectToAction(nameof(Index), new { id = dormitoryId });
+            return redirectToDay(dormitoryId, day);
+        }
+
+        private IActionResult redirectToDay(int dormitoryId, DateTime day)
+        {
+            return RedirectToAction(
+                nameof(Day),
+                new
+                {
+                    id = dormitoryId,
+                    year = day.Year,
+                    month = day.Month,
+                    day = day.Day
+                });
         }
     }
 }
