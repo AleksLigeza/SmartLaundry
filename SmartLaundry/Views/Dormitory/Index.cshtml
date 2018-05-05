@@ -41,7 +41,7 @@
                         }
                         @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
                         {
-                            <a asp-action="ManageDormitoryUsers" asp-route-id="@item.DormitoryID">Manage users</a>@Html.Raw("|");
+                            <a asp-action="ManageDormitoryUsers" asp-route-id="@item.DormitoryID">Manage users</a> @Html.Raw("|");
                             <a asp-action="Rooms" asp-route-id="@item.DormitoryID">Rooms</a> @Html.Raw("|");
                         }
                         @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)

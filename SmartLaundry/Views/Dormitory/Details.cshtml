@@ -13,7 +13,32 @@
 
 <div>
     <h4>Dormitory</h4>
+
+    <h4>Announcements</h4>
+    @foreach (var item in Model.Announcements)
+    {
+        <p>
+            @item.Message --- @item.PublishingDate
+        </p>
+        @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+        {
+            <form method="POST" asp-action="RemoveAnnouncement">
+                <input type="hidden" name="announcementId" value="@item.Id" />
+                <input type="submit" value="Assign manager" />
+            </form>
+        }
+    }
     <hr />
+
+    @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+    {
+        <form method="POST" asp-action="AddAnnouncement">
+            <input type="text" name="message" />
+            <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
+            <input type="submit" value="Add" />
+        </form>
+    }
+
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Dormitory.Name)

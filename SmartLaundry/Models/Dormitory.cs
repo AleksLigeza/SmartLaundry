@@ -28,5 +28,6 @@ namespace SmartLaundry.Models
         public virtual ICollection<ApplicationUser> Porters { get; set; }
         public virtual ICollection<Laundry> Laundries { get; set; }
         public virtual ICollection<Room> Rooms { get; set; }
+        public virtual ICollection<Announcement> Announcements { get; set; }
     }
 }

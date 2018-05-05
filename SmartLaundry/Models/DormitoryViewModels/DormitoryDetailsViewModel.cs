@@ -10,5 +10,7 @@ namespace SmartLaundry.Models.DormitoryViewModels
         public ApplicationUser Manager;
         public List<ApplicationUser> Porters;
         public List<Laundry> Laundries;
+
+        public List<Announcement> Announcements { get; internal set; }
     }
 }

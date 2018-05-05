@@ -70,6 +70,7 @@ namespace SmartLaundry
             services.AddTransient<IReservationRepository, ReservationRepository>();
             services.AddTransient<IWashingMachineRepository, WashingMachineRepository>();
             services.AddTransient<ILaundryRepository, LaundryRepository>();
+            services.AddTransient<IAnnouncementRepository, AnnouncementRepository>();
 
             services.AddSingleton<IAuthorizationHandler, DormitoryAuthorizationHandler>();
 

@@ -15,6 +15,7 @@ namespace SmartLaundry.Data
         public DbSet<Room> Rooms { get; set; }
         public DbSet<WashingMachine> WashingMachines { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Announcement> Announcements { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -66,6 +67,11 @@ namespace SmartLaundry.Data
             builder.Entity<Laundry>()
                 .HasOne(x => x.Dormitory)
                 .WithMany(x => x.Laundries)
+                .HasForeignKey(x => x.DormitoryId);
+
+            builder.Entity<Announcement>()
+                .HasOne(x => x.Dormitory)
+                .WithMany(x => x.Announcements)
                 .HasForeignKey(x => x.DormitoryId);
         }
     }
