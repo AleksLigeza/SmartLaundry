@@ -50,10 +50,7 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumOccupant")]
         public async Task<IActionResult> Day(int id, int year, int month, int day)
         {
-            var dormitory = _dormitoryRepo.GetSingleById(id);
-
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            if (!authorizationResult.Succeeded)
+            if (! await checkDormitoryMembership(id))
             {
                 return BadRequest();
             }
@@ -96,10 +93,7 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumManager")]
         public async Task<IActionResult> AddLaundry(int laundryPosition, int dormitoryId, TimeSpan startTime, TimeSpan shiftTime, int shiftCount)
         {
-            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            if (!authorizationResult.Succeeded)
+            if (!await checkDormitoryMembership(dormitoryId))
             {
                 return BadRequest();
             }
@@ -137,12 +131,10 @@ namespace SmartLaundry.Controllers
             {
                 return null;
             }
+
             var dormitoryId = _laundryRepo.GetLaundryById(laundry.Id).DormitoryId;
 
-            var dormitory = _dormitoryRepo.GetSingleById(id);
-
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            if (!authorizationResult.Succeeded)
+            if (!await checkDormitoryMembership(dormitoryId))
             {
                 return BadRequest();
             }
@@ -158,10 +150,8 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumManager")]
         public async Task<IActionResult> AddWashingMachine(int id, int machinePosition)
         {
-            var dormitoryId = _laundryRepo.GetLaundryById(id).DormitoryId;
-            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            if (!authorizationResult.Succeeded)
+            var laundry = _laundryRepo.GetLaundryById(id);
+            if (!await checkDormitoryMembership(laundry.DormitoryId))
             {
                 return BadRequest();
             }
@@ -187,10 +177,7 @@ namespace SmartLaundry.Controllers
                 return BadRequest();
             }
 
-            var dormitoryId = _laundryRepo.GetLaundryById(machine.LaundryId).DormitoryId;
-            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            if (!authorizationResult.Succeeded)
+            if (!await checkDormitoryMembership(machine))
             {
                 return BadRequest();
             }
@@ -206,12 +193,9 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> CancelReservation(int reservationId)
         {
             var reservation = _reservationRepo.GetReservationById(reservationId);
-
-            var laundryId = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId).LaundryId;
-            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
-            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            if (!authorizationResult.Succeeded)
+            var machine = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId);
+            
+            if (!await checkDormitoryMembership(reservation))
             {
                 return BadRequest();
             }
@@ -230,7 +214,7 @@ namespace SmartLaundry.Controllers
 
             _reservationRepo.RemoveReservation(reservation);
 
-            return redirectToDayByLaundryId(laundryId, reservation.StartTime);
+            return redirectToDayByLaundryId(machine.LaundryId, reservation.StartTime);
 
         }
 
@@ -239,11 +223,8 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumOccupant")]
         public async Task<IActionResult> Reserve(DateTime startTime, int machineId)
         {
-            var laundryId = _washingMachineRepo.GetWashingMachineById(machineId).LaundryId;
-            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
-            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            if (!authorizationResult.Succeeded)
+            var machine = _washingMachineRepo.GetWashingMachineById(machineId);
+            if (!await checkDormitoryMembership(machine))
             {
                 return BadRequest();
             }
@@ -269,8 +250,6 @@ namespace SmartLaundry.Controllers
             {
                 return BadRequest();
             }
-
-            var machine = _washingMachineRepo.GetWashingMachineById(machineId);
 
             if (_reservationRepo.IsCurrentlyFault(machineId))
             {
@@ -299,22 +278,18 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumPorter")]
         public async Task<IActionResult> EnableWashingMachine(int machineId)
         {
-            var laundryId = _washingMachineRepo.GetWashingMachineById(machineId).LaundryId;
-            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
-            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            if (!authorizationResult.Succeeded)
+            var machine = _washingMachineRepo.EnableWashingMachine(machineId);
+            if (machine == null)
+            {
+                return BadRequest();
+            }
+
+            if (!await checkDormitoryMembership(machine))
             {
                 return BadRequest();
             }
 
             if (!_reservationRepo.IsCurrentlyFault(machineId))
-            {
-                return BadRequest();
-            }
-
-            var machine = _washingMachineRepo.EnableWashingMachine(machineId);
-            if (machine == null)
             {
                 return BadRequest();
             }
@@ -327,11 +302,13 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumPorter")]
         public async Task<IActionResult> DisableWashingMachine(int machineId)
         {
-            var laundryId = _washingMachineRepo.GetWashingMachineById(machineId).LaundryId;
-            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
-            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            if (!authorizationResult.Succeeded)
+            var machine = _washingMachineRepo.GetWashingMachineById(machineId);
+            if (machine == null)
+            {
+                return BadRequest();
+            }
+
+            if (!await checkDormitoryMembership(machine))
             {
                 return BadRequest();
             }
@@ -341,11 +318,6 @@ namespace SmartLaundry.Controllers
                 return BadRequest();
             }
 
-            var machine = _washingMachineRepo.DisableWashingMachine(machineId);
-            if (machine == null)
-            {
-                return BadRequest();
-            }
 
             return redirectToDayByLaundryId(machine.LaundryId, DateTime.Now.Date);
         }
@@ -357,11 +329,8 @@ namespace SmartLaundry.Controllers
         {
             var reservation = _reservationRepo.GetReservationById(reservationId);
 
-            var laundryId = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId).LaundryId;
-            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
-            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            if (!authorizationResult.Succeeded)
+            var machine = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId);
+            if (!await checkDormitoryMembership(machine))
             {
                 return BadRequest();
             }
@@ -377,7 +346,7 @@ namespace SmartLaundry.Controllers
             reservation.ToRenew = false;
             _reservationRepo.UpdateReservation(reservation);
 
-            return redirectToDayByLaundryId(laundryId, reservation.StartTime.Date);
+            return redirectToDayByLaundryId(machine.LaundryId, reservation.StartTime.Date);
         }
 
 
@@ -398,6 +367,30 @@ namespace SmartLaundry.Controllers
                     month = day.Month,
                     day = day.Day
                 });
+        }
+
+        private async Task<bool> checkDormitoryMembership(Dormitory dormitory)
+        {
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            return authorizationResult.Succeeded;
+        }
+
+        private async Task<bool> checkDormitoryMembership(int dormitoryId)
+        {
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            return await checkDormitoryMembership(dormitory);
+        }
+        
+        private async Task<bool> checkDormitoryMembership(WashingMachine machine)
+        {
+            var dormitoryId = _laundryRepo.GetLaundryById(machine.LaundryId).DormitoryId;
+            return await checkDormitoryMembership(dormitoryId);
+        }
+
+        private async Task<bool> checkDormitoryMembership(Reservation reservation)
+        {
+            var machine = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId);
+            return await checkDormitoryMembership(machine);
         }
     }
 }
