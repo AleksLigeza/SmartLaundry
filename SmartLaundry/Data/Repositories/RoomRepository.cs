@@ -58,8 +58,8 @@ namespace SmartLaundry.Data.Repositories
             _context.SaveChanges();
         }
 
-        public Room GetRoomById(int id) => _context.Rooms.Where(x => x.Id == id).SingleOrDefault();
-        public Room GetRoomWithOccupants(int id) => _context.Rooms.Where(x => x.Id == id).Include(x => x.Occupants).SingleOrDefault();
+        public Room GetRoomById(int id) => _context.Rooms.Where(x => x.Id == id).Include(x=>x.Dormitory).SingleOrDefault();
+        public Room GetRoomWithOccupants(int id) => _context.Rooms.Where(x => x.Id == id).Include(x => x.Occupants).Include(x=>x.Dormitory).SingleOrDefault();
         
     }
 }

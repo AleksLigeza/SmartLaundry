@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SmartLaundry.Authorization;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
 using SmartLaundry.Models.LaundryViewModels;
@@ -15,23 +17,26 @@ namespace SmartLaundry.Controllers
     public class LaundryController : Controller
     {
         private readonly ILaundryRepository _laundryRepo;
-        private readonly IReservationRepository _resetvationRepo;
+        private readonly IReservationRepository _reservationRepo;
         private readonly IUserRepository _userRepo;
         private readonly IWashingMachineRepository _washingMachineRepo;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IDormitoryRepository _dormitoryRepo;
 
         public LaundryController(
-            ILaundryRepository laundryRepository,
-            IReservationRepository reservationRepository,
-            IUserRepository userRepository,
-            IWashingMachineRepository washingMachineRepo,
-            UserManager<ApplicationUser> userManager)
+            ILaundryRepository laundryRepository, IReservationRepository reservationRepository,
+            IUserRepository userRepository, IWashingMachineRepository washingMachineRepo,
+            UserManager<ApplicationUser> userManager, IAuthorizationService authorizationService,
+            IDormitoryRepository dormitoryRepository)
         {
             _laundryRepo = laundryRepository;
-            _resetvationRepo = reservationRepository;
+            _reservationRepo = reservationRepository;
             _userRepo = userRepository;
             _userManager = userManager;
             _washingMachineRepo = washingMachineRepo;
+            _authorizationService = authorizationService;
+            _dormitoryRepo = dormitoryRepository;
         }
 
         [HttpGet]
@@ -43,8 +48,16 @@ namespace SmartLaundry.Controllers
 
         [HttpGet("/[controller]/[action]/{id}/{year}/{month}/{day}")]
         [Authorize(Policy = "MinimumOccupant")]
-        public IActionResult Day(int id, int year, int month, int day)
+        public async Task<IActionResult> Day(int id, int year, int month, int day)
         {
+            var dormitory = _dormitoryRepo.GetSingleById(id);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
             var date = new DateTime(year, month, day);
             var laundries = _laundryRepo.GetDormitoryLaundriesWithEntitiesAtDay(id, date);
 
@@ -60,19 +73,37 @@ namespace SmartLaundry.Controllers
             {
                 Laundries = laundries,
                 DormitoryId = id,
-                currentRoomReservation = _resetvationRepo.GetRoomDailyReservation(roomId.Value, date),
-                hasReservationToRenew = _resetvationRepo.HasReservationToRenew(roomId.Value),
-                washingMachineState = _resetvationRepo.GetDormitoryWashingMachineStates(id),
+                washingMachineState = _reservationRepo.GetDormitoryWashingMachineStates(id),
                 date = date
             };
+
+            if (roomId != null)
+            {
+                model.currentRoomReservation = _reservationRepo.GetRoomDailyReservation(roomId.Value, date);
+                model.hasReservationToRenew = _reservationRepo.HasReservationToRenew(roomId.Value);
+            }
+            else
+            {
+                model.currentRoomReservation = null;
+                model.hasReservationToRenew = false;
+            }
+
             return View(model);
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
-        public IActionResult AddLaundry(int laundryPosition, int dormitoryId, TimeSpan startTime, TimeSpan shiftTime, int shiftCount)
+        public async Task<IActionResult> AddLaundry(int laundryPosition, int dormitoryId, TimeSpan startTime, TimeSpan shiftTime, int shiftCount)
         {
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
             TimeSpan wholeWorkingTime = startTime + shiftTime * shiftCount;
             if (wholeWorkingTime.TotalHours > 24)
             {
@@ -99,7 +130,7 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
-        public IActionResult DeleteLaundry(int id)
+        public async Task<IActionResult> DeleteLaundry(int id)
         {
             var laundry = _laundryRepo.GetLaundryById(id);
             if (laundry == null)
@@ -107,6 +138,14 @@ namespace SmartLaundry.Controllers
                 return null;
             }
             var dormitoryId = _laundryRepo.GetLaundryById(laundry.Id).DormitoryId;
+
+            var dormitory = _dormitoryRepo.GetSingleById(id);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
 
             _laundryRepo.RemoveLaundry(laundry);
 
@@ -117,8 +156,16 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
-        public IActionResult AddWashingMachine(int id, int machinePosition)
+        public async Task<IActionResult> AddWashingMachine(int id, int machinePosition)
         {
+            var dormitoryId = _laundryRepo.GetLaundryById(id).DormitoryId;
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
             var machine = _washingMachineRepo.AddWashingMachine(id, machinePosition);
             if (machine == null)
             {
@@ -131,11 +178,19 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
-        public IActionResult RemoveWashingMachine(int machineId)
+        public async Task<IActionResult> RemoveWashingMachine(int machineId)
         {
             var machine = _washingMachineRepo.GetWashingMachineById(machineId);
 
             if (machine == null)
+            {
+                return BadRequest();
+            }
+
+            var dormitoryId = _laundryRepo.GetLaundryById(machine.LaundryId).DormitoryId;
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
             {
                 return BadRequest();
             }
@@ -148,21 +203,32 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumOccupant")]
-        public IActionResult CancelReservation(int reservationId)
+        public async Task<IActionResult> CancelReservation(int reservationId)
         {
-            var reservation = _resetvationRepo.GetReservationById(reservationId);
+            var reservation = _reservationRepo.GetReservationById(reservationId);
 
-            if (reservation == null
-                || _resetvationRepo.GetHourReservation(reservation.WashingMachineId, reservation.StartTime) == null
-                || _resetvationRepo.IsFaultAtTime(reservation.WashingMachineId, reservation.StartTime)
-                || reservation.StartTime < DateTime.Now)
+            var laundryId = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId).LaundryId;
+            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
             {
                 return BadRequest();
             }
 
-            var laundryId = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId).LaundryId;
+            var userId = _userManager.GetUserId(User);
+            var roomId = _userRepo.GetUserById(userId).RoomId;
+            
+            if (reservation == null
+                || _reservationRepo.GetHourReservation(reservation.WashingMachineId, reservation.StartTime) == null
+                || _reservationRepo.IsFaultAtTime(reservation.WashingMachineId, reservation.StartTime)
+                || reservation.StartTime < DateTime.Now
+                || roomId != reservation.RoomId && roomId != null)
+            {
+                return BadRequest();
+            }
 
-            _resetvationRepo.RemoveReservation(reservation);
+            _reservationRepo.RemoveReservation(reservation);
 
             return redirectToDayByLaundryId(laundryId, reservation.StartTime);
 
@@ -171,8 +237,17 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumOccupant")]
-        public IActionResult Reserve(DateTime startTime, int machineId)
+        public async Task<IActionResult> Reserve(DateTime startTime, int machineId)
         {
+            var laundryId = _washingMachineRepo.GetWashingMachineById(machineId).LaundryId;
+            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
             var userId = _userManager.GetUserId(User);
             var roomId = _userRepo.GetUserById(userId).RoomId;
 
@@ -184,8 +259,8 @@ namespace SmartLaundry.Controllers
                 Fault = false
             };
 
-            var reservationAtHour = _resetvationRepo.GetHourReservation(machineId, startTime);
-            var faultAtTime = _resetvationRepo.IsFaultAtTime(machineId, startTime);
+            var reservationAtHour = _reservationRepo.GetHourReservation(machineId, startTime);
+            var faultAtTime = _reservationRepo.IsFaultAtTime(machineId, startTime);
 
             if (reservation == null
                 || reservationAtHour != null
@@ -197,23 +272,24 @@ namespace SmartLaundry.Controllers
 
             var machine = _washingMachineRepo.GetWashingMachineById(machineId);
 
-            if (_resetvationRepo.IsCurrentlyFault(machineId))
+            if (_reservationRepo.IsCurrentlyFault(machineId))
             {
                 return BadRequest();
             }
-
-            var toRenew = _resetvationRepo.GetRoomToRenewReservation(roomId.Value);
-            var roomReservation = _resetvationRepo.GetRoomDailyReservation(roomId.Value, startTime);
-            if (toRenew != null)
+            if (roomId != null)
             {
-                _resetvationRepo.RemoveReservation(toRenew);
+                var toRenew = _reservationRepo.GetRoomToRenewReservation(roomId.Value);
+                var roomReservation = _reservationRepo.GetRoomDailyReservation(roomId.Value, startTime);
+                if (toRenew != null)
+                {
+                    _reservationRepo.RemoveReservation(toRenew);
+                }
+                else if (roomReservation != null)
+                {
+                    return BadRequest();
+                }
             }
-            else if (roomReservation != null)
-            {
-                return BadRequest();
-            }
-
-            _resetvationRepo.AddReservation(reservation);
+            _reservationRepo.AddReservation(reservation);
 
             return redirectToDayByLaundryId(machine.LaundryId, startTime);
         }
@@ -221,9 +297,18 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumPorter")]
-        public IActionResult EnableWashingMachine(int machineId)
+        public async Task<IActionResult> EnableWashingMachine(int machineId)
         {
-            if (!_resetvationRepo.IsCurrentlyFault(machineId))
+            var laundryId = _washingMachineRepo.GetWashingMachineById(machineId).LaundryId;
+            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
+            if (!_reservationRepo.IsCurrentlyFault(machineId))
             {
                 return BadRequest();
             }
@@ -240,9 +325,18 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumPorter")]
-        public IActionResult DisableWashingMachine(int machineId)
+        public async Task<IActionResult> DisableWashingMachine(int machineId)
         {
-            if (_resetvationRepo.IsCurrentlyFault(machineId))
+            var laundryId = _washingMachineRepo.GetWashingMachineById(machineId).LaundryId;
+            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
+            if (_reservationRepo.IsCurrentlyFault(machineId))
             {
                 return BadRequest();
             }
@@ -259,12 +353,21 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumOccupant")]
-        public IActionResult ConfirmReservation(int reservationId)
+        public async Task<IActionResult> ConfirmReservation(int reservationId)
         {
-            var reservation = _resetvationRepo.GetReservationById(reservationId);
+            var reservation = _reservationRepo.GetReservationById(reservationId);
+
+            var laundryId = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId).LaundryId;
+            var dormitoryId = _laundryRepo.GetLaundryById(laundryId).DormitoryId;
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
 
             if (reservation == null
-                || _resetvationRepo.IsFaultAtTime(reservation.WashingMachineId, reservation.StartTime)
+                || _reservationRepo.IsFaultAtTime(reservation.WashingMachineId, reservation.StartTime)
                 || reservation.Confirmed == true
                 || reservation.StartTime < DateTime.Now)
             {
@@ -272,9 +375,8 @@ namespace SmartLaundry.Controllers
             }
 
             reservation.ToRenew = false;
-            _resetvationRepo.UpdateReservation(reservation);
+            _reservationRepo.UpdateReservation(reservation);
 
-            var laundryId = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId).LaundryId;
             return redirectToDayByLaundryId(laundryId, reservation.StartTime.Date);
         }
 

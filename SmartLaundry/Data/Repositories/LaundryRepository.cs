@@ -104,7 +104,7 @@ namespace SmartLaundry.Data.Repositories
                              WashingMachineId = r.WashingMachineId
                          }).Where(r => r.StartTime.Date == date.Date).ToList()
                      }).ToList()
-                 }).OrderBy(x=>x.Position).ToList();
+                 }).Where(x=>x.DormitoryId==dormitoryId).OrderBy(x=>x.Position).ToList();
         }
 
         public Laundry GetLaundryById(int id) => _context.Laundries.FirstOrDefault(x => x.Id == id);

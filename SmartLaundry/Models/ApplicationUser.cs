@@ -16,6 +16,7 @@ namespace SmartLaundry.Models
         [Required, MaxLength(20), RegularExpression("^[a-zA-Z ąćęłńóśźżĄĘŁŃÓŚŹŻ]*$")]
         public string Lastname { get; set; }
 
+        public int? DormitoryManagerId { get; set; }
         public virtual Dormitory DormitoryManager { get; set; }
         public int? DormitoryPorterId { get; set; }
         public virtual Dormitory DormitoryPorter { get; set; }

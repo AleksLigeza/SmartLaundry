@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using SmartLaundry.Authorization;
 using SmartLaundry.Data;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
@@ -21,33 +22,43 @@ namespace SmartLaundry.Controllers
         private readonly IUserRepository _userRepo;
         private readonly IRoomRepository _roomRepo;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
         public DormitoryController(
             IDormitoryRepository dormitoryRepository,
             IUserRepository userRepository,
             IRoomRepository roomRepository,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IAuthorizationService authorizationService)
         {
             _dormitoryRepo = dormitoryRepository;
             _userRepo = userRepository;
             _roomRepo = roomRepository;
             _userManager = userManager;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return View(_dormitoryRepo.GetAll());
         }
 
         [Authorize(Roles = "Administrator")]
         [HttpGet]
-        public IActionResult ManageDormitoryUsers(
+        public async Task<IActionResult> ManageDormitoryUsers(
                 int id,
                 string currentFilter,
                 string searchString,
                 int? page)
         {
+            var dormitory = _dormitoryRepo.GetSingleById(id);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
 
             if (searchString != null)
             {
@@ -70,7 +81,18 @@ namespace SmartLaundry.Controllers
                 users = _userRepo.Users.ToList();
             }
 
-            var dormitory = _dormitoryRepo.GetSingleById(id);
+            var usersWithoutDormitory = users
+                .Where(x => x.DormitoryManagerId == null
+                    && x.DormitoryPorterId == null
+                    && x.RoomId == null
+                    && x.Email != "admin@admin.admin")
+                .ToList();
+            var thisDormitoryUsers = users
+                .Where(x => x.DormitoryPorterId == dormitory.DormitoryID
+                    || x.DormitoryManagerId == dormitory.DormitoryID
+                    && dormitory.Rooms.Any(z => z.Id == x.RoomId))
+                .ToList();
+            users = usersWithoutDormitory.Concat(thisDormitoryUsers).ToList();
 
             if (dormitory == null)
             {
@@ -83,12 +105,23 @@ namespace SmartLaundry.Controllers
 
         [Authorize(Policy = "MinimumManager")]
         [HttpGet]
-        public IActionResult ManageRoomUsers(
+        public async Task<IActionResult> ManageRoomUsers(
                 int id,
                 string currentFilter,
                 string searchString,
                 int? page)
         {
+            var room = _roomRepo.GetRoomWithOccupants(id);
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, room.Dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
 
             if (searchString != null)
             {
@@ -111,11 +144,20 @@ namespace SmartLaundry.Controllers
                 users = _userRepo.Users.ToList();
             }
 
-            var room = _roomRepo.GetRoomWithOccupants(id);
-            if (room == null)
-            {
-                return NotFound();
-            }
+            var dormitory = _dormitoryRepo.GetDormitoryWithRooms(room.DormitoryId);
+
+            var usersWithoutDormitory = users
+                .Where(x => x.DormitoryManagerId == null
+                    && x.DormitoryPorterId == null
+                    && x.RoomId == null
+                    && x.Email != "admin@admin.admin")
+                .ToList();
+            var thisDormitoryUsers = users
+                .Where(x => x.DormitoryPorterId == null
+                    && x.DormitoryManagerId == null
+                    && dormitory.Rooms.Any(z=> z.Id == x.RoomId))
+                .ToList();
+            users = usersWithoutDormitory.Concat(thisDormitoryUsers).ToList();
 
             int pageSize = 10;
             var model = new ManageRoomUsersViewModel()
@@ -133,6 +175,13 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> AssignManager(int dormitoryId, string managerEmail)
         {
             var dormitory = _dormitoryRepo.GetSingleWithIncludes(dormitoryId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
+
 
             if (dormitory.Manager != null)
             {
@@ -160,6 +209,13 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> AssignPorter(int dormitoryId, string porterEmail)
         {
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
+
             var user = _userRepo.GetUserByEmail(porterEmail);
             user.DormitoryPorterId = dormitoryId;
 
@@ -175,14 +231,21 @@ namespace SmartLaundry.Controllers
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
         [ValidateAntiForgeryToken]
-        public IActionResult RemovePorter(int dormitoryId, string porterEmail)
+        public async Task<IActionResult> RemovePorter(int dormitoryId, string porterEmail)
         {
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
+
             var user = _userRepo.GetUserByEmail(porterEmail);
             user.DormitoryPorterId = dormitoryId;
 
             _userRepo.RemoveDormitoryPorter(user, dormitory);
-            _userManager.RemoveFromRoleAsync(user, "Porter");
+            await _userManager.RemoveFromRoleAsync(user, "Porter");
 
             return RedirectToAction("Details", new { id = dormitoryId });
         }
@@ -221,8 +284,15 @@ namespace SmartLaundry.Controllers
         [HttpPost]
         [Authorize(Roles = "Administrator")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("DormitoryID,Name,Address,ZipCode,City")] Dormitory dormitory)
+        public async Task<IActionResult> Create([Bind("DormitoryID,Name,Address,ZipCode,City")] Dormitory dormitory)
         {
+            dormitory.Rooms = new List<Room>();
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
             if (ModelState.IsValid)
             {
                 _dormitoryRepo.AddSingle(dormitory);
@@ -233,14 +303,21 @@ namespace SmartLaundry.Controllers
 
         [HttpGet]
         [Authorize(Policy = "MinimumManager")]
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
+            var dormitory = _dormitoryRepo.GetSingleById(id.Value);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
             if (id == null)
             {
                 return NotFound();
             }
 
-            var dormitory = _dormitoryRepo.GetSingleById(id.Value);
+
             if (dormitory == null)
             {
                 return NotFound();
@@ -251,8 +328,15 @@ namespace SmartLaundry.Controllers
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("DormitoryID,Name,Address,ZipCode,City")] Dormitory dormitory)
+        public async Task<IActionResult> Edit(int id, [Bind("DormitoryID,Name,Address,ZipCode,City")] Dormitory dormitory)
         {
+            var dormToCheck = _dormitoryRepo.GetSingleById(dormitory.DormitoryID);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormToCheck, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
             if (id != dormitory.DormitoryID)
             {
                 return NotFound();
@@ -282,14 +366,21 @@ namespace SmartLaundry.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Administrator")]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
+            var dormitory = _dormitoryRepo.GetSingleById(id.Value);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
             if (id == null)
             {
                 return NotFound();
             }
 
-            var dormitory = _dormitoryRepo.GetSingleById(id.Value);
+
             if (dormitory == null)
             {
                 return NotFound();
@@ -301,22 +392,27 @@ namespace SmartLaundry.Controllers
         [HttpPost, ActionName("Delete")]
         [Authorize(Roles = "Administrator")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var dormitory = _dormitoryRepo.GetSingleWithIncludes(id);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
 
-            _userManager.RemoveFromRoleAsync(dormitory.Manager, "Manager");
+            await _userManager.RemoveFromRoleAsync(dormitory.Manager, "Manager");
 
             foreach (var porter in dormitory.Porters)
             {
-                _userManager.RemoveFromRoleAsync(porter, "Porter");
+                await _userManager.RemoveFromRoleAsync(porter, "Porter");
             }
 
             foreach (var room in dormitory.Rooms)
             {
                 foreach (var user in room.Occupants)
                 {
-                    _userManager.RemoveFromRoleAsync(user, "Occupant");
+                    await _userManager.RemoveFromRoleAsync(user, "Occupant");
                 }
             }
 
@@ -326,18 +422,33 @@ namespace SmartLaundry.Controllers
 
         [HttpGet]
         [Authorize(Policy = "MinimumPorter")]
-        public IActionResult Rooms(int id)
+        public async Task<IActionResult> Rooms(int id)
         {
             var dormitory = _dormitoryRepo.GetDormitoryWithRooms(id);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
+
             return View(dormitory);
         }
 
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "MinimumManager")]
         [HttpPost]
-        public IActionResult AddRoom(int roomNumber, int dormitoryId)
+        public async Task<IActionResult> AddRoom(int roomNumber, int dormitoryId)
         {
-            if (_dormitoryRepo.DormitoryHasRoom(dormitoryId, roomNumber))
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
+            if (!_dormitoryRepo.DormitoryHasRoom(dormitoryId, roomNumber))
             {
                 return BadRequest();
             }
@@ -349,9 +460,16 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
-        public IActionResult DeleteRoom(int id)
+        public async Task<IActionResult> DeleteRoom(int id)
         {
             var room = _roomRepo.GetRoomWithOccupants(id);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, room.Dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
 
             if (room == null)
             {
@@ -360,7 +478,7 @@ namespace SmartLaundry.Controllers
 
             foreach (var user in room.Occupants)
             {
-                _userManager.RemoveFromRoleAsync(user, "Occupant");
+                await _userManager.RemoveFromRoleAsync(user, "Occupant");
             }
 
             var dormitoryId = _roomRepo.DeleteRoom(id);
@@ -379,6 +497,13 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> AssignOccupant(string userId, int roomId)
         {
             var room = _roomRepo.GetRoomById(roomId);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, room.Dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
             var user = _userRepo.GetUserById(userId);
 
             _roomRepo.AssignOccupant(room, user);
@@ -393,13 +518,20 @@ namespace SmartLaundry.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "MinimumManager")]
-        public IActionResult RemoveOccupant(string userId, int roomId)
+        public async Task<IActionResult> RemoveOccupant(string userId, int roomId)
         {
             var room = _roomRepo.GetRoomById(roomId);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, room.Dormitory, AuthPolicies.DormitoryMembership);
+            if (!authorizationResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
             var user = _userRepo.GetUserById(userId);
 
             _roomRepo.RemoveOccupant(room, user);
-            _userManager.RemoveFromRoleAsync(user, "Occupant");
+            await _userManager.RemoveFromRoleAsync(user, "Occupant");
 
             return RedirectToAction("Rooms", new { id = room.DormitoryId });
         }

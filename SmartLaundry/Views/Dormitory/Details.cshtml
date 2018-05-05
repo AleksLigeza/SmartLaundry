@@ -1,5 +1,5 @@
 ﻿@using Microsoft.CodeAnalysis.CSharp
-
+@using SmartLaundry.Authorization
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService AuthorizationService
 
@@ -43,7 +43,10 @@
             @Html.DisplayNameFor(model => model.Manager)
         </dt>
         <dd>
-            @Model.Manager.Firstname @Model.Manager.Lastname
+            @if (Model.Manager != null)
+            {
+                Html.Raw(Model.Manager.Firstname + Model.Manager.Lastname);
+            }
         </dd>
         <dt>
             Porters
@@ -66,20 +69,22 @@
     </dl>
 </div>
 <div>
-
-    @if (User.IsInRole("Administrator"))
+    @if ((await AuthorizationService.AuthorizeAsync(User, Model.Dormitory, AuthPolicies.DormitoryMembership)).Succeeded)
     {
-        <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryID">Edit</a> @Html.Raw("|");
-        <a asp-action="Delete" asp-route-id="@Model.Dormitory.DormitoryID">Delete</a> @Html.Raw("|");
-    }
-    @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
-    {
-        <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryID">Manage users</a> @Html.Raw("|");
-        <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryID">Rooms</a> @Html.Raw("|");
-    }
-    @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
-    {
-        <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryID">Laundries</a> @Html.Raw("|");
+        @if (User.IsInRole("Administrator"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryID">Edit</a> @Html.Raw("|");
+            <a asp-action="Delete" asp-route-id="@Model.Dormitory.DormitoryID">Delete</a> @Html.Raw("|");
+        }
+        @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+        {
+            <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryID">Manage users</a> @Html.Raw("|");
+            <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryID">Rooms</a> @Html.Raw("|");
+        }
+        @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
+        {
+            <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryID">Laundries</a> @Html.Raw("|");
+        }
     }
     <a asp-action="Index">Back to List</a>
 </div>

@@ -28,10 +28,10 @@ namespace SmartLaundry.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
 
-            builder.Entity<Dormitory>()
-                .HasOne(d => d.Manager)
-                .WithOne(u => u.DormitoryManager)
-                .HasForeignKey<Dormitory>(d => d.ManagerId);
+            builder.Entity<ApplicationUser>()
+                .HasOne(x => x.DormitoryManager)
+                .WithOne(x => x.Manager)
+                .HasForeignKey<ApplicationUser>(x => x.DormitoryManagerId);
 
             builder.Entity<ApplicationUser>()
                 .HasOne(u => u.DormitoryPorter)

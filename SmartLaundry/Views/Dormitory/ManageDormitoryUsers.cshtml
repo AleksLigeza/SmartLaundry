@@ -45,7 +45,7 @@
                     @Html.DisplayFor(modelItem => item.Lastname)
                 </td>
                 <td>
-                    @if (item.Id != @Model.Dormitory.ManagerId && User.IsInRole("Administrator"))
+                    @if (item.DormitoryManagerId != Model.Dormitory.DormitoryID && User.IsInRole("Administrator"))
                     {
                         <form method="POST" asp-action="AssignManager">
                             <input type="hidden" name="managerEmail" value="@item.Email" />
@@ -53,7 +53,7 @@
                             <input type="submit" value="Assign manager" />
                         </form>
                     }
-                    @if (item.DormitoryPorterId == null && item.Id != Model.Dormitory.ManagerId && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager").Succeeded)
+                    @if (item.DormitoryPorterId == null && item.DormitoryManagerId != Model.Dormitory.DormitoryID && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
                     {
                     <form method="POST" asp-action="AssignPorter">
                         <input type="hidden" name="porterEmail" value="@item.Email" />
@@ -61,7 +61,7 @@
                         <input type="submit" value="Assign porter" />
                     </form>
                     }
-                    @if (item.DormitoryPorterId == Model.Dormitory.DormitoryID)
+                    @if (item.DormitoryPorterId == Model.Dormitory.DormitoryID && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
                     {
                     <form method="POST" asp-action="RemovePorter">
                         <input type="hidden" name="porterEmail" value="@item.Email" />

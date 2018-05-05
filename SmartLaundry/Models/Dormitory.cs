@@ -24,7 +24,6 @@ namespace SmartLaundry.Models
         [Required, MaxLength(40), RegularExpression("^[a-zA-Z ąćęłńóśźżĄĘŁŃÓŚŹŻ]*$")]
         public string City { get; set; }
 
-        public string ManagerId { get; set; }
         public virtual ApplicationUser Manager { get; set; }
         public virtual ICollection<ApplicationUser> Porters { get; set; }
         public virtual ICollection<Laundry> Laundries { get; set; }

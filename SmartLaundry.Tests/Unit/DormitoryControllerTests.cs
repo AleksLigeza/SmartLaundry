@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,8 +25,9 @@ namespace SmartLaundry.Tests.Unit {
             var _userRepo = new Mock<IUserRepository>().Object;
             var _roomRepo = new Mock<IRoomRepository>().Object;
             var _userManager = new Mock<UserManager<ApplicationUser>>().Object;
+            var _authService = new Mock<IAuthorizationService>().Object;
 
-            _controller = new DormitoryController(_dormitoryRepo, _userRepo, _roomRepo, _userManager);
+            _controller = new DormitoryController(_dormitoryRepo, _userRepo, _roomRepo, _userManager, _authService);
         }
 
         [Fact]

@@ -14,6 +14,9 @@ using SmartLaundry.Services;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Data.Repositories;
 using System.Reflection;
+using SmartLaundry.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace SmartLaundry
 {
@@ -68,6 +71,10 @@ namespace SmartLaundry
             services.AddTransient<IWashingMachineRepository, WashingMachineRepository>();
             services.AddTransient<ILaundryRepository, LaundryRepository>();
 
+            services.AddSingleton<IAuthorizationHandler, DormitoryAuthorizationHandler>();
+
+            services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, MyUserClaimsPrincipalFactory>();
+
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddMvc();
@@ -77,6 +84,7 @@ namespace SmartLaundry
                 options.AddPolicy("MinimumOccupant", policy => policy.RequireRole("Administrator", "Manager", "Porter", "Occupant"));
                 options.AddPolicy("MinimumPorter", policy => policy.RequireRole("Administrator", "Manager", "Porter"));
                 options.AddPolicy("MinimumManager", policy => policy.RequireRole("Administrator", "Manager"));
+                options.AddPolicy("DormitoryMembership", policy => policy.Requirements.Add(new DormitoryMembershipRequirement()));
             });
         }
 
