@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SmartLaundry.Models;
 using SmartLaundry.Models.ManageViewModels;
 using SmartLaundry.Services;
@@ -103,7 +98,7 @@ namespace SmartLaundry.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(nameof(Index), model);
             }
 
             var user = await _userManager.GetUserAsync(User);

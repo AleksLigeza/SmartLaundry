@@ -1,10 +1,7 @@
 ﻿using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
 namespace SmartLaundry.Data.Repositories {
     public class UserRepository : IUserRepository {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
@@ -13,10 +9,8 @@ using SmartLaundry.Models;
 using SmartLaundry.Services;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Data.Repositories;
-using System.Reflection;
 using SmartLaundry.Authorization;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace SmartLaundry
 {
@@ -114,7 +108,7 @@ namespace SmartLaundry
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            RolesData.SeedRoles(app.ApplicationServices).Wait();
+            RolesData.SeedRoles(app.ApplicationServices, Configuration).Wait();
         }
     }
 }

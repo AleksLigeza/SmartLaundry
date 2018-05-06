@@ -1,9 +1,7 @@
 ﻿using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SmartLaundry.Data.Repositories
 {
@@ -25,7 +23,7 @@ namespace SmartLaundry.Data.Repositories
 
         public void DeleteAnnouncement(int announcementId)
         {
-            var announcement = _context.Announcements.Where(x => x.Id == announcementId).Single();
+            var announcement = _context.Announcements.Single(x => x.Id == announcementId);
             _context.Announcements.Remove(announcement);
             _context.SaveChanges();
         }

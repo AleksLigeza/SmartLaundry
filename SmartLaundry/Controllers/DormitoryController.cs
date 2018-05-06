@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SmartLaundry.Authorization;
-using SmartLaundry.Data;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
 using SmartLaundry.Models.DormitoryViewModels;
@@ -111,7 +109,7 @@ namespace SmartLaundry.Controllers
                 return NotFound();
             }
 
-            if (!await checkDormitoryMembership(room.Dormitory))
+            if (!await CheckDormitoryMembership(room.Dormitory))
             {
                 return BadRequest();
             }
@@ -195,7 +193,7 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> AssignPorter(int dormitoryId, string porterEmail)
         {
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            if (!await checkDormitoryMembership(dormitory))
+            if (!await CheckDormitoryMembership(dormitory))
             {
                 return BadRequest();
             }
@@ -218,7 +216,7 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> RemovePorter(int dormitoryId, string porterEmail)
         {
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            if (!await checkDormitoryMembership(dormitory))
+            if (!await CheckDormitoryMembership(dormitory))
             {
                 return BadRequest();
             }
@@ -282,7 +280,7 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             var dormitory = _dormitoryRepo.GetSingleById(id.Value);
-            if (!await checkDormitoryMembership(dormitory))
+            if (!await CheckDormitoryMembership(dormitory))
             {
                 return BadRequest();
             }
@@ -295,7 +293,7 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("DormitoryID,Name,Address,ZipCode,City")] Dormitory dormitory)
         {
-            if (!await checkDormitoryMembership(id))
+            if (!await CheckDormitoryMembership(id))
             {
                 return BadRequest();
             }
@@ -372,7 +370,7 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> Rooms(int id)
         {
             var dormitory = _dormitoryRepo.GetDormitoryWithRooms(id);
-            if (!await checkDormitoryMembership(dormitory))
+            if (!await CheckDormitoryMembership(dormitory))
             {
                 return BadRequest();
             }
@@ -385,7 +383,7 @@ namespace SmartLaundry.Controllers
         [HttpPost]
         public async Task<IActionResult> AddRoom(int roomNumber, int dormitoryId)
         {
-            if (!await checkDormitoryMembership(dormitoryId))
+            if (!await CheckDormitoryMembership(dormitoryId))
             {
                 return BadRequest();
             }
@@ -411,7 +409,7 @@ namespace SmartLaundry.Controllers
                 return NotFound();
             }
 
-            if (!await checkDormitoryMembership(room.Dormitory))
+            if (!await CheckDormitoryMembership(room.Dormitory))
             {
                 return BadRequest();
             }
@@ -438,7 +436,7 @@ namespace SmartLaundry.Controllers
         {
             var room = _roomRepo.GetRoomById(roomId);
 
-            if (!await checkDormitoryMembership(room.Dormitory))
+            if (!await CheckDormitoryMembership(room.Dormitory))
             {
                 return BadRequest();
             }
@@ -461,7 +459,7 @@ namespace SmartLaundry.Controllers
         {
             var room = _roomRepo.GetRoomById(roomId);
 
-            if (!await checkDormitoryMembership(room.Dormitory))
+            if (!await CheckDormitoryMembership(room.Dormitory))
             {
                 return BadRequest();
             }
@@ -479,7 +477,7 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumManager")]
         public async Task<IActionResult> AddAnnouncement(string message, int dormitoryId)
         {
-            if (!await checkDormitoryMembership(dormitoryId))
+            if (!await CheckDormitoryMembership(dormitoryId))
             {
                 return BadRequest();
             }
@@ -501,7 +499,7 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> RemoveAnnouncement(int announcementId)
         {
             var announcement = _announcementRepo.GetAnnouncementById(announcementId);
-            if (!await checkDormitoryMembership(announcement.DormitoryId))
+            if (!await CheckDormitoryMembership(announcement.DormitoryId))
             {
                 return BadRequest();
             }
@@ -516,16 +514,16 @@ namespace SmartLaundry.Controllers
             return _dormitoryRepo.Dormitories.Any(e => e.DormitoryID == id);
         }
 
-        private async Task<bool> checkDormitoryMembership(Dormitory dormitory)
+        private async Task<bool> CheckDormitoryMembership(Dormitory dormitory)
         {
             var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
             return authorizationResult.Succeeded;
         }
 
-        private async Task<bool> checkDormitoryMembership(int dormitoryId)
+        private async Task<bool> CheckDormitoryMembership(int dormitoryId)
         {
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            return await checkDormitoryMembership(dormitory);
+            return await CheckDormitoryMembership(dormitory);
         }
     }
 }

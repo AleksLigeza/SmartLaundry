@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
 using SmartLaundry.Controllers;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Data.Mock;
 using SmartLaundry.Models;
-using SmartLaundry.Models.AccountViewModels;
-using SmartLaundry.Services;
 using Xunit;
 
 namespace SmartLaundry.Tests.Unit {

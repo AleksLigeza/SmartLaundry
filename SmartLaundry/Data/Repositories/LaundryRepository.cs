@@ -4,7 +4,6 @@ using SmartLaundry.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SmartLaundry.Data.Repositories
 {
@@ -56,6 +55,7 @@ namespace SmartLaundry.Data.Repositories
 
         public void RemoveLaundry(Laundry laundry)
         {
+            if (laundry == null) return;
             laundry = _context.Laundries.
                 Where(x => x.Id == laundry.Id)
                 .Include(x => x.WashingMachines)

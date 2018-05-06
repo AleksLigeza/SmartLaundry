@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SmartLaundry.Data.Repositories
 {
@@ -43,10 +41,9 @@ namespace SmartLaundry.Data.Repositories
 
         public Dormitory GetSingleWithIncludes(int id)
         {
-            return _context.Dormitories
-                .Include(x => x.Laundries).Include(x => x.Manager)
-                .Include(x => x.Porters).Include(x => x.Rooms)
-                .Where(x => x.DormitoryID == id).SingleOrDefault();
+            return _context.Dormitories.Include(x => x.Laundries)
+                .Include(x => x.Manager).Include(x => x.Porters)
+                .Include(x => x.Rooms).SingleOrDefault(x => x.DormitoryID == id);
         }
 
         public Dormitory UpdateSingle(Dormitory source)
@@ -70,10 +67,6 @@ namespace SmartLaundry.Data.Repositories
             return _context.Dormitories.Where(x => x.DormitoryID == id).Include(x => x.Rooms).ThenInclude(x => x.Occupants).SingleOrDefault();
         }
 
-        public bool DormitoryHasRoom(int roomNumber, int dormiotryId)
-        {
-            var room = _context.Rooms.Where(x => x.DormitoryId == dormiotryId && x.Number == roomNumber).SingleOrDefault();
-            return room != null;
-        }
+        public bool DormitoryHasRoom(int roomNumber, int dormiotryId) => _context.Rooms.Any(x => x.DormitoryId == dormiotryId && x.Number == roomNumber);
     }
 }

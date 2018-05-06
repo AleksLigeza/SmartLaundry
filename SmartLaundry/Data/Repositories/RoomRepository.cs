@@ -1,10 +1,8 @@
 ﻿using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace SmartLaundry.Data.Repositories
 {
