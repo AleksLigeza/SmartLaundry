@@ -29,8 +29,9 @@ namespace SmartLaundry.Models
 
         [Required]
         public int DormitoryId { get; set; }
+
         public virtual Dormitory Dormitory { get; set; }
-    
+
         public virtual ICollection<WashingMachine> WashingMachines { get; set; }
     }
 }

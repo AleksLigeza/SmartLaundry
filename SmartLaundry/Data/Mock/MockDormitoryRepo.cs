@@ -5,14 +5,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SmartLaundry.Data.Mock {
-    public class MockDormitoryRepo : IDormitoryRepository {
-        public IEnumerable<Dormitory> Dormitories {
-            get {
-                return new List<Dormitory> {
-                    new Dormitory{ Name = "Promień", DormitoryID = 1, Address = "Akademicka 1", City = "Rzeszów", ZipCode="35-084"},
-                    new Dormitory{ Name = "Pingwin", DormitoryID = 2, Address = "Akademicka 5", City = "Rzeszów", ZipCode="35-084"},
-                    new Dormitory{ Name = "Nestor", DormitoryID = 3, Address = "Akademicka 3", City = "Rzeszów", ZipCode="35-084"},
+namespace SmartLaundry.Data.Mock
+{
+    public class MockDormitoryRepo : IDormitoryRepository
+    {
+        public IEnumerable<Dormitory> Dormitories
+        {
+            get
+            {
+                return new List<Dormitory>
+                {
+                    new Dormitory
+                    {
+                        Name = "Promień",
+                        DormitoryID = 1,
+                        Address = "Akademicka 1",
+                        City = "Rzeszów",
+                        ZipCode = "35-084"
+                    },
+                    new Dormitory
+                    {
+                        Name = "Pingwin",
+                        DormitoryID = 2,
+                        Address = "Akademicka 5",
+                        City = "Rzeszów",
+                        ZipCode = "35-084"
+                    },
+                    new Dormitory
+                    {
+                        Name = "Nestor",
+                        DormitoryID = 3,
+                        Address = "Akademicka 3",
+                        City = "Rzeszów",
+                        ZipCode = "35-084"
+                    },
                 };
             }
         }

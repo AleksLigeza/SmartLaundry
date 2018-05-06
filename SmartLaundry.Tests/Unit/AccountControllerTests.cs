@@ -11,15 +11,17 @@ using SmartLaundry.Models.AccountViewModels;
 using SmartLaundry.Services;
 using Xunit;
 
-namespace SmartLaundry.Tests.Unit {
-    public class AccountControllerTests {
-
+namespace SmartLaundry.Tests.Unit
+{
+    public class AccountControllerTests
+    {
         private readonly AccountController _controller;
         private readonly Mock<MockSignInManager> _signInManager;
         private readonly Mock<MockUserManager> _userManager;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountControllerTests() {
+        public AccountControllerTests()
+        {
             var userManager = new Mock<MockUserManager>();
             var signInManager = new Mock<MockSignInManager>();
             var logger = new Mock<ILogger<AccountController>>().Object;
@@ -31,12 +33,14 @@ namespace SmartLaundry.Tests.Unit {
             _signInManager.Setup(manager => manager.SignOutAsync())
                 .Returns(Task.CompletedTask);
 
-            _controller = new AccountController(userManager.Object, signInManager.Object, new FakeEmailSender(), logger);
+            _controller =
+                new AccountController(userManager.Object, signInManager.Object, new FakeEmailSender(), logger);
         }
 
         [Fact]
         [Trait("Category", "Unit")]
-        public void LoginGetReturnsLoginViewWhenNotSignedIn() {
+        public void LoginGetReturnsLoginViewWhenNotSignedIn()
+        {
             //Arrange
             _signInManager.Setup(manager => manager.IsSignedIn(It.IsAny<ClaimsPrincipal>()))
                 .Returns(false);
@@ -49,7 +53,8 @@ namespace SmartLaundry.Tests.Unit {
 
         [Fact]
         [Trait("Category", "Unit")]
-        public void LoginGetRedirectsToIndexWhenSignedIn() {
+        public void LoginGetRedirectsToIndexWhenSignedIn()
+        {
             //Arrange
             _signInManager.Setup(manager => manager.IsSignedIn(It.IsAny<ClaimsPrincipal>()))
                 .Returns(true);
@@ -64,7 +69,8 @@ namespace SmartLaundry.Tests.Unit {
 
         [Fact]
         [Trait("Category", "Unit")]
-        public async void LoginPostReturnsViewModelWhenNotValidModel() {
+        public async void LoginPostReturnsViewModelWhenNotValidModel()
+        {
             //Arrange
             _controller.ModelState.AddModelError("test", "test");
 
@@ -76,9 +82,12 @@ namespace SmartLaundry.Tests.Unit {
 
         [Fact]
         [Trait("Category", "Unit")]
-        public async void LoginPostReturnsRedirectsToReturnUrlWhenSucceeded() {
+        public async void LoginPostReturnsRedirectsToReturnUrlWhenSucceeded()
+        {
             //Arrange
-            _signInManager.Setup(manager => manager.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            _signInManager.Setup(manager =>
+                    manager.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
+                        It.IsAny<bool>()))
                 .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
 
             _controller.ModelState.Clear();
@@ -93,9 +102,12 @@ namespace SmartLaundry.Tests.Unit {
 
         [Fact]
         [Trait("Category", "Unit")]
-        public async void LoginPostShowsErrorWhenFailed() {
+        public async void LoginPostShowsErrorWhenFailed()
+        {
             //Arrange
-            _signInManager.Setup(manager => manager.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            _signInManager.Setup(manager =>
+                    manager.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
+                        It.IsAny<bool>()))
                 .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Failed);
 
             //Act
@@ -107,9 +119,12 @@ namespace SmartLaundry.Tests.Unit {
 
         [Fact]
         [Trait("Category", "Unit")]
-        public async void LoginPostShowsErrorWhenEmailIsNotConfirmed() {
+        public async void LoginPostShowsErrorWhenEmailIsNotConfirmed()
+        {
             //Arrange
-            _signInManager.Setup(manager => manager.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            _signInManager.Setup(manager =>
+                    manager.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
+                        It.IsAny<bool>()))
                 .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.NotAllowed);
 
             //Act
@@ -121,7 +136,8 @@ namespace SmartLaundry.Tests.Unit {
 
         [Fact]
         [Trait("Category", "Unit")]
-        public void RegisterGetReturnsLoginViewWhenNotSignedIn() {
+        public void RegisterGetReturnsLoginViewWhenNotSignedIn()
+        {
             //Arrange
             _signInManager.Setup(manager => manager.IsSignedIn(It.IsAny<ClaimsPrincipal>()))
                 .Returns(false);
@@ -134,7 +150,8 @@ namespace SmartLaundry.Tests.Unit {
 
         [Fact]
         [Trait("Category", "Unit")]
-        public void RegisterGetRedirectsToIndexWhenSignedIn() {
+        public void RegisterGetRedirectsToIndexWhenSignedIn()
+        {
             //Arrange
             _signInManager.Setup(manager => manager.IsSignedIn(It.IsAny<ClaimsPrincipal>()))
                 .Returns(true);
@@ -149,7 +166,8 @@ namespace SmartLaundry.Tests.Unit {
 
         [Fact]
         [Trait("Category", "Unit")]
-        public async void RegisterPostReturnsViewModelWhenModeStatelIsNotValid() {
+        public async void RegisterPostReturnsViewModelWhenModeStatelIsNotValid()
+        {
             //Arrange
             _controller.ModelState.AddModelError("test", "test");
 
@@ -161,10 +179,11 @@ namespace SmartLaundry.Tests.Unit {
 
         [Fact]
         [Trait("Category", "Unit")]
-        public async void RegisterPostShowsErrorWhenFailed() {
+        public async void RegisterPostShowsErrorWhenFailed()
+        {
             //Arrange
             _userManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
-                .ReturnsAsync(IdentityResult.Failed(new IdentityError() { Description = "test" }));
+                .ReturnsAsync(IdentityResult.Failed(new IdentityError() {Description = "test"}));
 
             //Act
             var result = await _controller.Register(new RegisterViewModel());
@@ -175,7 +194,8 @@ namespace SmartLaundry.Tests.Unit {
 
         [Fact]
         [Trait("Category", "Unit")]
-        public async void RegisterPostRedirectsToActionWhenSucceeded() {
+        public async void RegisterPostRedirectsToActionWhenSucceeded()
+        {
             //Arrange
             _userManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
@@ -193,7 +213,7 @@ namespace SmartLaundry.Tests.Unit {
             TestHelpers.SetFakeHttpRequestSchemeTo(_controller, It.IsAny<string>());
 
             //Act
-            var result = await _controller.Register(new RegisterViewModel() { Email = "" });
+            var result = await _controller.Register(new RegisterViewModel() {Email = ""});
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);

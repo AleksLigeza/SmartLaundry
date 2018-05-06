@@ -13,6 +13,7 @@ namespace SmartLaundry.Models
 
         [StringLength(255)]
         public string Message { get; set; }
+
         public DateTime PublishingDate { get; set; }
 
         public int DormitoryId { get; set; }

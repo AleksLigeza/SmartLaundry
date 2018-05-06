@@ -58,7 +58,7 @@ namespace SmartLaundry.Data
                 .HasOne(x => x.WashingMachine)
                 .WithMany(x => x.Reservations)
                 .HasForeignKey(x => x.WashingMachineId);
-    
+
             builder.Entity<WashingMachine>()
                 .HasOne(x => x.Laundry)
                 .WithMany(x => x.WashingMachines)

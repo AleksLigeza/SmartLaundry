@@ -8,5 +8,7 @@ namespace SmartLaundry.Authorization
             new DormitoryMembershipRequirement();
     }
 
-    public class DormitoryMembershipRequirement : IAuthorizationRequirement { }
+    public class DormitoryMembershipRequirement : IAuthorizationRequirement
+    {
+    }
 }

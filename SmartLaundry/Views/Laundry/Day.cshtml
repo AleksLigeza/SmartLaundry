@@ -14,7 +14,7 @@
     var firstFreeLaundryNumber = 1;
     for (int i = 1; i < 100; i++)
     {
-        if (!Model.Laundries.Any(x => x.Position == i))
+        if (Model.Laundries.All(x => x.Position != i))
         {
             firstFreeLaundryNumber = i;
             break;
@@ -22,12 +22,12 @@
     }
 
     <form method="POST" asp-action="AddLaundry">
-        <input type="number" name="laundryPosition" value="@firstFreeLaundryNumber" min="1" max="100" />
-        <input type="hidden" name="dormitoryId" value="@Model.DormitoryId" />
-        <input type="time" name="startTime" min="00:00" max="23:00" value="15:00" />
-        <input type="time" name="shiftTime" min="01:00" max="03:00" value="02:00" />
-        <input type="number" name="shiftCount" min="1" max="24" value="4" />
-        <input type="submit" value="Add laundry" />
+        <input type="number" name="laundryPosition" value="@firstFreeLaundryNumber" min="1" max="100"/>
+        <input type="hidden" name="dormitoryId" value="@Model.DormitoryId"/>
+        <input type="time" name="startTime" min="00:00" max="23:00" value="15:00"/>
+        <input type="time" name="shiftTime" min="01:00" max="03:00" value="02:00"/>
+        <input type="number" name="shiftCount" min="1" max="24" value="4"/>
+        <input type="submit" value="Add laundry"/>
     </form>
 }
 @foreach (var laundry in Model.Laundries)
@@ -35,16 +35,16 @@
     var washingMachines = laundry.WashingMachines.OrderBy(x => x.Position).ToList();
 
     <form method="post" asp-action="DeleteLaundry">
-        <input type="hidden" name="id" value="@laundry.Id" />
-        <input type="submit" value="Remove laundry" />
+        <input type="hidden" name="id" value="@laundry.Id"/>
+        <input type="submit" value="Remove laundry"/>
     </form>
 
-    @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+    if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
     {
         var firstFreeWashingMachineNumber = 1;
         for (int i = 1; i < 100; i++)
         {
-            if (!laundry.WashingMachines.Any(x => x.Position == i))
+            if (laundry.WashingMachines.All(x => x.Position != i))
             {
                 firstFreeWashingMachineNumber = i;
                 break;
@@ -52,138 +52,137 @@
         }
 
         <form method="post" asp-action="AddWashingMachine">
-            <input type="hidden" name="id" value="@laundry.Id" />
-            <input type="number" name="machinePosition" min="1" max="100" value="@firstFreeWashingMachineNumber" />
-            <input type="submit" value="Add washing machine" />
+            <input type="hidden" name="id" value="@laundry.Id"/>
+            <input type="number" name="machinePosition" min="1" max="100" value="@firstFreeWashingMachineNumber"/>
+            <input type="submit" value="Add washing machine"/>
         </form>
     }
     <table class="table">
         <thead>
-            <tr>
+        <tr>
+            <th>
+                Laundry @laundry.Position
+            </th>
+            @foreach (var item in washingMachines)
+            {
                 <th>
-                    Laundry @laundry.Position
-                </th>
-                @foreach (var item in washingMachines)
-                {
-                    <th>
-                        @item.Position
-                        @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                    @item.Position
+                    @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                    {
+                        <form method="POST" asp-action="RemoveWashingMachine">
+                            <input type="hidden" name="machineId" value="@item.Id"/>
+                            <input type="submit" value="Remove washing machine"/>
+                        </form>
+                    }
+                    @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumPorter")).Succeeded)
+                    {
+                        if (Model.isCurrentlyFault(item.Id))
                         {
-                            <form method="POST" asp-action="RemoveWashingMachine">
-                                <input type="hidden" name="machineId" value="@item.Id" />
-                                <input type="submit" value="Remove washing machine" />
+                            <form method="POST" asp-action="EnableWashingMachine">
+                                <input type="hidden" name="machineId" value="@item.Id"/>
+                                <input type="submit" value="Enable washing machine"/>
                             </form>
                         }
-                        @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumPorter")).Succeeded)
+                        else
                         {
-                            if (Model.isCurrentlyFault(item.Id))
+                            <form method="POST" asp-action="DisableWashingMachine">
+                                <input type="hidden" name="machineId" value="@item.Id"/>
+                                <input type="submit" value="Disable washing machine"/>
+                            </form>
+                        }
+                    }
+                </th>
+            }
+        </tr>
+        </thead>
+        <tbody>
+        @for (int shift = 0; shift < laundry.shiftCount; shift++)
+        {
+            DateTime startTime = Model.date.Add(laundry.startTime + laundry.shiftTime * shift);
+            DateTime endTime = Model.date.Add(laundry.startTime + laundry.shiftTime * (shift + 1));
+            <tr>
+                <td>
+                    @startTime.Hour.ToString("00"):@startTime.Minute.ToString("00") - @endTime.Hour.ToString("00"):@endTime.Minute.ToString("00")
+                </td>
+                @foreach (var item in washingMachines)
+                {
+                    <td>
+                        @{
+                            var reservation = item.Reservations
+                                .SingleOrDefault(x => x.StartTime == startTime
+                                                      && x.Fault == false && x.ToRenew == false);
+                            var reservationToConfirm = item.Reservations
+                                .SingleOrDefault(x => x.StartTime == startTime
+                                                      && x.Fault == false
+                                                      && x.ToRenew
+                                                      && x.Confirmed == false
+                                                      && (x.StartTime - DateTime.Now).TotalMinutes > 15);
+                        }
+                        @if (reservation != null)
+                        {
+                            if (reservation.Room != null)
                             {
-                                <form method="POST" asp-action="EnableWashingMachine">
-                                    <input type="hidden" name="machineId" value="@item.Id" />
-                                    <input type="submit" value="Enable washing machine" />
-                                </form>
+                                <b>@reservation.Room.Number</b>
                             }
                             else
                             {
-                                <form method="POST" asp-action="DisableWashingMachine">
-                                    <input type="hidden" name="machineId" value="@item.Id" />
-                                    <input type="submit" value="Disable washing machine" />
-                                </form>
+                                <b>Personel</b>
                             }
                         }
-                    </th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @for (int shift = 0; shift < laundry.shiftCount; shift++)
-            {
-                DateTime startTime = Model.date.Add(laundry.startTime + laundry.shiftTime * shift);
-                DateTime endTime = Model.date.Add(laundry.startTime + laundry.shiftTime * (shift + 1));
-                <tr>
-                    <td>
-                        @startTime.Hour.ToString("00"):@startTime.Minute.ToString("00") - @endTime.Hour.ToString("00"):@endTime.Minute.ToString("00")
-                    </td>
-                    @foreach (var item in washingMachines)
-                    {
-                        <td>
-                            @{
-                                var reservation = item.Reservations
-                                    .Where(x => x.StartTime == startTime
-                                        && x.Fault == false && x.ToRenew == false)
-                                    .SingleOrDefault();
-                                var reservationToConfirm = item.Reservations
-                                    .Where(x => x.StartTime == startTime
-                                        && x.Fault == false
-                                        && x.ToRenew == true
-                                        && x.Confirmed == false
-                                        && (x.StartTime - DateTime.Now).TotalMinutes > 15)
-                                    .SingleOrDefault();
-                            }
-                            @if (reservation != null)
+                        @if (Model.IsFaultAtTime(item, startTime))
+                        {
+                            <b>FAULT</b>
+                        }
+                        else if (DateTime.Now < startTime && (await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
+                        {
+                            if (reservationToConfirm != null)
                             {
-                                if (reservation.Room != null)
+                                if (reservationToConfirm.Room != null)
                                 {
-                                    <b>@reservation.Room.Number</b>
+                                    <b>@reservationToConfirm.Room.Number - to confirm</b>
                                 }
                                 else
                                 {
-                                    <b>Personel</b>
+                                    <b>Personel - to confirm</b>
+                                }
+
+                                if (Model.currentRoomReservation != null && Model.currentRoomReservation.Id == reservationToConfirm.Id || reservationToConfirm.Room == null)
+                                {
+                                    <form method="POST" asp-action="ConfirmReservation">
+                                        <input type="hidden" name="reservationId" value="@reservationToConfirm.Id"/>
+                                        <input type="submit" value="Confirm reservation"/>
+                                    </form>
                                 }
                             }
-                            @if (Model.IsFaultAtTime(item, startTime))
+                            else
                             {
-                                <b>FAULT</b>
-                            }
-                            else if (DateTime.Now < startTime && (await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
-                            {
-                                if (reservationToConfirm != null)
-                                {
-                                    if (reservationToConfirm.Room != null)
-                                    {
-                                        <b>@reservationToConfirm.Room.Number - to confirm</b>
-                                    }
-                                    else
-                                    {
-                                        <b>Personel - to confirm</b>
-                                    }
-                                    
-                                    if (Model.currentRoomReservation != null && Model.currentRoomReservation.Id == reservationToConfirm.Id || reservationToConfirm.Room == null)
-                                    {
-                                        <form method="POST" asp-action="ConfirmReservation">
-                                            <input type="hidden" name="reservationId" value="@reservationToConfirm.Id" />
-                                            <input type="submit" value="Confirm reservation" />
-                                        </form>
-                                    }
-                                }
-                                else
-                                {
-                                    if (reservation != null
+                                if (reservation != null
                                     && ((Model.currentRoomReservation != null && reservation.Id == Model.currentRoomReservation.Id)
                                         || (await AuthorizationService.AuthorizeAsync(User, "MinimumPorter")).Succeeded))
-                                    {
-                                        <form method="POST" asp-action="CancelReservation">
-                                            <input type="hidden" name="reservationId" value="@reservation.Id" />
-                                            <input type="submit" value="Cancel reservation" />
-                                        </form>
-                                    }
-                                    else if ((Model.currentRoomReservation == null || !Model.currentRoomReservation.Confirmed)
-                                    && reservation == null
-                                    && (Model.date == DateTime.Now.Date || Model.date == DateTime.Now.Date.AddDays(1) && Model.hasReservationToRenew))
-                                    {
-                                        <form method="POST" asp-action="Reserve">
-                                            <input type="hidden" name="startTime" value="@startTime" />
-                                            <input type="hidden" name="machineId" value="@item.Id" />
-                                            <input type="submit" value="Reserve" />
-                                        </form>
-                                    }
+                                {
+                                    <form method="POST" asp-action="CancelReservation">
+                                        <input type="hidden" name="reservationId" value="@reservation.Id"/>
+                                        <input type="submit" value="Cancel reservation"/>
+                                    </form>
+                                }
+                                else if ((Model.currentRoomReservation == null || !Model.currentRoomReservation.Confirmed)
+                                         && reservation == null
+                                         && (Model.date == DateTime.Now.Date || Model.date == DateTime.Now.Date.AddDays(1) && Model.hasReservationToRenew
+                                             || (await AuthorizationService.AuthorizeAsync(User, "MinimumPorter")).Succeeded))
+                                {
+                                    <form method="POST" asp-action="Reserve">
+                                        <input type="hidden" name="startTime" value="@startTime"/>
+                                        <input type="hidden" name="machineId" value="@item.Id"/>
+                                        <input type="submit" value="Reserve"/>
+                                    </form>
                                 }
                             }
+                        }
 
-                        </td>
-                    }
-                </tr>
-            }
+                    </td>
+                }
+            </tr>
+        }
         </tbody>
     </table>
 }

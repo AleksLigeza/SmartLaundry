@@ -1,6 +1,5 @@
-﻿@model Dormitory
-
-@using Microsoft.AspNetCore.Authorization
+﻿@using Microsoft.AspNetCore.Authorization
+@model Dormitory
 @inject IAuthorizationService AuthorizationService
 
 @{
@@ -14,53 +13,51 @@
 @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
 {
     <form method="POST" asp-action="AddRoom">
-        <input type="number" name="roomNumber" min="1" max="2000" />
-        <input type="hidden" name="dormitoryId" value="@Model.DormitoryID" />
-        <input type="submit" value="Add room" />
+        <input type="number" name="roomNumber" min="1" max="2000"/>
+        <input type="hidden" name="dormitoryId" value="@Model.DormitoryID"/>
+        <input type="submit" value="Add room"/>
     </form>
 }
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                Dormitory: @Model.Name
-            </th>
-            <th colspan="2"></th>
-        </tr>
+    <tr>
+        <th>
+            Dormitory: @Model.Name
+        </th>
+        <th colspan="2"></th>
+    </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Rooms)
+    @foreach (var item in Model.Rooms)
+    {
+        <tr>
+            <td rowspan="@(1 + item.Occupants.Count)">
+                @Html.DisplayFor(modelItem => item.Number)
+            </td>
+            <td colspan="2">
+                <form method="post" asp-action="DeleteRoom">
+                    <input type="hidden" name="id" value="@item.Id"/>
+                    <input type="submit" value="Remove room"/>
+                </form>
+                |
+                <a asp-action="ManageRoomUsers" asp-route-id="@item.Id">Manage occupants</a>
+            </td>
+        </tr>
+        foreach (var occupant in item.Occupants)
         {
             <tr>
-                <td rowspan="@(1 + @item.Occupants.Count)">
-                    @Html.DisplayFor(modelItem => item.Number)
+                <td>
+                    @occupant.Firstname @occupant.Lastname
                 </td>
-                <td colspan="2">
-                    <form method="post" asp-action="DeleteRoom">
-                        <input type="hidden" name="id" value="@item.Id" />
-                        <input type="submit" value="Remove room" />
+                <td>
+                    <form method="POST" asp-action="RemoveOccupant">
+                        <input type="hidden" name="userId" value="@occupant.Id"/>
+                        <input type="hidden" name="roomId" value="@item.Id"/>
+                        <input type="submit" value="Remove occupant"/>
                     </form>
-                    |
-                    <a asp-action="ManageRoomUsers" asp-route-id="@item.Id">Manage occupants</a>
                 </td>
             </tr>
-            @foreach (var occupant in item.Occupants)
-            {
-
-                <tr>
-                    <td>
-                        @occupant.Firstname @occupant.Lastname
-                    </td>
-                    <td>
-                        <form method="POST" asp-action="RemoveOccupant">
-                            <input type="hidden" name="userId" value="@occupant.Id" />
-                            <input type="hidden" name="roomId" value="@item.Id" />
-                            <input type="submit" value="Remove occupant" />
-                        </form>
-                    </td>
-                </tr>
-            }
         }
+    }
     </tbody>
 </table>
-

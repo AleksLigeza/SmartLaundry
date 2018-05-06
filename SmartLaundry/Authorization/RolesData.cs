@@ -12,7 +12,7 @@ namespace SmartLaundry.Authorization
 {
     public static class RolesData
     {
-        private static readonly string[] Roles = new string[] { "Administrator", "Manager", "Porter", "Occupant" };
+        private static readonly string[] Roles = new string[] {"Administrator", "Manager", "Porter", "Occupant"};
 
         public static async Task SeedRoles(IServiceProvider serviceProvider, IConfiguration configuration)
         {
@@ -25,29 +25,30 @@ namespace SmartLaundry.Authorization
                 {
                     await dbContext.Database.MigrateAsync();
 
-                var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                    var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-                foreach (var role in Roles)
-                {
-                    if (await roleManager.RoleExistsAsync(role)) continue;
-                    await roleManager.CreateAsync(new IdentityRole(role));
-
-                    if (role != "Administrator") continue;
-                    var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-                    var user = new ApplicationUser
+                    foreach (var role in Roles)
                     {
-                        UserName = configuration["AdminEmail"],
-                        Email = configuration["AdminEmail"],
-                        Firstname = "Admin",
-                        Lastname = "Admin",
-                        EmailConfirmed = true
-                    };
+                        if (await roleManager.RoleExistsAsync(role)) continue;
+                        await roleManager.CreateAsync(new IdentityRole(role));
 
-                    await userManager.CreateAsync(user, configuration["AdminPassword"]);
-                            
-                    await userManager.AddToRoleAsync(user, "Administrator");
-                }
+                        if (role != "Administrator") continue;
+                        var userManager =
+                            serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+                        var user = new ApplicationUser
+                        {
+                            UserName = configuration["AdminEmail"],
+                            Email = configuration["AdminEmail"],
+                            Firstname = "Admin",
+                            Lastname = "Admin",
+                            EmailConfirmed = true
+                        };
+
+                        await userManager.CreateAsync(user, configuration["AdminPassword"]);
+
+                        await userManager.AddToRoleAsync(user, "Administrator");
+                    }
                 }
             }
         }

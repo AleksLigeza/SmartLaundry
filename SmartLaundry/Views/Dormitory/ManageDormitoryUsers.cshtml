@@ -1,7 +1,7 @@
-﻿@using SmartLaundry.Models.DormitoryViewModels
-@using Microsoft.AspNetCore.Authorization
-@inject IAuthorizationService AuthorizationService
+﻿@inject IAuthorizationService AuthorizationService
 
+@using Microsoft.AspNetCore.Authorization
+@using SmartLaundry.Models.DormitoryViewModels
 @model ManageDormitoryUsersViewModel
 
 @{
@@ -13,8 +13,8 @@
 <form asp-action="ManageDormitoryUsers" method="get">
     <div class="form-actions no-color">
         <p>
-            Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
-            <input type="submit" value="Search" class="btn btn-default" /> |
+            Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]"/>
+            <input type="submit" value="Search" class="btn btn-default"/> |
             <a asp-action="ManageDormitoryUsers">Back to Full List</a>
         </p>
     </div>
@@ -24,54 +24,54 @@
 
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                Dormitory: @Model.Dormitory.Name
-            </th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>
+            Dormitory: @Model.Dormitory.Name
+        </th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Users)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Firstname)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Lastname)
-                </td>
-                <td>
-                    @if (item.DormitoryManagerId != Model.Dormitory.DormitoryID && User.IsInRole("Administrator"))
-                    {
-                        <form method="POST" asp-action="AssignManager">
-                            <input type="hidden" name="managerEmail" value="@item.Email" />
-                            <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
-                            <input type="submit" value="Assign manager" />
-                        </form>
-                    }
-                    @if (item.DormitoryPorterId == null && item.DormitoryManagerId != Model.Dormitory.DormitoryID && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
-                    {
+    @foreach (var item in Model.Users)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Firstname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Lastname)
+            </td>
+            <td>
+                @if (item.DormitoryManagerId != Model.Dormitory.DormitoryID && User.IsInRole("Administrator"))
+                {
+                    <form method="POST" asp-action="AssignManager">
+                        <input type="hidden" name="managerEmail" value="@item.Email"/>
+                        <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID"/>
+                        <input type="submit" value="Assign manager"/>
+                    </form>
+                }
+                @if (item.DormitoryPorterId == null && item.DormitoryManagerId != Model.Dormitory.DormitoryID && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                {
                     <form method="POST" asp-action="AssignPorter">
-                        <input type="hidden" name="porterEmail" value="@item.Email" />
-                        <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
-                        <input type="submit" value="Assign porter" />
+                        <input type="hidden" name="porterEmail" value="@item.Email"/>
+                        <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID"/>
+                        <input type="submit" value="Assign porter"/>
                     </form>
-                    }
-                    @if (item.DormitoryPorterId == Model.Dormitory.DormitoryID && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
-                    {
+                }
+                @if (item.DormitoryPorterId == Model.Dormitory.DormitoryID && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                {
                     <form method="POST" asp-action="RemovePorter">
-                        <input type="hidden" name="porterEmail" value="@item.Email" />
-                        <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
-                        <input type="submit" value="Remove porter" />
+                        <input type="hidden" name="porterEmail" value="@item.Email"/>
+                        <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID"/>
+                        <input type="submit" value="Remove porter"/>
                     </form>
-                    }
-                </td>
-            </tr>
-        }
+                }
+            </td>
+        </tr>
+    }
     </tbody>
 </table>
 

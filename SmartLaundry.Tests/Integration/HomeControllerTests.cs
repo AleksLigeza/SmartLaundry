@@ -5,14 +5,16 @@ using SmartLaundry.Data;
 using SmartLaundry.Models;
 using Xunit;
 
-namespace SmartLaundry.Tests.Integration {
-    public class HomeControllerTests : IClassFixture<TestFixture> {
-
+namespace SmartLaundry.Tests.Integration
+{
+    public class HomeControllerTests : IClassFixture<TestFixture>
+    {
         private readonly HttpClient _client;
         private readonly ApplicationDbContext _globalContext;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeControllerTests(TestFixture fixture) {
+        public HomeControllerTests(TestFixture fixture)
+        {
             _client = fixture.Client;
             _globalContext = fixture.Context;
             _userManager = fixture.UserManager;
@@ -20,7 +22,8 @@ namespace SmartLaundry.Tests.Integration {
 
         [Fact]
         [Trait("Category", "Integration")]
-        public async Task EmptyPathReturnsIndexPage() {
+        public async Task EmptyPathReturnsIndexPage()
+        {
             // Arrange
             // ---
 

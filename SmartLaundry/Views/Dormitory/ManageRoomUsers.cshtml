@@ -1,8 +1,7 @@
-﻿@using SmartLaundry.Models.DormitoryViewModels
-@using Microsoft.AspNetCore.Authorization
-@inject IAuthorizationService AuthorizationService
+﻿@inject IAuthorizationService AuthorizationService
 
-@model ManageRoomUsersViewModel
+@using Microsoft.AspNetCore.Authorization
+@model SmartLaundry.Models.DormitoryViewModels.ManageRoomUsersViewModel
 
 @{
     ViewBag.Title = "Manage Room Users";
@@ -15,8 +14,8 @@
     <form asp-action="ManageRoomUsers" method="get">
         <div class="form-actions no-color">
             <p>
-                Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
-                <input type="submit" value="Search" class="btn btn-default" /> |
+                Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]"/>
+                <input type="submit" value="Search" class="btn btn-default"/> |
                 <a asp-action="ManageRoomUsers">Back to Full List</a>
             </p>
         </div>
@@ -26,49 +25,49 @@
 
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                Room: @Model.Room.Number
-            </th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>
+            Room: @Model.Room.Number
+        </th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Users)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Firstname)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Lastname)
-                </td>
-                <td>
-                    @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+    @foreach (var item in Model.Users)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Firstname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Lastname)
+            </td>
+            <td>
+                @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                {
+                    if (Model.Room.Occupants.SingleOrDefault(x => x.Id == item.Id) != null)
                     {
-                        if (Model.Room.Occupants.Where(x => x.Id == item.Id).SingleOrDefault() != null)
-                        {
-                            <form method="POST" asp-action="RemoveOccupant">
-                                <input type="hidden" name="userId" value="@item.Id" />
-                                <input type="hidden" name="roomId" value="@Model.Room.Id" />
-                                <input type="submit" value="Remove occupant" />
-                            </form>
-                        }
-                        else
-                        {
-                            <form method="POST" asp-action="AssignOccupant">
-                                <input type="hidden" name="userId" value="@item.Id" />
-                                <input type="hidden" name="roomId" value="@Model.Room.Id" />
-                                <input type="submit" value="Assign occupant" />
-                            </form>
-                        }
+                        <form method="POST" asp-action="RemoveOccupant">
+                            <input type="hidden" name="userId" value="@item.Id"/>
+                            <input type="hidden" name="roomId" value="@Model.Room.Id"/>
+                            <input type="submit" value="Remove occupant"/>
+                        </form>
                     }
-                </td>
-            </tr>
-        }
+                    else
+                    {
+                        <form method="POST" asp-action="AssignOccupant">
+                            <input type="hidden" name="userId" value="@item.Id"/>
+                            <input type="hidden" name="roomId" value="@Model.Room.Id"/>
+                            <input type="submit" value="Assign occupant"/>
+                        </form>
+                    }
+                }
+            </td>
+        </tr>
+    }
     </tbody>
 </table>
 

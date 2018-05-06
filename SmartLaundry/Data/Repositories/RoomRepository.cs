@@ -9,6 +9,7 @@ namespace SmartLaundry.Data.Repositories
     public class RoomRepository : IRoomRepository
     {
         private readonly ApplicationDbContext _context;
+
         public RoomRepository(ApplicationDbContext context)
         {
             _context = context;
@@ -36,6 +37,7 @@ namespace SmartLaundry.Data.Repositories
             {
                 return null;
             }
+
             var dormitoryId = room.DormitoryId;
 
             _context.Rooms.Remove(room);
@@ -56,8 +58,10 @@ namespace SmartLaundry.Data.Repositories
             _context.SaveChanges();
         }
 
-        public Room GetRoomById(int id) => _context.Rooms.Where(x => x.Id == id).Include(x=>x.Dormitory).SingleOrDefault();
-        public Room GetRoomWithOccupants(int id) => _context.Rooms.Where(x => x.Id == id).Include(x => x.Occupants).Include(x=>x.Dormitory).SingleOrDefault();
-        
+        public Room GetRoomById(int id) =>
+            _context.Rooms.Where(x => x.Id == id).Include(x => x.Dormitory).SingleOrDefault();
+
+        public Room GetRoomWithOccupants(int id) => _context.Rooms.Where(x => x.Id == id).Include(x => x.Occupants)
+            .Include(x => x.Dormitory).SingleOrDefault();
     }
 }

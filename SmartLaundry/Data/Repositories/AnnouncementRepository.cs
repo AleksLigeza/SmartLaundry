@@ -8,6 +8,7 @@ namespace SmartLaundry.Data.Repositories
     public class AnnouncementRepository : IAnnouncementRepository
     {
         private readonly ApplicationDbContext _context;
+
         public AnnouncementRepository(ApplicationDbContext context)
         {
             _context = context;

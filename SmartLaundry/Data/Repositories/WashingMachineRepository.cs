@@ -10,6 +10,7 @@ namespace SmartLaundry.Data.Repositories
     public class WashingMachineRepository : IWashingMachineRepository
     {
         private readonly ApplicationDbContext _context;
+
         public WashingMachineRepository(ApplicationDbContext context)
         {
             _context = context;
@@ -23,7 +24,7 @@ namespace SmartLaundry.Data.Repositories
         {
             if (_context.WashingMachines
                 .Any(x => x.LaundryId == laundryId
-                    && x.Position == position))
+                          && x.Position == position))
             {
                 return null;
             }
@@ -38,7 +39,8 @@ namespace SmartLaundry.Data.Repositories
             return machine;
         }
 
-        public void RemoveWashingMachine(WashingMachine washingMachine) {
+        public void RemoveWashingMachine(WashingMachine washingMachine)
+        {
             if (washingMachine == null) return;
             var machine = washingMachine;
             washingMachine = _context.WashingMachines

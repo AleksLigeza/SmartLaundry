@@ -33,7 +33,7 @@ namespace SmartLaundry
                 services.AddDbContext<ApplicationDbContext>(optionsBuilder =>
                     optionsBuilder
                         .UseInMemoryDatabase(CurrentEnvironment.EnvironmentName)
-                    );
+                );
 
                 services.AddTransient<IEmailSender, FakeEmailSender>();
             }
@@ -47,14 +47,14 @@ namespace SmartLaundry
             }
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-            {
-                options.Password.RequiredLength = 6;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireDigit = false;
-                options.SignIn.RequireConfirmedEmail = true;
-            })
+                {
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireDigit = false;
+                    options.SignIn.RequireConfirmedEmail = true;
+                })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -76,10 +76,12 @@ namespace SmartLaundry
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("MinimumOccupant", policy => policy.RequireRole("Administrator", "Manager", "Porter", "Occupant"));
+                options.AddPolicy("MinimumOccupant",
+                    policy => policy.RequireRole("Administrator", "Manager", "Porter", "Occupant"));
                 options.AddPolicy("MinimumPorter", policy => policy.RequireRole("Administrator", "Manager", "Porter"));
                 options.AddPolicy("MinimumManager", policy => policy.RequireRole("Administrator", "Manager"));
-                options.AddPolicy("DormitoryMembership", policy => policy.Requirements.Add(new DormitoryMembershipRequirement()));
+                options.AddPolicy("DormitoryMembership",
+                    policy => policy.Requirements.Add(new DormitoryMembershipRequirement()));
             });
         }
 

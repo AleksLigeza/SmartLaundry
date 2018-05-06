@@ -9,11 +9,14 @@ using SmartLaundry.Data.Mock;
 using SmartLaundry.Models;
 using Xunit;
 
-namespace SmartLaundry.Tests.Unit {
-    public class DormitoryControllerTests {
+namespace SmartLaundry.Tests.Unit
+{
+    public class DormitoryControllerTests
+    {
         private readonly DormitoryController _controller;
 
-        public DormitoryControllerTests() {
+        public DormitoryControllerTests()
+        {
             var _dormitoryRepo = new MockDormitoryRepo();
             var _userRepo = new Mock<IUserRepository>().Object;
             var _roomRepo = new Mock<IRoomRepository>().Object;
@@ -21,12 +24,14 @@ namespace SmartLaundry.Tests.Unit {
             var _authService = new Mock<IAuthorizationService>().Object;
             var _announcementRepo = new Mock<IAnnouncementRepository>().Object;
 
-            _controller = new DormitoryController(_dormitoryRepo, _userRepo, _roomRepo, _userManager, _authService, _announcementRepo);
+            _controller = new DormitoryController(_dormitoryRepo, _userRepo, _roomRepo, _userManager, _authService,
+                _announcementRepo);
         }
 
         [Fact]
         [Trait("Category", "Unit")]
-        public void IndexReturnsListOfAllDormitories() {
+        public void IndexReturnsListOfAllDormitories()
+        {
             //Arrange
 
             //Act

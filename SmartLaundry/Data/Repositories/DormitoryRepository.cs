@@ -14,6 +14,7 @@ namespace SmartLaundry.Data.Repositories
         {
             _context = appDbContext;
         }
+
         public IEnumerable<Dormitory> Dormitories => _context.Dormitories;
 
         public Dormitory AddSingle(Dormitory source)
@@ -64,9 +65,11 @@ namespace SmartLaundry.Data.Repositories
 
         public Dormitory GetDormitoryWithRooms(int id)
         {
-            return _context.Dormitories.Where(x => x.DormitoryID == id).Include(x => x.Rooms).ThenInclude(x => x.Occupants).SingleOrDefault();
+            return _context.Dormitories.Where(x => x.DormitoryID == id).Include(x => x.Rooms)
+                .ThenInclude(x => x.Occupants).SingleOrDefault();
         }
 
-        public bool DormitoryHasRoom(int roomNumber, int dormiotryId) => _context.Rooms.Any(x => x.DormitoryId == dormiotryId && x.Number == roomNumber);
+        public bool DormitoryHasRoom(int roomNumber, int dormiotryId) =>
+            _context.Rooms.Any(x => x.DormitoryId == dormiotryId && x.Number == roomNumber);
     }
 }

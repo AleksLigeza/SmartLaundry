@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -45,10 +44,10 @@ namespace SmartLaundry.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpGet]
         public IActionResult ManageDormitoryUsers(
-                int id,
-                string currentFilter,
-                string searchString,
-                int? page)
+            int id,
+            string currentFilter,
+            string searchString,
+            int? page)
         {
             if (searchString != null)
             {
@@ -61,28 +60,22 @@ namespace SmartLaundry.Controllers
 
             ViewData["CurrentFilter"] = searchString;
 
-            List<ApplicationUser> users;
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                users = _userRepo.GetUsersWithEmailLike(searchString);
-            }
-            else
-            {
-                users = _userRepo.Users.ToList();
-            }
+            var users = !string.IsNullOrEmpty(searchString)
+                ? _userRepo.GetUsersWithEmailLike(searchString)
+                : _userRepo.Users.ToList();
 
             var dormitory = _dormitoryRepo.GetSingleById(id);
-            
+
             var usersWithoutDormitory = users
                 .Where(x => x.DormitoryManagerId == null
-                    && x.DormitoryPorterId == null
-                    && x.RoomId == null
-                    && x.Email != "admin@admin.admin")
+                            && x.DormitoryPorterId == null
+                            && x.RoomId == null
+                            && x.Email != "admin@admin.admin")
                 .ToList();
             var thisDormitoryUsers = users
                 .Where(x => x.DormitoryPorterId == dormitory.DormitoryID
-                    || x.DormitoryManagerId == dormitory.DormitoryID
-                    && dormitory.Rooms.Any(z => z.Id == x.RoomId))
+                            || x.DormitoryManagerId == dormitory.DormitoryID
+                            && dormitory.Rooms.Any(z => z.Id == x.RoomId))
                 .ToList();
             users = usersWithoutDormitory.Concat(thisDormitoryUsers).ToList();
 
@@ -92,16 +85,17 @@ namespace SmartLaundry.Controllers
             }
 
             int pageSize = 10;
-            return View(new ManageDormitoryUsersViewModel(new PaginatedList<ApplicationUser>(users, users.Count, page ?? 1, pageSize), dormitory));
+            return View(new ManageDormitoryUsersViewModel(
+                new PaginatedList<ApplicationUser>(users, users.Count, page ?? 1, pageSize), dormitory));
         }
 
         [Authorize(Policy = "MinimumManager")]
         [HttpGet]
         public async Task<IActionResult> ManageRoomUsers(
-                int id,
-                string currentFilter,
-                string searchString,
-                int? page)
+            int id,
+            string currentFilter,
+            string searchString,
+            int? page)
         {
             var room = _roomRepo.GetRoomWithOccupants(id);
             if (room == null)
@@ -125,28 +119,22 @@ namespace SmartLaundry.Controllers
 
             ViewData["CurrentFilter"] = searchString;
 
-            List<ApplicationUser> users;
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                users = _userRepo.GetUsersWithEmailLike(searchString);
-            }
-            else
-            {
-                users = _userRepo.Users.ToList();
-            }
+            var users = !String.IsNullOrEmpty(searchString)
+                ? _userRepo.GetUsersWithEmailLike(searchString)
+                : _userRepo.Users.ToList();
 
             var dormitory = room.Dormitory;
 
             var usersWithoutDormitory = users
                 .Where(x => x.DormitoryManagerId == null
-                    && x.DormitoryPorterId == null
-                    && x.RoomId == null
-                    && x.Email != "admin@admin.admin")
+                            && x.DormitoryPorterId == null
+                            && x.RoomId == null
+                            && x.Email != "admin@admin.admin")
                 .ToList();
             var thisDormitoryUsers = users
                 .Where(x => x.DormitoryPorterId == null
-                    && x.DormitoryManagerId == null
-                    && dormitory.Rooms.Any(z=> z.Id == x.RoomId))
+                            && x.DormitoryManagerId == null
+                            && dormitory.Rooms.Any(z => z.Id == x.RoomId))
                 .ToList();
             users = usersWithoutDormitory.Concat(thisDormitoryUsers).ToList();
 
@@ -184,7 +172,8 @@ namespace SmartLaundry.Controllers
             {
                 await _userManager.AddToRoleAsync(user, "Manager");
             }
-            return RedirectToAction("Details", new { id = dormitoryId });
+
+            return RedirectToAction("Details", new {id = dormitoryId});
         }
 
         [HttpPost]
@@ -207,7 +196,7 @@ namespace SmartLaundry.Controllers
                 await _userManager.AddToRoleAsync(user, "Porter");
             }
 
-            return RedirectToAction("Details", new { id = dormitoryId });
+            return RedirectToAction("Details", new {id = dormitoryId});
         }
 
         [HttpPost]
@@ -227,7 +216,7 @@ namespace SmartLaundry.Controllers
             _userRepo.RemoveDormitoryPorter(user, dormitory);
             await _userManager.RemoveFromRoleAsync(user, "Porter");
 
-            return RedirectToAction("Details", new { id = dormitoryId });
+            return RedirectToAction("Details", new {id = dormitoryId});
         }
 
         [HttpGet]
@@ -244,12 +233,14 @@ namespace SmartLaundry.Controllers
                 return NotFound();
             }
 
-            var model = new DormitoryDetailsViewModel();
-            model.Dormitory = dormitory;
-            model.Manager = dormitory.Manager;
-            model.Porters = dormitory.Porters.ToList();
-            model.Laundries = dormitory.Laundries.ToList();
-            model.Announcements = _announcementRepo.GetDormitoryAnnouncements(dormitory.DormitoryID);
+            var model = new DormitoryDetailsViewModel
+            {
+                Dormitory = dormitory,
+                Manager = dormitory.Manager,
+                Porters = dormitory.Porters.ToList(),
+                Laundries = dormitory.Laundries.ToList(),
+                Announcements = _announcementRepo.GetDormitoryAnnouncements(dormitory.DormitoryID)
+            };
 
             return View(model);
         }
@@ -265,20 +256,24 @@ namespace SmartLaundry.Controllers
         [HttpPost]
         [Authorize(Roles = "Administrator")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("DormitoryID,Name,Address,ZipCode,City")] Dormitory dormitory)
+        public IActionResult Create([Bind("DormitoryID,Name,Address,ZipCode,City")]
+            Dormitory dormitory)
         {
-            if (ModelState.IsValid)
-            {
-                _dormitoryRepo.AddSingle(dormitory);
-                return RedirectToAction(nameof(Index));
-            }
-            return View(dormitory);
+            if (!ModelState.IsValid)
+                return View(dormitory);
+            _dormitoryRepo.AddSingle(dormitory);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
         [Authorize(Policy = "MinimumManager")]
         public async Task<IActionResult> Edit(int? id)
         {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
             var dormitory = _dormitoryRepo.GetSingleById(id.Value);
             if (!await CheckDormitoryMembership(dormitory))
             {
@@ -291,7 +286,8 @@ namespace SmartLaundry.Controllers
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DormitoryID,Name,Address,ZipCode,City")] Dormitory dormitory)
+        public async Task<IActionResult> Edit(int id, [Bind("DormitoryID,Name,Address,ZipCode,City")]
+            Dormitory dormitory)
         {
             if (!await CheckDormitoryMembership(id))
             {
@@ -320,8 +316,10 @@ namespace SmartLaundry.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(dormitory);
         }
 
@@ -394,7 +392,7 @@ namespace SmartLaundry.Controllers
             }
 
             _roomRepo.AddRoomToDormitory(roomNumber, dormitoryId);
-            return RedirectToAction(nameof(Rooms), new { id = dormitoryId });
+            return RedirectToAction(nameof(Rooms), new {id = dormitoryId});
         }
 
         [ValidateAntiForgeryToken]
@@ -426,7 +424,7 @@ namespace SmartLaundry.Controllers
                 return NotFound();
             }
 
-            return RedirectToAction(nameof(Rooms), new { id = dormitoryId });
+            return RedirectToAction(nameof(Rooms), new {id = dormitoryId});
         }
 
         [HttpPost]
@@ -449,7 +447,7 @@ namespace SmartLaundry.Controllers
                 await _userManager.AddToRoleAsync(user, "Occupant");
             }
 
-            return RedirectToAction("Rooms", new { id = room.DormitoryId });
+            return RedirectToAction("Rooms", new {id = room.DormitoryId});
         }
 
         [HttpPost]
@@ -469,7 +467,7 @@ namespace SmartLaundry.Controllers
             _roomRepo.RemoveOccupant(room, user);
             await _userManager.RemoveFromRoleAsync(user, "Occupant");
 
-            return RedirectToAction("Rooms", new { id = room.DormitoryId });
+            return RedirectToAction("Rooms", new {id = room.DormitoryId});
         }
 
         [HttpPost]
@@ -490,7 +488,7 @@ namespace SmartLaundry.Controllers
             };
             _announcementRepo.CreateAnnouncement(announcement);
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details), new {id = dormitoryId});
         }
 
         [HttpPost]
@@ -504,9 +502,11 @@ namespace SmartLaundry.Controllers
                 return BadRequest();
             }
 
-            _announcementRepo.CreateAnnouncement(announcement);
+            var dormitoryId = announcement.DormitoryId;
 
-            return RedirectToAction(nameof(Index));
+            _announcementRepo.DeleteAnnouncement(announcementId);
+
+            return RedirectToAction(nameof(Details), new {id = dormitoryId});
         }
 
         private bool DormitoryExists(int id)
@@ -516,7 +516,8 @@ namespace SmartLaundry.Controllers
 
         private async Task<bool> CheckDormitoryMembership(Dormitory dormitory)
         {
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
+            var authorizationResult =
+                await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
             return authorizationResult.Succeeded;
         }
 

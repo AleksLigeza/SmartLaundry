@@ -14,13 +14,16 @@ namespace SmartLaundry.Models.LaundryViewModels
         public bool hasReservationToRenew;
         public Dictionary<int, Reservation> washingMachineState;
 
-        public bool IsFaultAtTime(WashingMachine machine, DateTime time) {
-            return isCurrentlyFault(machine.Id) && time >= washingMachineState[machine.Id].StartTime 
-                || machine.Reservations.Where(x => x.StartTime <= time
-                    && (x.EndTime == null || x.EndTime > time) && x.Fault == true).Any();
+        public bool IsFaultAtTime(WashingMachine machine, DateTime time)
+        {
+            return isCurrentlyFault(machine.Id) && time >= washingMachineState[machine.Id].StartTime
+                   || machine.Reservations.Where(x => x.StartTime <= time
+                                                      && (x.EndTime == null || x.EndTime > time) && x.Fault == true)
+                       .Any();
         }
 
-        public bool isCurrentlyFault(int machineId) {
+        public bool isCurrentlyFault(int machineId)
+        {
             return washingMachineState[machineId] != null && washingMachineState[machineId].EndTime == null;
         }
     }

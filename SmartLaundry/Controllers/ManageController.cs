@@ -25,11 +25,11 @@ namespace SmartLaundry.Controllers
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
         public ManageController(
-          UserManager<ApplicationUser> userManager,
-          SignInManager<ApplicationUser> signInManager,
-          IEmailSender emailSender,
-          ILogger<ManageController> logger,
-          UrlEncoder urlEncoder)
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IEmailSender emailSender,
+            ILogger<ManageController> logger,
+            UrlEncoder urlEncoder)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -84,7 +84,8 @@ namespace SmartLaundry.Controllers
                 var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
                 if (!setEmailResult.Succeeded)
                 {
-                    throw new ApplicationException($"Unexpected error occurred setting email for user with ID '{user.Id}'.");
+                    throw new ApplicationException(
+                        $"Unexpected error occurred setting email for user with ID '{user.Id}'.");
                 }
             }
 
@@ -131,7 +132,7 @@ namespace SmartLaundry.Controllers
                 return RedirectToAction(nameof(SetPassword));
             }
 
-            var model = new ChangePasswordViewModel { StatusMessage = StatusMessage };
+            var model = new ChangePasswordViewModel {StatusMessage = StatusMessage};
             return View(model);
         }
 
@@ -150,7 +151,8 @@ namespace SmartLaundry.Controllers
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            var changePasswordResult =
+                await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
             if (!changePasswordResult.Succeeded)
             {
                 AddErrors(changePasswordResult);
@@ -180,7 +182,7 @@ namespace SmartLaundry.Controllers
                 return RedirectToAction(nameof(ChangePassword));
             }
 
-            var model = new SetPasswordViewModel { StatusMessage = StatusMessage };
+            var model = new SetPasswordViewModel {StatusMessage = StatusMessage};
             return View(model);
         }
 

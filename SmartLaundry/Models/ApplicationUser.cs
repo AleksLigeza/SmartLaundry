@@ -13,6 +13,7 @@ namespace SmartLaundry.Models
     {
         [Required, MaxLength(20), RegularExpression("^[a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]*$")]
         public string Firstname { get; set; }
+
         [Required, MaxLength(20), RegularExpression("^[a-zA-Z ąćęłńóśźżĄĘŁŃÓŚŹŻ]*$")]
         public string Lastname { get; set; }
 

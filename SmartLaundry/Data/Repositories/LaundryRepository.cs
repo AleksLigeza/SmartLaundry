@@ -10,6 +10,7 @@ namespace SmartLaundry.Data.Repositories
     public class LaundryRepository : ILaundryRepository
     {
         private readonly ApplicationDbContext _context;
+
         public LaundryRepository(ApplicationDbContext context)
         {
             _context = context;
@@ -28,7 +29,7 @@ namespace SmartLaundry.Data.Repositories
             {
                 DormitoryId = dormitoryId,
                 Position = position,
-                startTime = new TimeSpan(15,0,0),
+                startTime = new TimeSpan(15, 0, 0),
                 shiftTime = new TimeSpan(2, 0, 0),
                 shiftCount = 4
             };
@@ -56,8 +57,7 @@ namespace SmartLaundry.Data.Repositories
         public void RemoveLaundry(Laundry laundry)
         {
             if (laundry == null) return;
-            laundry = _context.Laundries.
-                Where(x => x.Id == laundry.Id)
+            laundry = _context.Laundries.Where(x => x.Id == laundry.Id)
                 .Include(x => x.WashingMachines)
                 .ThenInclude(x => x.Reservations)
                 .Single();
@@ -76,35 +76,35 @@ namespace SmartLaundry.Data.Repositories
             //    .ToList();
 
             return _context.Laundries
-                 .Select(n => new Laundry
-                 {
-                     DormitoryId = n.DormitoryId,
-                     Id = n.Id,
-                     Position = n.Position,
-                     shiftCount = n.shiftCount,
-                     shiftTime = n.shiftTime,
-                     startTime = n.startTime,
-                     Dormitory = n.Dormitory,
-                     WashingMachines = n.WashingMachines.Select(w => new WashingMachine
-                     {
-                         Id = w.Id,
-                         LaundryId = w.LaundryId,
-                         Position = w.Position,
-                         Laundry = w.Laundry,
-                         Reservations = w.Reservations.Select(r=> new Reservation
-                         {
-                             Id = r.Id,
-                             Room = r.Room,
-                             RoomId = r.RoomId,
-                             ToRenew = r.ToRenew,
-                             EndTime = r.EndTime,
-                             Fault = r.Fault,
-                             StartTime = r.StartTime,
-                             WashingMachine = r.WashingMachine,
-                             WashingMachineId = r.WashingMachineId
-                         }).Where(r => r.StartTime.Date == date.Date).ToList()
-                     }).ToList()
-                 }).Where(x=>x.DormitoryId==dormitoryId).OrderBy(x=>x.Position).ToList();
+                .Select(n => new Laundry
+                {
+                    DormitoryId = n.DormitoryId,
+                    Id = n.Id,
+                    Position = n.Position,
+                    shiftCount = n.shiftCount,
+                    shiftTime = n.shiftTime,
+                    startTime = n.startTime,
+                    Dormitory = n.Dormitory,
+                    WashingMachines = n.WashingMachines.Select(w => new WashingMachine
+                    {
+                        Id = w.Id,
+                        LaundryId = w.LaundryId,
+                        Position = w.Position,
+                        Laundry = w.Laundry,
+                        Reservations = w.Reservations.Select(r => new Reservation
+                        {
+                            Id = r.Id,
+                            Room = r.Room,
+                            RoomId = r.RoomId,
+                            ToRenew = r.ToRenew,
+                            EndTime = r.EndTime,
+                            Fault = r.Fault,
+                            StartTime = r.StartTime,
+                            WashingMachine = r.WashingMachine,
+                            WashingMachineId = r.WashingMachineId
+                        }).Where(r => r.StartTime.Date == date.Date).ToList()
+                    }).ToList()
+                }).Where(x => x.DormitoryId == dormitoryId).OrderBy(x => x.Position).ToList();
         }
 
         public Laundry GetLaundryById(int id) => _context.Laundries.FirstOrDefault(x => x.Id == id);

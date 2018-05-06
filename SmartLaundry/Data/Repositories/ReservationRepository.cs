@@ -11,6 +11,7 @@ namespace SmartLaundry.Data.Repositories
     public class ReservationRepository : IReservationRepository
     {
         private readonly ApplicationDbContext _context;
+
         public ReservationRepository(ApplicationDbContext context)
         {
             _context = context;
@@ -56,10 +57,10 @@ namespace SmartLaundry.Data.Repositories
             return _context.Reservations
                 .FirstOrDefault(
                     x => x.RoomId == roomId
-                    && x.StartTime.Date == date.Date
-                    && x.Fault == false
-                    && (!x.ToRenew || x.ToRenew
-                    && (x.StartTime - DateTime.Now).TotalMinutes > 15)
+                         && x.StartTime.Date == date.Date
+                         && x.Fault == false
+                         && (!x.ToRenew || x.ToRenew
+                             && (x.StartTime - DateTime.Now).TotalMinutes > 15)
                 );
         }
 
@@ -69,16 +70,16 @@ namespace SmartLaundry.Data.Repositories
             return _context.Reservations
                 .FirstOrDefault(
                     x => x.WashingMachineId == machineId
-                    && x.StartTime == startTime
-                    && x.Fault == false
-                    && x.Confirmed);
+                         && x.StartTime == startTime
+                         && x.Fault == false
+                         && x.Confirmed);
         }
 
         public bool IsFaultAtTime(int machineId, DateTime time)
         {
             return _context.Reservations
                 .Any(x => x.Fault && x.WashingMachineId == machineId
-                    && x.StartTime <= time && (x.EndTime == null || x.EndTime >= time));
+                                  && x.StartTime <= time && (x.EndTime == null || x.EndTime >= time));
         }
 
         public bool IsCurrentlyFault(int machineId)
@@ -97,7 +98,8 @@ namespace SmartLaundry.Data.Repositories
         public bool IsFaultAtTimeAtDay(int machineId, DateTime dateTime)
         {
             var machine = _context.WashingMachines.Where(x => x.Id == machineId).Include(x => x.Laundry).Single();
-            dateTime = LaundryTimeHelper.GetClosestStartTime(dateTime, machine.Laundry.startTime, machine.Laundry.shiftTime, machine.Laundry.shiftCount);
+            dateTime = LaundryTimeHelper.GetClosestStartTime(dateTime, machine.Laundry.startTime,
+                machine.Laundry.shiftTime, machine.Laundry.shiftCount);
 
             return IsFaultAtTime(machineId, dateTime);
         }
@@ -106,16 +108,16 @@ namespace SmartLaundry.Data.Repositories
         {
             return _context.Reservations
                 .SingleOrDefault(x => x.RoomId == roomId
-                    && x.ToRenew
-                    && x.StartTime > DateTime.UtcNow.Subtract(new TimeSpan(48, 0, 0)));
+                                      && x.ToRenew
+                                      && x.StartTime > DateTime.UtcNow.Subtract(new TimeSpan(48, 0, 0)));
         }
 
         public bool HasReservationToRenew(int roomId)
         {
             return _context.Reservations
                 .Any(x => x.RoomId == roomId
-                    && x.ToRenew
-                    && x.StartTime > DateTime.Now.AddHours(-48));
+                          && x.ToRenew
+                          && x.StartTime > DateTime.Now.AddHours(-48));
         }
 
         public Dictionary<int, Reservation> GetDormitoryWashingMachineStates(int id)
@@ -133,8 +135,10 @@ namespace SmartLaundry.Data.Repositories
                     if (machine.Reservations.Any(x => x.Fault))
                     {
                         var lastFaultTime = machine.Reservations.Where(x => x.Fault).Max(x => x.StartTime);
-                        var lastFaults = machine.Reservations.Where(x => x.StartTime == lastFaultTime && x.Fault).ToList();
-                        if (lastFaults.Count > 1) {
+                        var lastFaults = machine.Reservations.Where(x => x.StartTime == lastFaultTime && x.Fault)
+                            .ToList();
+                        if (lastFaults.Count > 1)
+                        {
                             dictionary.Add(machine.Id,
                                 lastFaults.Any(x => x.EndTime == null)
                                     ? lastFaults.Single(x => x.EndTime == null)
@@ -151,6 +155,7 @@ namespace SmartLaundry.Data.Repositories
                     }
                 }
             }
+
             return dictionary;
         }
     }

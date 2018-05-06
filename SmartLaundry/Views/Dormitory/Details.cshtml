@@ -1,5 +1,4 @@
-﻿@using Microsoft.CodeAnalysis.CSharp
-@using SmartLaundry.Authorization
+﻿@using SmartLaundry.Authorization
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService AuthorizationService
 
@@ -20,22 +19,22 @@
         <p>
             @item.Message --- @item.PublishingDate
         </p>
-        @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+        if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
         {
             <form method="POST" asp-action="RemoveAnnouncement">
-                <input type="hidden" name="announcementId" value="@item.Id" />
-                <input type="submit" value="Assign manager" />
+                <input type="hidden" name="announcementId" value="@item.Id"/>
+                <input type="submit" value="RemoveAnnouncement"/>
             </form>
         }
     }
-    <hr />
+    <hr/>
 
     @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
     {
         <form method="POST" asp-action="AddAnnouncement">
-            <input type="text" name="message" />
-            <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID" />
-            <input type="submit" value="Add" />
+            <input type="text" name="message"/>
+            <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID"/>
+            <input type="submit" value="Add announcement"/>
         </form>
     }
 
@@ -70,7 +69,7 @@
         <dd>
             @if (Model.Manager != null)
             {
-                Html.Raw(Model.Manager.Firstname + Model.Manager.Lastname);
+                @Html.Raw(Model.Manager.Firstname + Model.Manager.Lastname)
             }
         </dd>
         <dt>
@@ -96,19 +95,29 @@
 <div>
     @if ((await AuthorizationService.AuthorizeAsync(User, Model.Dormitory, AuthPolicies.DormitoryMembership)).Succeeded)
     {
-        @if (User.IsInRole("Administrator"))
+        if (User.IsInRole("Administrator"))
         {
-            <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryID">Edit</a> @Html.Raw("|");
-            <a asp-action="Delete" asp-route-id="@Model.Dormitory.DormitoryID">Delete</a> @Html.Raw("|");
+            <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryID">Edit</a>
+            @Html.Raw("|")
+            ;
+            <a asp-action="Delete" asp-route-id="@Model.Dormitory.DormitoryID">Delete</a>
+            @Html.Raw("|")
+            ;
         }
-        @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+        if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
         {
-            <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryID">Manage users</a> @Html.Raw("|");
-            <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryID">Rooms</a> @Html.Raw("|");
+            <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryID">Manage users</a>
+            @Html.Raw("|")
+            ;
+            <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryID">Rooms</a>
+            @Html.Raw("|")
+            ;
         }
-        @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
+        if ((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
         {
-            <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryID">Laundries</a> @Html.Raw("|");
+            <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryID">Laundries</a>
+            @Html.Raw("|")
+            ;
         }
     }
     <a asp-action="Index">Back to List</a>

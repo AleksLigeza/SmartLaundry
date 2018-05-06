@@ -17,14 +17,16 @@ using SmartLaundry.Models;
 using SmartLaundry.Models.AccountViewModels;
 using Xunit;
 
-namespace SmartLaundry.Tests.Integration {
-    public class AccountControllerTests : IClassFixture<TestFixture> {
-
+namespace SmartLaundry.Tests.Integration
+{
+    public class AccountControllerTests : IClassFixture<TestFixture>
+    {
         private readonly HttpClient _client;
         private readonly ApplicationDbContext _dbContext;
         private readonly TestFixture _fixture;
 
-        public AccountControllerTests(TestFixture fixture) {
+        public AccountControllerTests(TestFixture fixture)
+        {
             _client = fixture.Client;
             _dbContext = fixture.Context;
             _fixture = fixture;
@@ -32,15 +34,17 @@ namespace SmartLaundry.Tests.Integration {
 
         [Fact]
         [Trait("Category", "Integration")]
-        public async Task UserCantRegisterWithoutVerificationToken() {
+        public async Task UserCantRegisterWithoutVerificationToken()
+        {
             //Arrange
             var fixture = TestFixture.CreateLocalFixture();
-            var content = new {
+            var content = new
+            {
                 ConfirmPassword = "abcd123",
                 Password = "abcd123",
                 Email = "abc@abc.pl",
             };
-            
+
             //Act
             var response = await fixture.Client.PostAsJsonAsync("/account/register", content);
 
@@ -50,7 +54,8 @@ namespace SmartLaundry.Tests.Integration {
 
         [Fact]
         [Trait("Category", "Integration")]
-        public async Task UserCanRegisterWithValidVerificationToken() {
+        public async Task UserCanRegisterWithValidVerificationToken()
+        {
             //Arrange
             var fixture = TestFixture.CreateLocalFixture();
             var initialResponse = await fixture.Client.GetAsync("/account/register");
@@ -63,23 +68,25 @@ namespace SmartLaundry.Tests.Integration {
                 {"Email", "abc@abc.pl"},
             };
             var postRequest = new HttpRequestMessage(HttpMethod.Post, "/account/register");
-            postRequest.Headers.Add("Cookie", new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
+            postRequest.Headers.Add("Cookie",
+                new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
             postRequest.Content = new FormUrlEncodedContent(formData);
 
             //Act
             var postResponse = await fixture.Client.SendAsync(postRequest);
-        
+
             //Assert
             Assert.True(postResponse.StatusCode == HttpStatusCode.Found);
         }
 
         [Fact]
         [Trait("Category", "Integration")]
-        public async Task UserCantLoginWithoutVerifiedEmail() {
+        public async Task UserCantLoginWithoutVerifiedEmail()
+        {
             //Arrange
             var fixture = TestFixture.CreateLocalFixture();
 
-            var user = new ApplicationUser { UserName = "abc@abc.pl", Email = "abc@abc.pl" };
+            var user = new ApplicationUser {UserName = "abc@abc.pl", Email = "abc@abc.pl"};
             var result = await fixture.UserManager.CreateAsync(user, "abcd123");
 
             var initialResponse = await _fixture.Client.GetAsync("/account/login");
@@ -89,10 +96,11 @@ namespace SmartLaundry.Tests.Integration {
                 {TestFixture.AntiForgeryFieldName, antiForgeryValues.fieldValue},
                 {"Password", "abcd123"},
                 {"Email", "abc@abc.pl"},
-                { "RememberMe", "true" }
+                {"RememberMe", "true"}
             };
             var postRequest = new HttpRequestMessage(HttpMethod.Post, "/account/login");
-            postRequest.Headers.Add("Cookie", new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
+            postRequest.Headers.Add("Cookie",
+                new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
             postRequest.Content = new FormUrlEncodedContent(formData);
 
             //Act
@@ -106,11 +114,12 @@ namespace SmartLaundry.Tests.Integration {
 
         [Fact]
         [Trait("Category", "Integration")]
-        public async Task UserCanLoginWithVerifiedEmail() {
+        public async Task UserCanLoginWithVerifiedEmail()
+        {
             //Arrange
             var fixture = TestFixture.CreateLocalFixture();
 
-            var user = new ApplicationUser { UserName = "abc@abc.pl", Email = "abc@abc.pl" };
+            var user = new ApplicationUser {UserName = "abc@abc.pl", Email = "abc@abc.pl"};
             var result = await fixture.UserManager.CreateAsync(user, "abcd123");
 
             var userToConfirm = fixture.Context.Users.Where(u => u.UserName == "abc@abc.pl").SingleOrDefault();
@@ -125,10 +134,11 @@ namespace SmartLaundry.Tests.Integration {
                 {TestFixture.AntiForgeryFieldName, antiForgeryValues.fieldValue},
                 {"Password", "abcd123"},
                 {"Email", "abc@abc.pl"},
-                { "RememberMe", "true" }
+                {"RememberMe", "true"}
             };
             var postRequest = new HttpRequestMessage(HttpMethod.Post, "/account/login");
-            postRequest.Headers.Add("Cookie", new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
+            postRequest.Headers.Add("Cookie",
+                new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
             postRequest.Content = new FormUrlEncodedContent(formData);
 
             //Act

@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace SmartLaundry.Models.DormitoryViewModels
 {
-    public class DormitoryDetailsViewModel {
+    public class DormitoryDetailsViewModel
+    {
         public Dormitory Dormitory;
         public ApplicationUser Manager;
         public List<ApplicationUser> Porters;
