@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace SmartLaundry.Models
 
         [Required]
         [Range(1, 10)]
+        [DefaultValue(1)]
         public int Position { get; set; }
 
         [Required]
@@ -25,6 +27,7 @@ namespace SmartLaundry.Models
 
         [Required]
         [Range(1, 24)]
+        [DefaultValue(4)]
         public int shiftCount { get; set; }
 
         [Required]

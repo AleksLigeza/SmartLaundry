@@ -37,7 +37,7 @@ namespace SmartLaundry.Data.Repositories
 
         public Dormitory GetSingleById(int id)
         {
-            return _context.Dormitories.Where(x => x.DormitoryId == id).Include(x => x.Rooms).Single();
+            return _context.Dormitories.Where(x => x.DormitoryId == id).Include(x => x.Rooms).SingleOrDefault();
         }
 
         public Dormitory GetSingleWithIncludes(int id)

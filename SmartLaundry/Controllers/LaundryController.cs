@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -42,7 +43,9 @@ namespace SmartLaundry.Controllers
             _authRepositories = new AuthHelpers.AuthRepositories()
             {
                 DormitoryRepo = dormitoryRepository,
-                AuthorizationService = authorizationService
+                AuthorizationService = authorizationService,
+                WashingMachineRepo = washingMachineRepo,
+                LaundryRepo = laundryRepository
             };
         }
 
@@ -57,70 +60,65 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumOccupant")]
         public async Task<IActionResult> Day(int id, int year, int month, int day)
         {
-            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, id))
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, id))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
-            var date = new DateTime(year, month, day);
-            var laundries = _laundryRepo.GetDormitoryLaundriesWithEntitiesAtDay(id, date) ?? new List<Laundry>();
-
-            var userId = _userManager.GetUserId(User);
-            var roomId = _userRepo.GetUserById(userId).RoomId;
-
-            var model = new DayViewModel()
-            {
-                Laundries = laundries,
-                DormitoryId = id,
-                washingMachineState = _reservationRepo.GetDormitoryWashingMachineStates(id),
-                date = date
-            };
-
-            if (roomId != null)
-            {
-                model.currentRoomReservation = _reservationRepo.GetRoomDailyReservation(roomId.Value, date);
-                model.hasReservationToRenew = _reservationRepo.HasReservationToRenew(roomId.Value);
-            }
-            else
-            {
-                model.currentRoomReservation = null;
-                model.hasReservationToRenew = false;
-            }
+            var model = CreateDayViewModel(id, new DateTime(year, month, day));
 
             return View(model);
+        }
+
+        [Authorize(Policy = "MinimumOccupant")]
+        public IActionResult Day(DayViewModel model)
+        {
+            return model.DormitoryId == 0 ? ControllerHelpers.Show404ErrorPage(this) : View(model);
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
-        public async Task<IActionResult> AddLaundry(int laundryPosition, int dormitoryId, TimeSpan startTime,
-            TimeSpan shiftTime, int shiftCount)
+        public async Task<IActionResult> AddLaundry(DayViewModel parentModel)
         {
-            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, dormitoryId))
+            var laundry = parentModel.LaundryToAdd;
+
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, laundry.DormitoryId))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
-            TimeSpan wholeWorkingTime = startTime + shiftTime * shiftCount;
+            DayViewModel model = null;
+            var wholeWorkingTime = laundry.startTime + laundry.shiftTime * laundry.shiftCount;
             if (wholeWorkingTime.TotalHours > 24)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
-            }
-
-            var laundry = _laundryRepo.AddLaundry(dormitoryId, laundryPosition);
-
-            if (laundry == null)
+                model = CreateDayViewModel(laundry.DormitoryId, DateTime.Today);
+                model.AddLaundryError = "Laundry's working time ends after midnight.";
+            } else if (_laundryRepo.Laundries.Any(x => x.DormitoryId == laundry.DormitoryId && x.Position == laundry.Position))
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                model = CreateDayViewModel(laundry.DormitoryId, DateTime.Today);
+                model.AddLaundryError = "There is a laundry with the same number.";
             }
 
-            laundry.startTime = startTime;
-            laundry.shiftCount = shiftCount;
-            laundry.shiftTime = shiftTime;
+            if (model != null)
+            { 
+                model.LaundryToAdd.startTime = laundry.startTime;
+                model.LaundryToAdd.shiftCount = laundry.shiftCount;
+                model.LaundryToAdd.shiftTime = laundry.shiftTime;
+                model.LaundryToAdd.Position = laundry.Position;
+                model.LaundryToAdd.DormitoryId = laundry.DormitoryId;
+                return View(nameof(Day), model);
+            }
 
-            _laundryRepo.UpdateLaundry(laundry);
+            var addedLaundry = _laundryRepo.AddLaundry(laundry.DormitoryId, laundry.Position);
 
-            return RedirectToDayByLaundryId(laundry.Id, DateTime.Now.Date);
+            addedLaundry.startTime = laundry.startTime;
+            addedLaundry.shiftCount = laundry.shiftCount;
+            addedLaundry.shiftTime = laundry.shiftTime;
+
+            _laundryRepo.UpdateLaundry(addedLaundry);
+
+            return RedirectToDayByLaundryId(addedLaundry.Id, DateTime.Now.Date);
         }
 
         [ValidateAntiForgeryToken]
@@ -129,39 +127,47 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> DeleteLaundry(int id)
         {
             var laundry = _laundryRepo.GetLaundryById(id);
-            if (laundry == null)
+            if(laundry == null)
             {
                 return null;
             }
 
             var dormitoryId = _laundryRepo.GetLaundryById(laundry.Id).DormitoryId;
 
-            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, dormitoryId))
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, dormitoryId))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             _laundryRepo.RemoveLaundry(laundry);
 
-            return RedirectToAction(nameof(Index), new {id = dormitoryId});
+            return RedirectToAction(nameof(Index), new { id = dormitoryId });
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
-        public async Task<IActionResult> AddWashingMachine(int id, int machinePosition)
+        public async Task<IActionResult> AddWashingMachine(DayViewModel parentModel)
         {
-            var laundry = _laundryRepo.GetLaundryById(id);
-            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, laundry.DormitoryId))
+            var laundryId = parentModel.WashingMachineToAdd.LaundryId;
+            var machinePosition = parentModel.WashingMachineToAdd.Position;
+
+            var laundry = _laundryRepo.GetLaundryById(laundryId);
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, laundry.DormitoryId))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
-            var machine = _washingMachineRepo.AddWashingMachine(id, machinePosition);
-            if (machine == null)
+            if(_washingMachineRepo.WashingMachines.Any(x=>x.Position == machinePosition && x.LaundryId == laundryId))
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                var model = CreateDayViewModel(laundry.DormitoryId, DateTime.Today);
+                model.AddWashingMachineError = "There is washing machine with the same number in this laundry.";
+                model.WashingMachineToAdd.Position = laundry.Position;
+                model.WashingMachineToAdd.LaundryId = laundryId;
+                return View(nameof(Day), model);
             }
+
+            var machine = _washingMachineRepo.AddWashingMachine(laundryId, machinePosition);
 
             return RedirectToDayByLaundryId(machine.LaundryId, DateTime.Now.Date);
         }
@@ -173,12 +179,12 @@ namespace SmartLaundry.Controllers
         {
             var machine = _washingMachineRepo.GetWashingMachineById(machineId);
 
-            if (machine == null)
+            if(machine == null)
             {
                 return ControllerHelpers.Show404ErrorPage(this);
             }
 
-            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, machine))
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, machine))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
@@ -195,7 +201,7 @@ namespace SmartLaundry.Controllers
             var reservation = _reservationRepo.GetReservationById(reservationId);
             var machine = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId);
 
-            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, reservation))
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, reservation))
             {
                 return ControllerHelpers.Show404ErrorPage(this);
             }
@@ -203,7 +209,7 @@ namespace SmartLaundry.Controllers
             var userId = _userManager.GetUserId(User);
             var roomId = _userRepo.GetUserById(userId).RoomId;
 
-            if (_reservationRepo.GetHourReservation(reservation.WashingMachineId, reservation.StartTime) == null
+            if(_reservationRepo.GetHourReservation(reservation.WashingMachineId, reservation.StartTime) == null
                 || _reservationRepo.IsFaultAtTime(reservation.WashingMachineId, reservation.StartTime)
                 || reservation.StartTime < DateTime.Now
                 || roomId != reservation.RoomId && roomId != null)
@@ -223,7 +229,7 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> Reserve(DateTime startTime, int machineId)
         {
             var machine = _washingMachineRepo.GetWashingMachineById(machineId);
-            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, machine))
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, machine))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
@@ -242,27 +248,27 @@ namespace SmartLaundry.Controllers
             var reservationAtHour = _reservationRepo.GetHourReservation(machineId, startTime);
             var faultAtTime = _reservationRepo.IsFaultAtTime(machineId, startTime);
 
-            if (reservationAtHour != null
+            if(reservationAtHour != null
                 || faultAtTime
                 || reservation.StartTime < DateTime.Now)
             {
                 return ControllerHelpers.Show404ErrorPage(this);
             }
 
-            if (_reservationRepo.IsCurrentlyFault(machineId))
+            if(_reservationRepo.IsCurrentlyFault(machineId))
             {
                 return ControllerHelpers.Show404ErrorPage(this);
             }
 
-            if (roomId != null)
+            if(roomId != null)
             {
                 var toRenew = _reservationRepo.GetRoomToRenewReservation(roomId.Value);
                 var roomReservation = _reservationRepo.GetRoomDailyReservation(roomId.Value, startTime);
-                if (toRenew != null)
+                if(toRenew != null)
                 {
                     _reservationRepo.RemoveReservation(toRenew);
                 }
-                else if (roomReservation != null)
+                else if(roomReservation != null)
                 {
                     return ControllerHelpers.Show404ErrorPage(this);
                 }
@@ -279,17 +285,17 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> EnableWashingMachine(int machineId)
         {
             var machine = _washingMachineRepo.GetWashingMachineById(machineId);
-            if (machine == null)
+            if(machine == null)
             {
                 return ControllerHelpers.Show404ErrorPage(this);
             }
 
-            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, machine))
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, machine))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
-            if (!_reservationRepo.IsCurrentlyFault(machineId))
+            if(!_reservationRepo.IsCurrentlyFault(machineId))
             {
                 return ControllerHelpers.Show404ErrorPage(this);
             }
@@ -305,17 +311,17 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> DisableWashingMachine(int machineId)
         {
             var machine = _washingMachineRepo.GetWashingMachineById(machineId);
-            if (machine == null)
+            if(machine == null)
             {
                 return ControllerHelpers.Show404ErrorPage(this);
             }
 
-            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, machine))
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, machine))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
-            if (_reservationRepo.IsCurrentlyFault(machineId))
+            if(_reservationRepo.IsCurrentlyFault(machineId))
             {
                 return ControllerHelpers.Show404ErrorPage(this);
             }
@@ -333,12 +339,12 @@ namespace SmartLaundry.Controllers
             var reservation = _reservationRepo.GetReservationById(reservationId);
 
             var machine = _washingMachineRepo.GetWashingMachineById(reservation.WashingMachineId);
-            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, machine))
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, machine))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
-            if (_reservationRepo.IsFaultAtTime(reservation.WashingMachineId, reservation.StartTime)
+            if(_reservationRepo.IsFaultAtTime(reservation.WashingMachineId, reservation.StartTime)
                 || reservation.Confirmed
                 || reservation.StartTime < DateTime.Now)
             {
@@ -369,6 +375,35 @@ namespace SmartLaundry.Controllers
                     month = day.Month,
                     day = day.Day
                 });
+        }
+
+        private DayViewModel CreateDayViewModel(int id, DateTime date)
+        {
+            var laundries = _laundryRepo.GetDormitoryLaundriesWithEntitiesAtDay(id, date) ?? new List<Laundry>();
+
+            var userId = _userManager.GetUserId(User);
+            var roomId = _userRepo.GetUserById(userId).RoomId;
+
+            var model = new DayViewModel()
+            {
+                Laundries = laundries,
+                DormitoryId = id,
+                washingMachineState = _reservationRepo.GetDormitoryWashingMachineStates(id),
+                date = date
+            };
+
+            if(roomId != null)
+            {
+                model.currentRoomReservation = _reservationRepo.GetRoomDailyReservation(roomId.Value, date);
+                model.hasReservationToRenew = _reservationRepo.HasReservationToRenew(roomId.Value);
+            }
+            else
+            {
+                model.currentRoomReservation = null;
+                model.hasReservationToRenew = false;
+            }
+
+            return model;
         }
     }
 }

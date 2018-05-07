@@ -29,13 +29,22 @@ namespace SmartLaundry.Controllers.Helpers
 
         public static async Task<bool> CheckDormitoryMembership(ClaimsPrincipal user, AuthRepositories repos, WashingMachine machine)
         {
-            var dormitoryId = repos.LaundryRepo.GetLaundryById(machine.LaundryId).DormitoryId;
+            var laundry = repos.LaundryRepo.GetLaundryById(machine.LaundryId);
+
+            if (laundry == null)
+                return await CheckDormitoryMembership(user, repos, null as Dormitory);
+
+            var dormitoryId = laundry.DormitoryId;
             return await CheckDormitoryMembership(user, repos, dormitoryId);
         }
 
         public static async Task<bool> CheckDormitoryMembership(ClaimsPrincipal user, AuthRepositories repos, Reservation reservation)
         {
             var machine = repos.WashingMachineRepo.GetWashingMachineById(reservation.WashingMachineId);
+
+            if(machine == null)
+                return await CheckDormitoryMembership(user, repos, null as Dormitory);
+
             return await CheckDormitoryMembership(user, repos, machine);
 
         }

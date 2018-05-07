@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Authorization
-@model Dormitory
+@model SmartLaundry.Models.DormitoryViewModels.RoomsViewModel
 @inject IAuthorizationService AuthorizationService
 
 @{
@@ -8,27 +8,57 @@
 
 <h2>Rooms</h2>
 
-<a asp-action="Details" asp-route-id=@Model.DormitoryId>Back to details</a>
+<a asp-action="Details" asp-route-id=@Model.Dormitory.DormitoryId>Back to details</a>
 
 @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
 {
-    <form method="POST" asp-action="AddRoom">
-        <input type="number" name="roomNumber" min="1" max="2000"/>
-        <input type="hidden" name="DormitoryId" value="@Model.DormitoryId"/>
-        <input type="submit" value="Add room"/>
-    </form>
+    var firstFreeRoomNumber = 1;
+    for(var i = 1; i < 100; i++)
+    {
+        if(Model.Dormitory.Rooms.All(x => x.Number != i))
+        {
+            firstFreeRoomNumber = i;
+            break;
+        }
+    }
+
+    if (Model.RoomToAdd.Number == 0)
+    {
+        Model.RoomToAdd.Number = firstFreeRoomNumber;
+    }
+
+    if(!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p class="text-danger">@Model.ErrorMessage</p>
+
+    }
+    <p>
+        <form asp-action="AddRoom" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="RoomToAdd.DormitoryId" />
+            <div class="form-group">
+                <label asp-for="RoomToAdd.Number" class="control-label"></label>
+                <input asp-for="RoomToAdd.Number" class="form-control" />
+                <span asp-validation-for="RoomToAdd.Number" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add room" />
+            </div>
+        </form>
+    </p>
 }
 <table class="table">
     <thead>
     <tr>
         <th>
-            Dormitory: @Model.Name
+            Dormitory: @Model.Dormitory.Name
         </th>
         <th colspan="2"></th>
     </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model.Rooms)
+    @foreach (var item in Model.Dormitory.Rooms)
     {
         <tr>
             <td rowspan="@(1 + item.Occupants.Count)">

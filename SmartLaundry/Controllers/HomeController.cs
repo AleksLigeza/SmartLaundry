@@ -18,7 +18,6 @@ namespace SmartLaundry.Controllers
         {
             var model = new ErrorViewModel
             {
-                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
                 Message = message,
                 Title = title
             };
