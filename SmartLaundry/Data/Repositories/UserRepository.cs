@@ -24,7 +24,7 @@ namespace SmartLaundry.Data.Repositories
 
         public Dormitory AssignDormitoryAsPorter(ApplicationUser user, Dormitory dormitory)
         {
-            user.DormitoryPorterId = dormitory.DormitoryID;
+            user.DormitoryPorterId = dormitory.DormitoryId;
             _context.Users.Update(user);
             _context.SaveChanges();
             return _context.Users.Find(user.Id).DormitoryPorter;

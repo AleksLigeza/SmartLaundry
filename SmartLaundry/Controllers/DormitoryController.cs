@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartLaundry.Authorization;
+using SmartLaundry.Controllers.Helpers;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
 using SmartLaundry.Models.DormitoryViewModels;
@@ -22,6 +23,8 @@ namespace SmartLaundry.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly IAnnouncementRepository _announcementRepo;
 
+        private readonly AuthHelpers.AuthRepositories _authRepositories;
+
         public DormitoryController(
             IDormitoryRepository dormitoryRepository, IUserRepository userRepository,
             IRoomRepository roomRepository, UserManager<ApplicationUser> userManager,
@@ -33,6 +36,12 @@ namespace SmartLaundry.Controllers
             _userManager = userManager;
             _authorizationService = authorizationService;
             _announcementRepo = announcementRepo;
+
+            _authRepositories = new AuthHelpers.AuthRepositories()
+            {
+                DormitoryRepo = dormitoryRepository,
+                AuthorizationService = authorizationService
+            };
         }
 
         [HttpGet]
@@ -41,14 +50,19 @@ namespace SmartLaundry.Controllers
             return View(_dormitoryRepo.GetAll());
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "MinimumManager")]
         [HttpGet]
-        public IActionResult ManageDormitoryUsers(
+        public async Task<IActionResult> ManageDormitoryUsers(
             int id,
             string currentFilter,
             string searchString,
             int? page)
         {
+            if(!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, id))
+            {
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
+            }
+
             if (searchString != null)
             {
                 page = 1;
@@ -73,15 +87,15 @@ namespace SmartLaundry.Controllers
                             && x.Email != "admin@admin.admin")
                 .ToList();
             var thisDormitoryUsers = users
-                .Where(x => x.DormitoryPorterId == dormitory.DormitoryID
-                            || x.DormitoryManagerId == dormitory.DormitoryID
+                .Where(x => x.DormitoryPorterId == dormitory.DormitoryId
+                            || x.DormitoryManagerId == dormitory.DormitoryId
                             && dormitory.Rooms.Any(z => z.Id == x.RoomId))
                 .ToList();
             users = usersWithoutDormitory.Concat(thisDormitoryUsers).ToList();
 
             if (dormitory == null)
             {
-                return NotFound();
+                return ControllerHelpers.Show404ErrorPage(this);
             }
 
             int pageSize = 10;
@@ -100,12 +114,12 @@ namespace SmartLaundry.Controllers
             var room = _roomRepo.GetRoomWithOccupants(id);
             if (room == null)
             {
-                return NotFound();
+                return ControllerHelpers.Show404ErrorPage(this);
             }
 
-            if (!await CheckDormitoryMembership(room.Dormitory))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories,room.Dormitory))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             if (searchString != null)
@@ -129,7 +143,7 @@ namespace SmartLaundry.Controllers
                 .Where(x => x.DormitoryManagerId == null
                             && x.DormitoryPorterId == null
                             && x.RoomId == null
-                            && x.Email != "admin@admin.admin")
+                            && !x.NormalizedEmail.Equals(RolesData.AdminEmail))
                 .ToList();
             var thisDormitoryUsers = users
                 .Where(x => x.DormitoryPorterId == null
@@ -182,9 +196,9 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> AssignPorter(int dormitoryId, string porterEmail)
         {
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            if (!await CheckDormitoryMembership(dormitory))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, dormitory))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             var user = _userRepo.GetUserByEmail(porterEmail);
@@ -205,9 +219,9 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> RemovePorter(int dormitoryId, string porterEmail)
         {
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            if (!await CheckDormitoryMembership(dormitory))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories,dormitory))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             var user = _userRepo.GetUserByEmail(porterEmail);
@@ -224,13 +238,13 @@ namespace SmartLaundry.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return ControllerHelpers.Show404ErrorPage(this);
             }
 
             var dormitory = _dormitoryRepo.GetSingleWithIncludes(id.Value);
             if (dormitory == null)
             {
-                return NotFound();
+                return ControllerHelpers.Show404ErrorPage(this);
             }
 
             var model = new DormitoryDetailsViewModel
@@ -239,7 +253,7 @@ namespace SmartLaundry.Controllers
                 Manager = dormitory.Manager,
                 Porters = dormitory.Porters.ToList(),
                 Laundries = dormitory.Laundries.ToList(),
-                Announcements = _announcementRepo.GetDormitoryAnnouncements(dormitory.DormitoryID)
+                Announcements = _announcementRepo.GetDormitoryAnnouncements(dormitory.DormitoryId)
             };
 
             return View(model);
@@ -271,13 +285,13 @@ namespace SmartLaundry.Controllers
         {
             if (id == null)
             {
-                return BadRequest();
+                return ControllerHelpers.Show404ErrorPage(this);
             }
 
             var dormitory = _dormitoryRepo.GetSingleById(id.Value);
-            if (!await CheckDormitoryMembership(dormitory))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories,dormitory))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             return View(dormitory);
@@ -289,14 +303,14 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("DormitoryID,Name,Address,ZipCode,City")]
             Dormitory dormitory)
         {
-            if (!await CheckDormitoryMembership(id))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories,id))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
-            if (id != dormitory.DormitoryID)
+            if (id != dormitory.DormitoryId)
             {
-                return NotFound();
+                return ControllerHelpers.Show404ErrorPage(this);
             }
 
             if (ModelState.IsValid)
@@ -307,9 +321,9 @@ namespace SmartLaundry.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DormitoryExists(dormitory.DormitoryID))
+                    if (!DormitoryExists(dormitory.DormitoryId))
                     {
-                        return NotFound();
+                        return ControllerHelpers.Show404ErrorPage(this);
                     }
                     else
                     {
@@ -329,7 +343,7 @@ namespace SmartLaundry.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return ControllerHelpers.Show404ErrorPage(this);
             }
 
             var dormitory = _dormitoryRepo.GetSingleById(id.Value);
@@ -368,9 +382,9 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> Rooms(int id)
         {
             var dormitory = _dormitoryRepo.GetDormitoryWithRooms(id);
-            if (!await CheckDormitoryMembership(dormitory))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories,dormitory))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             return View(dormitory);
@@ -381,14 +395,14 @@ namespace SmartLaundry.Controllers
         [HttpPost]
         public async Task<IActionResult> AddRoom(int roomNumber, int dormitoryId)
         {
-            if (!await CheckDormitoryMembership(dormitoryId))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories,dormitoryId))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
-            if (!_dormitoryRepo.DormitoryHasRoom(dormitoryId, roomNumber))
+            if (_dormitoryRepo.DormitoryHasRoom(dormitoryId, roomNumber))
             {
-                return BadRequest();
+                return ControllerHelpers.Show404ErrorPage(this);
             }
 
             _roomRepo.AddRoomToDormitory(roomNumber, dormitoryId);
@@ -404,12 +418,12 @@ namespace SmartLaundry.Controllers
 
             if (room == null)
             {
-                return NotFound();
+                return ControllerHelpers.Show404ErrorPage(this);
             }
 
-            if (!await CheckDormitoryMembership(room.Dormitory))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, room.Dormitory))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             foreach (var user in room.Occupants)
@@ -421,7 +435,7 @@ namespace SmartLaundry.Controllers
 
             if (dormitoryId == null)
             {
-                return NotFound();
+                return ControllerHelpers.Show404ErrorPage(this);
             }
 
             return RedirectToAction(nameof(Rooms), new {id = dormitoryId});
@@ -434,9 +448,9 @@ namespace SmartLaundry.Controllers
         {
             var room = _roomRepo.GetRoomById(roomId);
 
-            if (!await CheckDormitoryMembership(room.Dormitory))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, room.Dormitory))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             var user = _userRepo.GetUserById(userId);
@@ -457,9 +471,9 @@ namespace SmartLaundry.Controllers
         {
             var room = _roomRepo.GetRoomById(roomId);
 
-            if (!await CheckDormitoryMembership(room.Dormitory))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, room.Dormitory))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             var user = _userRepo.GetUserById(userId);
@@ -475,9 +489,9 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumManager")]
         public async Task<IActionResult> AddAnnouncement(string message, int dormitoryId)
         {
-            if (!await CheckDormitoryMembership(dormitoryId))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, dormitoryId))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             var announcement = new Announcement()
@@ -497,9 +511,9 @@ namespace SmartLaundry.Controllers
         public async Task<IActionResult> RemoveAnnouncement(int announcementId)
         {
             var announcement = _announcementRepo.GetAnnouncementById(announcementId);
-            if (!await CheckDormitoryMembership(announcement.DormitoryId))
+            if (!await AuthHelpers.CheckDormitoryMembership(User, _authRepositories, announcement.DormitoryId))
             {
-                return BadRequest();
+                return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             var dormitoryId = announcement.DormitoryId;
@@ -511,20 +525,7 @@ namespace SmartLaundry.Controllers
 
         private bool DormitoryExists(int id)
         {
-            return _dormitoryRepo.Dormitories.Any(e => e.DormitoryID == id);
-        }
-
-        private async Task<bool> CheckDormitoryMembership(Dormitory dormitory)
-        {
-            var authorizationResult =
-                await _authorizationService.AuthorizeAsync(User, dormitory, AuthPolicies.DormitoryMembership);
-            return authorizationResult.Succeeded;
-        }
-
-        private async Task<bool> CheckDormitoryMembership(int dormitoryId)
-        {
-            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
-            return await CheckDormitoryMembership(dormitory);
+            return _dormitoryRepo.Dormitories.Any(e => e.DormitoryId == id);
         }
     }
 }

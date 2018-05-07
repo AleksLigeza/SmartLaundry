@@ -37,14 +37,14 @@ namespace SmartLaundry.Data.Repositories
 
         public Dormitory GetSingleById(int id)
         {
-            return _context.Dormitories.Where(x => x.DormitoryID == id).Include(x => x.Rooms).Single();
+            return _context.Dormitories.Where(x => x.DormitoryId == id).Include(x => x.Rooms).Single();
         }
 
         public Dormitory GetSingleWithIncludes(int id)
         {
             return _context.Dormitories.Include(x => x.Laundries)
                 .Include(x => x.Manager).Include(x => x.Porters)
-                .Include(x => x.Rooms).SingleOrDefault(x => x.DormitoryID == id);
+                .Include(x => x.Rooms).SingleOrDefault(x => x.DormitoryId == id);
         }
 
         public Dormitory UpdateSingle(Dormitory source)
@@ -56,7 +56,7 @@ namespace SmartLaundry.Data.Repositories
 
         public Dormitory AssignManager(ApplicationUser user, Dormitory dormitory)
         {
-            user.DormitoryManagerId = dormitory.DormitoryID;
+            user.DormitoryManagerId = dormitory.DormitoryId;
             _context.Dormitories.Update(dormitory);
             _context.Users.Update(user);
             _context.SaveChanges();
@@ -65,7 +65,7 @@ namespace SmartLaundry.Data.Repositories
 
         public Dormitory GetDormitoryWithRooms(int id)
         {
-            return _context.Dormitories.Where(x => x.DormitoryID == id).Include(x => x.Rooms)
+            return _context.Dormitories.Where(x => x.DormitoryId == id).Include(x => x.Rooms)
                 .ThenInclude(x => x.Occupants).SingleOrDefault();
         }
 

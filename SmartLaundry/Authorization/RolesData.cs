@@ -12,10 +12,14 @@ namespace SmartLaundry.Authorization
 {
     public static class RolesData
     {
+        public static string AdminEmail { get; internal set; }
+
         private static readonly string[] Roles = new string[] {"Administrator", "Manager", "Porter", "Occupant"};
 
         public static async Task SeedRoles(IServiceProvider serviceProvider, IConfiguration configuration)
         {
+            AdminEmail = configuration["AdminEmail"].Normalize().ToUpper();
+
             using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 // DISABLED APLYING MIGRATIONS
@@ -38,8 +42,8 @@ namespace SmartLaundry.Authorization
 
                         var user = new ApplicationUser
                         {
-                            UserName = configuration["AdminEmail"],
-                            Email = configuration["AdminEmail"],
+                            UserName = AdminEmail,
+                            Email = AdminEmail,
                             Firstname = "Admin",
                             Lastname = "Admin",
                             EmailConfirmed = true

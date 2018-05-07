@@ -8,13 +8,13 @@
 
 <h2>Rooms</h2>
 
-<a asp-action="Details" asp-route-id=@Model.DormitoryID>Back to details</a>
+<a asp-action="Details" asp-route-id=@Model.DormitoryId>Back to details</a>
 
 @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
 {
     <form method="POST" asp-action="AddRoom">
         <input type="number" name="roomNumber" min="1" max="2000"/>
-        <input type="hidden" name="dormitoryId" value="@Model.DormitoryID"/>
+        <input type="hidden" name="DormitoryId" value="@Model.DormitoryId"/>
         <input type="submit" value="Add room"/>
     </form>
 }

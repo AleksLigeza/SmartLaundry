@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SmartLaundry.Controllers.Helpers;
 using SmartLaundry.Models;
 using SmartLaundry.Models.ManageViewModels;
 using SmartLaundry.Services;
@@ -20,7 +21,6 @@ namespace SmartLaundry.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
-        private readonly Helpers.Helpers _helpers;
 
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
@@ -36,8 +36,6 @@ namespace SmartLaundry.Controllers
             _emailSender = emailSender;
             _logger = logger;
             _urlEncoder = urlEncoder;
-
-            _helpers = new Helpers.Helpers();
         }
 
         [TempData]
@@ -109,9 +107,9 @@ namespace SmartLaundry.Controllers
             }
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var callbackUrl = _helpers.EmailConfirmationLink(Url, user.Id, code, Request.Scheme);
+            var callbackUrl = ControllerHelpers.EmailConfirmationLink(Url, user.Id, code, Request.Scheme);
             var email = user.Email;
-            await _helpers.SendEmailConfirmationAsync(_emailSender, email, callbackUrl);
+            await ControllerHelpers.SendEmailConfirmationAsync(_emailSender, email, callbackUrl);
 
             StatusMessage = "Verification email sent. Please check your email.";
             return RedirectToAction(nameof(Index));
@@ -214,7 +212,7 @@ namespace SmartLaundry.Controllers
             return RedirectToAction(nameof(SetPassword));
         }
 
-        #region Helpers
+        #region ControllerHelpers
 
         private void AddErrors(IdentityResult result)
         {

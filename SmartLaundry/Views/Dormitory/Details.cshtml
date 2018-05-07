@@ -33,7 +33,7 @@
     {
         <form method="POST" asp-action="AddAnnouncement">
             <input type="text" name="message"/>
-            <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID"/>
+            <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId"/>
             <input type="submit" value="Add announcement"/>
         </form>
     }
@@ -97,25 +97,25 @@
     {
         if (User.IsInRole("Administrator"))
         {
-            <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryID">Edit</a>
+            <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryId">Edit</a>
             @Html.Raw("|")
             ;
-            <a asp-action="Delete" asp-route-id="@Model.Dormitory.DormitoryID">Delete</a>
+            <a asp-action="Delete" asp-route-id="@Model.Dormitory.DormitoryId">Delete</a>
             @Html.Raw("|")
             ;
         }
         if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
         {
-            <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryID">Manage users</a>
+            <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryId">Manage users</a>
             @Html.Raw("|")
             ;
-            <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryID">Rooms</a>
+            <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryId">Rooms</a>
             @Html.Raw("|")
             ;
         }
         if ((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
         {
-            <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryID">Laundries</a>
+            <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryId">Laundries</a>
             @Html.Raw("|")
             ;
         }

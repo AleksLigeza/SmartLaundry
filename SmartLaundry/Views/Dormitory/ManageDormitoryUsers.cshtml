@@ -20,7 +20,7 @@
     </div>
 </form>
 
-<a asp-action="Details" asp-route-id=@Model.Dormitory.DormitoryID>Back to details</a>
+<a asp-action="Details" asp-route-id=@Model.Dormitory.DormitoryId>Back to details</a>
 
 <table class="table">
     <thead>
@@ -45,27 +45,27 @@
                 @Html.DisplayFor(modelItem => item.Lastname)
             </td>
             <td>
-                @if (item.DormitoryManagerId != Model.Dormitory.DormitoryID && User.IsInRole("Administrator"))
+                @if (item.DormitoryManagerId != Model.Dormitory.DormitoryId && User.IsInRole("Administrator"))
                 {
                     <form method="POST" asp-action="AssignManager">
                         <input type="hidden" name="managerEmail" value="@item.Email"/>
-                        <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID"/>
+                        <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId"/>
                         <input type="submit" value="Assign manager"/>
                     </form>
                 }
-                @if (item.DormitoryPorterId == null && item.DormitoryManagerId != Model.Dormitory.DormitoryID && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                @if (item.DormitoryPorterId == null && item.DormitoryManagerId != Model.Dormitory.DormitoryId && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
                 {
                     <form method="POST" asp-action="AssignPorter">
                         <input type="hidden" name="porterEmail" value="@item.Email"/>
-                        <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID"/>
+                        <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId"/>
                         <input type="submit" value="Assign porter"/>
                     </form>
                 }
-                @if (item.DormitoryPorterId == Model.Dormitory.DormitoryID && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                @if (item.DormitoryPorterId == Model.Dormitory.DormitoryId && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
                 {
                     <form method="POST" asp-action="RemovePorter">
                         <input type="hidden" name="porterEmail" value="@item.Email"/>
-                        <input type="hidden" name="dormitoryId" value="@Model.Dormitory.DormitoryID"/>
+                        <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId"/>
                         <input type="submit" value="Remove porter"/>
                     </form>
                 }

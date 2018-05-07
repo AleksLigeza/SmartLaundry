@@ -23,7 +23,7 @@
 
     <form method="POST" asp-action="AddLaundry">
         <input type="number" name="laundryPosition" value="@firstFreeLaundryNumber" min="1" max="100"/>
-        <input type="hidden" name="dormitoryId" value="@Model.DormitoryId"/>
+        <input type="hidden" name="DormitoryId" value="@Model.DormitoryId"/>
         <input type="time" name="startTime" min="00:00" max="23:00" value="15:00"/>
         <input type="time" name="shiftTime" min="01:00" max="03:00" value="02:00"/>
         <input type="number" name="shiftCount" min="1" max="24" value="4"/>

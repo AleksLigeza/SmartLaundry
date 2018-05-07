@@ -16,8 +16,8 @@ namespace SmartLaundry.Authorization
             var porterId = context.User.Claims.Single(x => x.Type == "PorterId").Value;
             var roomId = context.User.Claims.Single(x => x.Type == "RoomId").Value;
 
-            if (managerId == resource.DormitoryID.ToString()
-                || porterId == resource.DormitoryID.ToString()
+            if (managerId == resource.DormitoryId.ToString()
+                || porterId == resource.DormitoryId.ToString()
                 || resource.Rooms.Any(x => x.Id.ToString() == roomId)
                 || context.User.IsInRole("Administrator"))
             {

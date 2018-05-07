@@ -18,7 +18,7 @@ namespace SmartLaundry.Data.Mock
                     new Dormitory
                     {
                         Name = "Promień",
-                        DormitoryID = 1,
+                        DormitoryId = 1,
                         Address = "Akademicka 1",
                         City = "Rzeszów",
                         ZipCode = "35-084"
@@ -26,7 +26,7 @@ namespace SmartLaundry.Data.Mock
                     new Dormitory
                     {
                         Name = "Pingwin",
-                        DormitoryID = 2,
+                        DormitoryId = 2,
                         Address = "Akademicka 5",
                         City = "Rzeszów",
                         ZipCode = "35-084"
@@ -34,7 +34,7 @@ namespace SmartLaundry.Data.Mock
                     new Dormitory
                     {
                         Name = "Nestor",
-                        DormitoryID = 3,
+                        DormitoryId = 3,
                         Address = "Akademicka 3",
                         City = "Rzeszów",
                         ZipCode = "35-084"

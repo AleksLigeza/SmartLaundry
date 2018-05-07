@@ -10,7 +10,7 @@ namespace SmartLaundry.Models
     public class Dormitory
     {
         [Key]
-        public int DormitoryID { get; set; }
+        public int DormitoryId { get; set; }
 
         [Required, MaxLength(40), RegularExpression("^[a-zA-Z ąćęłńóśźżĄĘŁŃÓŚŹŻ]*$")]
         public string Name { get; set; }
