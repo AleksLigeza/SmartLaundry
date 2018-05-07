@@ -55,7 +55,9 @@ namespace SmartLaundry.Controllers
                 Username = user.UserName,
                 Email = user.Email,
                 IsEmailConfirmed = user.EmailConfirmed,
-                StatusMessage = StatusMessage
+                StatusMessage = StatusMessage,
+                Firstname = user.Firstname,
+                Lastname = user.Lastname
             };
 
             return View(model);
@@ -85,6 +87,13 @@ namespace SmartLaundry.Controllers
                     throw new ApplicationException(
                         $"Unexpected error occurred setting email for user with ID '{user.Id}'.");
                 }
+            }
+
+            if (user.Firstname != model.Firstname || user.Lastname != model.Lastname)
+            {
+                user.Firstname = model.Firstname;
+                user.Lastname = model.Lastname;
+                await _userManager.UpdateAsync(user);
             }
 
             StatusMessage = "Your profile has been updated";

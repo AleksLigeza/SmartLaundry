@@ -5,7 +5,12 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using SmartLaundry.Authorization;
+using SmartLaundry.Data;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Data.Repositories;
 using SmartLaundry.Models;
@@ -14,47 +19,57 @@ namespace SmartLaundry.Controllers.Helpers
 {
     public class AuthHelpers
     {
-        public static async Task<bool> CheckDormitoryMembership(ClaimsPrincipal user, AuthRepositories repos, Dormitory dormitory)
+        public static void SeedRepos(IServiceProvider serviceProvider)
+        {
+            using(var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                AuthRepositories.DormitoryRepo = serviceScope.ServiceProvider.GetRequiredService<IDormitoryRepository>();
+                AuthRepositories.LaundryRepo = serviceScope.ServiceProvider.GetRequiredService<ILaundryRepository>();
+                AuthRepositories.WashingMachineRepo = serviceScope.ServiceProvider.GetRequiredService<IWashingMachineRepository>();
+                AuthRepositories.AuthorizationService = serviceScope.ServiceProvider.GetRequiredService<IAuthorizationService>();             
+            }
+        }
+
+        public static async Task<bool> CheckDormitoryMembership(ClaimsPrincipal user, Dormitory dormitory)
         {
             var authorizationResult =
-                await repos.AuthorizationService.AuthorizeAsync(user, dormitory, AuthPolicies.DormitoryMembership);
+                await AuthRepositories.AuthorizationService.AuthorizeAsync(user, dormitory, AuthPolicies.DormitoryMembership);
             return authorizationResult.Succeeded;
         }
 
-        public static async Task<bool> CheckDormitoryMembership(ClaimsPrincipal user, AuthRepositories repos, int dormitoryId)
+        public static async Task<bool> CheckDormitoryMembership(ClaimsPrincipal user, int dormitoryId)
         {
-            var dormitory = repos.DormitoryRepo.GetSingleById(dormitoryId);
-            return await CheckDormitoryMembership(user, repos, dormitory);
+            var dormitory = AuthRepositories.DormitoryRepo.GetSingleById(dormitoryId);
+            return await CheckDormitoryMembership(user, dormitory);
         }
 
-        public static async Task<bool> CheckDormitoryMembership(ClaimsPrincipal user, AuthRepositories repos, WashingMachine machine)
+        public static async Task<bool> CheckDormitoryMembership(ClaimsPrincipal user, WashingMachine machine)
         {
-            var laundry = repos.LaundryRepo.GetLaundryById(machine.LaundryId);
+            var laundry = AuthRepositories.LaundryRepo.GetLaundryById(machine.LaundryId);
 
-            if (laundry == null)
-                return await CheckDormitoryMembership(user, repos, null as Dormitory);
+            if(laundry == null)
+                return await CheckDormitoryMembership(user, null as Dormitory);
 
             var dormitoryId = laundry.DormitoryId;
-            return await CheckDormitoryMembership(user, repos, dormitoryId);
+            return await CheckDormitoryMembership(user, dormitoryId);
         }
 
-        public static async Task<bool> CheckDormitoryMembership(ClaimsPrincipal user, AuthRepositories repos, Reservation reservation)
+        public static async Task<bool> CheckDormitoryMembership(ClaimsPrincipal user, Reservation reservation)
         {
-            var machine = repos.WashingMachineRepo.GetWashingMachineById(reservation.WashingMachineId);
+            var machine = AuthRepositories.WashingMachineRepo.GetWashingMachineById(reservation.WashingMachineId);
 
             if(machine == null)
-                return await CheckDormitoryMembership(user, repos, null as Dormitory);
+                return await CheckDormitoryMembership(user, null as Dormitory);
 
-            return await CheckDormitoryMembership(user, repos, machine);
-
+            return await CheckDormitoryMembership(user, machine);
         }
 
-        public class AuthRepositories
+        internal static class AuthRepositories
         {
-            public IDormitoryRepository DormitoryRepo;
-            public ILaundryRepository LaundryRepo;
-            public IWashingMachineRepository WashingMachineRepo;
-            public IAuthorizationService AuthorizationService;
+            public static IDormitoryRepository DormitoryRepo;
+            public static ILaundryRepository LaundryRepo;
+            public static IWashingMachineRepository WashingMachineRepo;
+            public static IAuthorizationService AuthorizationService;
         }
     }
 }

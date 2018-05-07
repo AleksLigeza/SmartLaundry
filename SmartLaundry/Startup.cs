@@ -11,6 +11,7 @@ using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Data.Repositories;
 using SmartLaundry.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using SmartLaundry.Controllers.Helpers;
 
 namespace SmartLaundry
 {
@@ -28,7 +29,7 @@ namespace SmartLaundry
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            if (CurrentEnvironment.IsEnvironment("Testing") || CurrentEnvironment.IsEnvironment("SingleTest"))
+            if(CurrentEnvironment.IsEnvironment("Testing") || CurrentEnvironment.IsEnvironment("SingleTest"))
             {
                 services.AddDbContext<ApplicationDbContext>(optionsBuilder =>
                     optionsBuilder
@@ -52,8 +53,8 @@ namespace SmartLaundry
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireLowercase = false;
                     options.Password.RequireUppercase = false;
-                    options.Password.RequireDigit = false;
-                    options.SignIn.RequireConfirmedEmail = true;
+                    options.Password.RequireDigit = true;
+                    options.SignIn.RequireConfirmedEmail = false;
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -88,7 +89,7 @@ namespace SmartLaundry
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            if(env.IsDevelopment())
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
@@ -111,6 +112,7 @@ namespace SmartLaundry
             });
 
             RolesData.SeedRoles(app.ApplicationServices, Configuration).Wait();
+            AuthHelpers.SeedRepos(app.ApplicationServices);
         }
     }
 }

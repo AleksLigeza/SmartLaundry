@@ -1,5 +1,6 @@
 ﻿@using SmartLaundry.Authorization
 @using Microsoft.AspNetCore.Authorization
+@using SmartLaundry.Models.DormitoryViewModels
 @inject IAuthorizationService AuthorizationService
 
 @model SmartLaundry.Models.DormitoryViewModels.DormitoryDetailsViewModel
@@ -13,30 +14,7 @@
 <div>
     <h4>Dormitory</h4>
 
-    <h4>Announcements</h4>
-    @foreach (var item in Model.Announcements)
-    {
-        <p>
-            @item.Message --- @item.PublishingDate
-        </p>
-        if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
-        {
-            <form method="POST" asp-action="RemoveAnnouncement">
-                <input type="hidden" name="announcementId" value="@item.Id"/>
-                <input type="submit" value="RemoveAnnouncement"/>
-            </form>
-        }
-    }
-    <hr/>
-
-    @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
-    {
-        <form method="POST" asp-action="AddAnnouncement">
-            <input type="text" name="message"/>
-            <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId"/>
-            <input type="submit" value="Add announcement"/>
-        </form>
-    }
+    @Html.Partial("_announcementsPartial", new AnnouncementsList(Model.Announcements, Model.Dormitory))
 
     <dl class="dl-horizontal">
         <dt>
@@ -67,7 +45,7 @@
             @Html.DisplayNameFor(model => model.Manager)
         </dt>
         <dd>
-            @if (Model.Manager != null)
+            @if(Model.Manager != null)
             {
                 @Html.Raw(Model.Manager.Firstname + Model.Manager.Lastname)
             }
@@ -75,7 +53,7 @@
         <dt>
             Porters
         </dt>
-        @foreach (var item in Model.Porters)
+        @foreach(var item in Model.Porters)
         {
             <dd>
                 @item.Firstname @item.Lastname
@@ -84,7 +62,7 @@
         <dt>
             Laundries
         </dt>
-        @foreach (var item in Model.Laundries)
+        @foreach(var item in Model.Laundries)
         {
             <dd>
                 @item.Id
@@ -93,9 +71,9 @@
     </dl>
 </div>
 <div>
-    @if ((await AuthorizationService.AuthorizeAsync(User, Model.Dormitory, AuthPolicies.DormitoryMembership)).Succeeded)
+    @if((await AuthorizationService.AuthorizeAsync(User, Model.Dormitory, AuthPolicies.DormitoryMembership)).Succeeded)
     {
-        if (User.IsInRole("Administrator"))
+        if(User.IsInRole("Administrator"))
         {
             <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryId">Edit</a>
             @Html.Raw("|")
@@ -104,7 +82,7 @@
             @Html.Raw("|")
             ;
         }
-        if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+        if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
         {
             <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryId">Manage users</a>
             @Html.Raw("|")
@@ -113,7 +91,7 @@
             @Html.Raw("|")
             ;
         }
-        if ((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
+        if((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
         {
             <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryId">Laundries</a>
             @Html.Raw("|")

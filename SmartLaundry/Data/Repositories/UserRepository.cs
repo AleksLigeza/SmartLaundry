@@ -2,6 +2,7 @@
 using SmartLaundry.Models;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmartLaundry.Data.Repositories
 {
@@ -40,6 +41,11 @@ namespace SmartLaundry.Data.Repositories
         public List<ApplicationUser> FindDormitoryPorters(int dormitoryId) =>
             _context.Users.Where(x => x.DormitoryPorterId == dormitoryId).OrderBy(x => x.Email).ToList();
 
-        public ApplicationUser GetUserById(string id) => _context.Users.FirstOrDefault(x => x.Id == id);
+        public ApplicationUser GetUserById(string id) => 
+            _context.Users.Where(x => x.Id == id)
+                .Include(x => x.DormitoryManager)
+                .Include(x => x.DormitoryPorter)
+                .Include(x => x.Room).ThenInclude(x => x.Dormitory)
+                .SingleOrDefault();
     }
 }
