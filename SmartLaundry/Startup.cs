@@ -11,6 +11,7 @@ using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Data.Repositories;
 using SmartLaundry.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartLaundry.Controllers.Helpers;
 
 namespace SmartLaundry
@@ -73,7 +74,7 @@ namespace SmartLaundry
 
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
-            services.AddMvc();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddAuthorization(options =>
             {
@@ -99,9 +100,9 @@ namespace SmartLaundry
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
+            app.UseHsts();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseAuthentication();
 
             app.UseMvc(routes =>

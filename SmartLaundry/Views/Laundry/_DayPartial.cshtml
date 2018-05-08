@@ -130,21 +130,20 @@ else
 
         }
 
-        <p>
-            <form asp-action="AddWashingMachine" method="post" asp-controller="Laundry">
-                @Html.AntiForgeryToken()
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="WashingMachineToAdd.LaundryId" />
-                <div class="form-group">
-                    <label asp-for="WashingMachineToAdd.Position" class="control-label"></label>
-                    <input asp-for="WashingMachineToAdd.Position" class="form-control" />
-                    <span asp-validation-for="WashingMachineToAdd.Position" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Add washing machine" />
-                </div>
-            </form>
-        </p>
+
+        <form asp-action="AddWashingMachine" method="post" asp-controller="Laundry">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="WashingMachineToAdd.LaundryId" />
+            <div class="form-group">
+                <label asp-for="WashingMachineToAdd.Position" class="control-label"></label>
+                <input asp-for="WashingMachineToAdd.Position" class="form-control" />
+                <span asp-validation-for="WashingMachineToAdd.Position" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add washing machine" />
+            </div>
+        </form>
     }
     <table class="table">
         <thead>

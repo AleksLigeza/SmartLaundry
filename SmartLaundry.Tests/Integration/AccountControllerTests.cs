@@ -69,7 +69,7 @@ namespace SmartLaundry.Tests.Integration
             };
             var postRequest = new HttpRequestMessage(HttpMethod.Post, "/account/register");
             postRequest.Headers.Add("Cookie",
-                new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
+                new Microsoft.Net.Http.Headers.CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
             postRequest.Content = new FormUrlEncodedContent(formData);
 
             //Act
@@ -100,7 +100,7 @@ namespace SmartLaundry.Tests.Integration
             };
             var postRequest = new HttpRequestMessage(HttpMethod.Post, "/account/login");
             postRequest.Headers.Add("Cookie",
-                new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
+                new Microsoft.Net.Http.Headers.CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
             postRequest.Content = new FormUrlEncodedContent(formData);
 
             //Act
@@ -138,7 +138,7 @@ namespace SmartLaundry.Tests.Integration
             };
             var postRequest = new HttpRequestMessage(HttpMethod.Post, "/account/login");
             postRequest.Headers.Add("Cookie",
-                new CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
+                new Microsoft.Net.Http.Headers.CookieHeaderValue(TestFixture.AntiForgeryCookieName, antiForgeryValues.cookieValue).ToString());
             postRequest.Content = new FormUrlEncodedContent(formData);
 
             //Act

@@ -22,7 +22,6 @@ namespace SmartLaundry.Controllers
         private readonly ILaundryRepository _laundryRepo;
         private readonly IUserRepository _userRepo;
         private readonly IReservationRepository _reservationRepo;
-        private readonly IRoomRepository _roomRepo;
         private readonly IAnnouncementRepository _announcementRepo;
 
         public HomeController(
