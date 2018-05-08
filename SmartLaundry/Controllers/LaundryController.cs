@@ -21,6 +21,7 @@ namespace SmartLaundry.Controllers
         private readonly IUserRepository _userRepo;
         private readonly IWashingMachineRepository _washingMachineRepo;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IDormitoryRepository _dormitoryRepo;
 
         private readonly AuthHelpers _authHelpers;
 
@@ -35,6 +36,7 @@ namespace SmartLaundry.Controllers
             _userRepo = userRepository;
             _userManager = userManager;
             _washingMachineRepo = washingMachineRepo;
+            _dormitoryRepo = dormitoryRepository;
 
             _authHelpers = new AuthHelpers(authorizationService, dormitoryRepository);
         }
@@ -78,7 +80,7 @@ namespace SmartLaundry.Controllers
         {
             var laundry = parentModel.LaundryToAdd;
 
-            if(!await _authHelpers.CheckDormitoryMembership(User, laundry.Dormitory))
+            if(!await _authHelpers.CheckDormitoryMembership(User, _dormitoryRepo.GetSingleById(laundry.DormitoryId)))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
@@ -140,10 +142,10 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "MinimumManager")]
-        public async Task<IActionResult> AddWashingMachine(DayViewModel parentModel)
+        public async Task<IActionResult> AddWashingMachine(WashingMachine model)
         {
-            var laundryId = parentModel.WashingMachineToAdd.LaundryId;
-            var machinePosition = parentModel.WashingMachineToAdd.Position;
+            var laundryId = model.LaundryId;
+            var machinePosition = model.Position;
 
             var laundry = _laundryRepo.GetLaundryById(laundryId);
             if(!await _authHelpers.CheckDormitoryMembership(User, laundry.Dormitory))
@@ -153,11 +155,11 @@ namespace SmartLaundry.Controllers
 
             if(_washingMachineRepo.WashingMachines.Any(x=>x.Position == machinePosition && x.LaundryId == laundryId))
             {
-                var model = CreateDayViewModel(laundry.DormitoryId, DateTime.Today);
-                model.AddWashingMachineError = "There is washing machine with the same number in this laundry.";
-                model.WashingMachineToAdd.Position = laundry.Position;
-                model.WashingMachineToAdd.LaundryId = laundryId;
-                return View(nameof(Day), model);
+                var dayViewModel = CreateDayViewModel(laundry.DormitoryId, DateTime.Today);
+                dayViewModel.AddWashingMachineError = "There is washing machine with the same number in this laundry.";
+                dayViewModel.WashingMachineToAdd.Position = laundry.Position;
+                dayViewModel.WashingMachineToAdd.LaundryId = laundryId;
+                return View(nameof(Day), dayViewModel);
             }
 
             var machine = _washingMachineRepo.AddWashingMachine(laundryId, machinePosition);

@@ -1,9 +1,4 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-}
-
-/* Wrapping element */
+﻿/* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
@@ -32,4 +27,130 @@
     .carousel-caption {
         display: none;
     }
+}
+
+body {
+    margin: 10px;
+    background-image: url('../images/background.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 30px;
+    text-align: center;
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+h2 {
+    margin-top: 5px;
+    margin-left: 20px;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.form-box {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.form-top {
+    overflow: hidden;
+    padding: 5px 25px 5px 25px;
+    background-color: #fafafa;
+    border-radius: 20px 20px 0px 0px;
+    text-align: left;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.form-top-simple {
+    overflow: hidden;
+    padding: 5px 25px 5px 25px;
+    background-color: #fafafa;
+    border-radius: 20px 20px 0px 0px;
+    text-align: center;
+    vertical-align: middle;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.form-top-full {
+    float: left;
+    width: 100%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.form-top-left {
+    float: left;
+    width: 75%;
+}
+
+.form-top-right {
+    float: left;
+    width: 25%;
+    padding-top: 10px;
+    font-size: 2.2rem;
+    line-height: 50px;
+    text-align: right;
+}
+
+.form-bottom {
+    padding: 10px 25px 20px 25px;
+    background-color: #fafafa;
+    border-radius: 0 0 20px 20px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+    .form-bottom form textarea {
+        height: 100px;
+    }
+
+    .form-bottom form button.btn {
+        width: 100%;
+    }
+
+    .form-bottom form .input-group input {
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+    }
+
+.col-centered {
+    float: none;
+    margin: 0 auto;
+}
+
+.announcement-left {
+    width: 75%;
+    float: left;
+    text-align: center;
+}
+
+.announcement-right {
+    width: 25%;
+    float: right;
+}
+
+.form-group-border {
+    border-radius: 15px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    background:rgba(0, 0, 0, 0.03)
+}
+
+.form-button {
+    padding: 10px 0px;
+}
+
+.form-button-small {
+    padding: 3px 0px;   
 }

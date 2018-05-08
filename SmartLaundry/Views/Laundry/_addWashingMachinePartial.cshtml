@@ -1,0 +1,13 @@
+﻿@model WashingMachine
+
+<form asp-action="AddWashingMachine" method="post" asp-controller="Laundry" class="form-group-border">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="LaundryId" />
+    <div class="form-group">
+        <label asp-for="Position" class="control-label"></label>
+        <input asp-for="Position" class="form-control" />
+        <span asp-validation-for="Position" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-default">Add washing machine</button>
+</form>

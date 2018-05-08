@@ -15,7 +15,7 @@
         <div class="form-actions no-color">
             <p>
                 Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]"/>
-                <input type="submit" value="Search" class="btn btn-default"/> |
+                <button type="submit" class="btn btn-default">Search</button>
                 <a asp-action="ManageRoomUsers">Back to Full List</a>
             </p>
         </div>
@@ -53,7 +53,7 @@
                         <form method="POST" asp-action="RemoveOccupant">
                             <input type="hidden" name="userId" value="@item.Id"/>
                             <input type="hidden" name="roomId" value="@Model.Room.Id"/>
-                            <input type="submit" value="Remove occupant"/>
+                            <button type="submit" class="btn btn-default">Remove occupant</button>
                         </form>
                     }
                     else
@@ -61,7 +61,7 @@
                         <form method="POST" asp-action="AssignOccupant">
                             <input type="hidden" name="userId" value="@item.Id"/>
                             <input type="hidden" name="roomId" value="@Model.Room.Id"/>
-                            <input type="submit" value="Assign occupant"/>
+                            <button type="submit" class="btn btn-default">Assign occupant</button>
                         </form>
                     }
                 }

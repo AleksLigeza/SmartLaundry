@@ -514,22 +514,24 @@ namespace SmartLaundry.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "MinimumManager")]
-        public async Task<IActionResult> AddAnnouncement(string message, int dormitoryId)
+        public async Task<IActionResult> AddAnnouncement(AnnouncementsList parentModel)
         {
-            if(!await _authHelpers.CheckDormitoryMembership(User, dormitoryId))
+            var model = parentModel.AnnouncementToAdd;
+
+            if(!await _authHelpers.CheckDormitoryMembership(User, model.DormitoryId))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
             var announcement = new Announcement()
             {
-                Message = message,
-                DormitoryId = dormitoryId,
+                Message = model.Message,
+                DormitoryId = model.DormitoryId,
                 PublishingDate = DateTime.Now
             };
             _announcementRepo.CreateAnnouncement(announcement);
 
-            return RedirectToAction(nameof(Details), new { id = dormitoryId });
+            return RedirectToAction(nameof(Details), new { id = model.DormitoryId });
         }
 
         [HttpPost]

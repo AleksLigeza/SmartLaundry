@@ -1,36 +1,46 @@
 ﻿@model SmartLaundry.Models.AccountViewModels.RegisterViewModel
-
-<form asp-action="Register" asp-controller="Home" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-    @Html.AntiForgeryToken()
-    <h4>Create a new account.</h4>
-    <hr />
-    @if(((string)ViewData["RequestForm"]) == "register")
-    {
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    }    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
+<div class="form-box">
+    <div class="form-top">
+        <div class="form-top-full">
+            <h3>
+                <b>Create a new account</b>
+            </h3>
+        </div>
+        <div class="form-top-right">
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="Firstname"></label>
-        <input asp-for="Firstname" class="form-control" />
-        <span asp-validation-for="Firstname" class="text-danger"></span>
+    <div class="form-bottom">
+        <form asp-action="Register" asp-controller="Home" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" class="login-form">
+            @Html.AntiForgeryToken()
+            @if(((string)ViewData["RequestForm"]) == "register")
+            {
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            }    <div class="form-group">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Firstname"></label>
+                <input asp-for="Firstname" class="form-control" />
+                <span asp-validation-for="Firstname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Lastname"></label>
+                <input asp-for="Lastname" class="form-control" />
+                <span asp-validation-for="Lastname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-info">Register</button>
+        </form>
     </div>
-    <div class="form-group">
-        <label asp-for="Lastname"></label>
-        <input asp-for="Lastname" class="form-control" />
-        <span asp-validation-for="Lastname" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="ConfirmPassword"></label>
-        <input asp-for="ConfirmPassword" class="form-control" />
-        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-default">Register</button>
-</form>
+</div>

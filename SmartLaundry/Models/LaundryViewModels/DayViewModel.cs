@@ -20,8 +20,6 @@ namespace SmartLaundry.Models.LaundryViewModels
         public Laundry LaundryToAdd { get; set; }
         public WashingMachine WashingMachineToAdd { get; set; }
 
-        public AddLaundryViewModel AddLaundryViewModel { get; set; }
-
         public bool IsFaultAtTime(WashingMachine machine, DateTime time)
         {
             return isCurrentlyFault(machine.Id) && time >= washingMachineState[machine.Id].StartTime

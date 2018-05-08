@@ -1,39 +1,40 @@
 ﻿@model SmartLaundry.Models.AccountViewModels.LoginViewModel
 
-<form asp-action="Login" asp-controller="Home" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-    <h4>Use a local account to log in.</h4>
-    <hr />
-    @if(((string)ViewData["RequestForm"]) == "login")
-    {
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    }
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <div class="checkbox">
-            <label asp-for="RememberMe">
-                <input asp-for="RememberMe" />
-                @Html.DisplayNameFor(m => m.RememberMe)
-            </label>
+<div class="form-box">
+    <div class="form-top">
+        <div class="form-top-full">
+            <h3>
+                <b>Login with existing account.</b>
+            </h3>
         </div>
     </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-default">Log in</button>
-    </div>
-    <div class="form-group">
-        <p>
+    <div class="form-bottom">
+        <form asp-action="Login" asp-controller="Home" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" class="login-form">
+            @if(((string)ViewData["RequestForm"]) == "login")
+            {
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            }
+            <div class="form-group">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label asp-for="RememberMe">
+                        <input asp-for="RememberMe" />
+                        @Html.DisplayNameFor(m => m.RememberMe)
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-info">Log in</button>
+            <hr />
             <a asp-action="ForgotPassword">Forgot your password?</a>
-        </p>
-        <p>
-            <a asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">Register as a new user?</a>
-        </p>
+        </form>
     </div>
-</form>
+</div>

@@ -11,23 +11,39 @@
 
 @if(SignInManager.IsSignedIn(User))
 {
-    <h>Your id: @UserManager.GetUserId(User)</h>
+    <div class="row">
+        <div class="col-md-12 col-centered">
+            <div class="form-box">
+                <div class="form-top-simple">
+                    <div class="form-top-full">
+                        <h3>
+                            <h>Your id: @UserManager.GetUserId(User)</h>
+                        </h3>
+                    </div>
+                </div>
+                <div class="form-bottom">
+                    <b></b>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     if(Model.DayViewModel != null)
     {
-        @await Html.PartialAsync("../Dormitory/_announcementsPartial", new AnnouncementsList(Model.Announcements, Model.Dormitory))
-        @await Html.PartialAsync("../Laundry/_DayPartial", Model.DayViewModel)
+    @await Html.PartialAsync("../Dormitory/_announcementsPartial", new AnnouncementsList(Model.Announcements, Model.Dormitory))
+    @await Html.PartialAsync("../Laundry/_DayPartial", Model.DayViewModel)
     }
-}
-else
-{
+    }
+    else
+    {
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <section>
                 @await Html.PartialAsync("../Home/_loginFormPartial", Model.LoginViewModel)
             </section>
         </div>
-        <div class="col-md-6 col-md-offset-2">
+        <div class="col-md-6">
             <section>
                 @await Html.PartialAsync("../Home/_registerFormPartial", Model.RegisterViewModel)
             </section>
@@ -36,5 +52,5 @@ else
 }
 
 @section Scripts {
-    @await  Html.PartialAsync("_ValidationScriptsPartial")
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

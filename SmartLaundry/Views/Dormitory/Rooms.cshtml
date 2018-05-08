@@ -42,9 +42,7 @@
                 <input asp-for="RoomToAdd.Number" class="form-control" />
                 <span asp-validation-for="RoomToAdd.Number" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Add room" />
-            </div>
+            <button type="submit" class="btn btn-default">Add room</button>
         </form>
     </p>
 }
@@ -67,7 +65,7 @@
             <td colspan="2">
                 <form method="post" asp-action="DeleteRoom">
                     <input type="hidden" name="id" value="@item.Id"/>
-                    <input type="submit" value="Remove room"/>
+                    <button type="submit" class="btn btn-default">Remove room</button>
                 </form>
                 |
                 <a asp-action="ManageRoomUsers" asp-route-id="@item.Id">Manage occupants</a>
@@ -83,7 +81,7 @@
                     <form method="POST" asp-action="RemoveOccupant">
                         <input type="hidden" name="userId" value="@occupant.Id"/>
                         <input type="hidden" name="roomId" value="@item.Id"/>
-                        <input type="submit" value="Remove occupant"/>
+                        <button type="submit" class="btn btn-default">Remove occupant</button>
                     </form>
                 </td>
             </tr>
