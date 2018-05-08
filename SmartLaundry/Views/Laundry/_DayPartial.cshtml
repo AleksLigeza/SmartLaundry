@@ -66,15 +66,16 @@
                         };
                     }
 
-                    if(!string.IsNullOrEmpty(Model.AddLaundryError))
-                    {
-                        <p class="text-danger">
-                            @Model.AddLaundryError
-                            @Html.ValidationSummary()
-                        </p>
-                    }
+
                     <hr />
                     <form asp-action="AddLaundry" asp-controller="Laundry" method="post" class="form-group-border">
+                        @if(!string.IsNullOrEmpty(Model.AddLaundryError))
+                        {
+                            <p class="text-danger">
+                                @Model.AddLaundryError
+                                @Html.ValidationSummary()
+                            </p>
+                        }
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <input type="hidden" asp-for="LaundryToAdd.DormitoryId" />
@@ -133,13 +134,13 @@
 
 
 
-                            if(!string.IsNullOrEmpty(Model.AddWashingMachineError))
+                            if(!string.IsNullOrEmpty(Model.AddWashingMachineError) && Model.WashingMachineToAdd.LaundryId == laundry.Id)
                             {
                                 <p class="text-danger">@Model.AddWashingMachineError</p>
 
                             }
 
-                            @await Html.PartialAsync("_addWashingMachinePartial", newMachine)
+                            @await Html.PartialAsync("../Laundry/_addWashingMachinePartial", newMachine)
 
                             <hr />
                         }

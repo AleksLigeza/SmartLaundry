@@ -3,11 +3,11 @@
 <form asp-action="AddWashingMachine" method="post" asp-controller="Laundry" class="form-group-border">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="LaundryId" />
+    <input type="hidden" asp-for="@Model.LaundryId" id="@(Model.LaundryId + Model.Position + "LaundryId")" value="@Model.LaundryId"/>
     <div class="form-group">
-        <label asp-for="Position" class="control-label"></label>
-        <input asp-for="Position" class="form-control" />
-        <span asp-validation-for="Position" class="text-danger"></span>
+        <label asp-for="@Model.Position" class="control-label"></label>
+        <input asp-for="@Model.Position" class="form-control" id="@(Model.LaundryId + Model.Position + "Position")" value="@Model.Position"/>
+        <span asp-validation-for="@Model.Position" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-default">Add washing machine</button>
+    <button type="submit" class="btn btn-success">Add washing machine</button>
 </form>

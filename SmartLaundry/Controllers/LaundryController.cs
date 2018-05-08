@@ -98,12 +98,15 @@ namespace SmartLaundry.Controllers
             }
 
             if (model != null)
-            { 
-                model.LaundryToAdd.startTime = laundry.startTime;
-                model.LaundryToAdd.shiftCount = laundry.shiftCount;
-                model.LaundryToAdd.shiftTime = laundry.shiftTime;
-                model.LaundryToAdd.Position = laundry.Position;
-                model.LaundryToAdd.DormitoryId = laundry.DormitoryId;
+            {
+                model.LaundryToAdd = new Laundry
+                {
+                    startTime = laundry.startTime,
+                    shiftCount = laundry.shiftCount,
+                    shiftTime = laundry.shiftTime,
+                    Position = laundry.Position,
+                    DormitoryId = laundry.DormitoryId
+                };
                 return View(nameof(Day), model);
             }
 
@@ -157,8 +160,11 @@ namespace SmartLaundry.Controllers
             {
                 var dayViewModel = CreateDayViewModel(laundry.DormitoryId, DateTime.Today);
                 dayViewModel.AddWashingMachineError = "There is washing machine with the same number in this laundry.";
-                dayViewModel.WashingMachineToAdd.Position = laundry.Position;
-                dayViewModel.WashingMachineToAdd.LaundryId = laundryId;
+                dayViewModel.WashingMachineToAdd = new WashingMachine
+                {
+                    Position = laundry.Position,
+                    LaundryId = laundryId
+                };
                 return View(nameof(Day), dayViewModel);
             }
 
