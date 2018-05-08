@@ -14,7 +14,7 @@
 <div>
     <h4>Dormitory</h4>
 
-    @Html.Partial("_announcementsPartial", new AnnouncementsList(Model.Announcements, Model.Dormitory))
+    @await Html.PartialAsync("_announcementsPartial", new AnnouncementsList(Model.Announcements, Model.Dormitory))
 
     <dl class="dl-horizontal">
         <dt>

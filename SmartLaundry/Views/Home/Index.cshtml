@@ -15,8 +15,8 @@
 
     if(Model.DayViewModel != null)
     {
-        @Html.Partial("../Dormitory/_announcementsPartial", new AnnouncementsList(Model.Announcements, Model.Dormitory))
-        @Html.Partial("../Laundry/_DayPartial", Model.DayViewModel)
+        @await Html.PartialAsync("../Dormitory/_announcementsPartial", new AnnouncementsList(Model.Announcements, Model.Dormitory))
+        @await Html.PartialAsync("../Laundry/_DayPartial", Model.DayViewModel)
     }
 }
 else
@@ -24,17 +24,17 @@ else
     <div class="row">
         <div class="col-md-4">
             <section>
-                @Html.Partial("../Home/_loginFormPartial", Model.LoginViewModel)
+                @await Html.PartialAsync("../Home/_loginFormPartial", Model.LoginViewModel)
             </section>
         </div>
         <div class="col-md-6 col-md-offset-2">
             <section>
-                @Html.Partial("../Home/_registerFormPartial", Model.RegisterViewModel)
+                @await Html.PartialAsync("../Home/_registerFormPartial", Model.RegisterViewModel)
             </section>
         </div>
     </div>
 }
 
 @section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
+    @await  Html.PartialAsync("_ValidationScriptsPartial")
 }

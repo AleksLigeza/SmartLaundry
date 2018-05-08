@@ -113,7 +113,6 @@ namespace SmartLaundry
             });
 
             RolesData.SeedRoles(app.ApplicationServices, Configuration).Wait();
-            AuthHelpers.SeedRepos(app.ApplicationServices);
         }
     }
 }

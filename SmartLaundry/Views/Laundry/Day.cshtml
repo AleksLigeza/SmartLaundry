@@ -4,7 +4,7 @@
     ViewData["Title"] = "Day";
 }
 
-@Html.Partial("_DayPartial", Model)
+@await Html.PartialAsync("_DayPartial", Model)
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
