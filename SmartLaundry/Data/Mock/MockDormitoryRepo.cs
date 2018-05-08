@@ -58,7 +58,7 @@ namespace SmartLaundry.Data.Mock
             throw new NotImplementedException();
         }
 
-        public bool DormitoryHasRoom(int roomNumber, int dormitoryId)
+        public bool IsRoomInDormitory(int roomNumber, int dormitoryId)
         {
             throw new NotImplementedException();
         }

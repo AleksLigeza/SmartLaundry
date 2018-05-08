@@ -15,6 +15,5 @@ namespace SmartLaundry.Data.Interfaces
         void AssignOccupant(Room room, ApplicationUser user);
         void RemoveOccupant(Room room, ApplicationUser user);
         Room GetRoomById(int id);
-        Room GetRoomWithOccupants(int id);
     }
 }

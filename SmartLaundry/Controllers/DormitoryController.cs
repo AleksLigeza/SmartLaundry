@@ -105,7 +105,7 @@ namespace SmartLaundry.Controllers
             string searchString,
             int? page)
         {
-            var room = _roomRepo.GetRoomWithOccupants(id);
+            var room = _roomRepo.GetRoomById(id);
             if(room == null)
             {
                 return ControllerHelpers.Show404ErrorPage(this);
@@ -161,7 +161,7 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignManager(int dormitoryId, string managerEmail)
         {
-            var dormitory = _dormitoryRepo.GetSingleWithIncludes(dormitoryId);
+            var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
 
             if(dormitory.Manager != null)
             {
@@ -243,7 +243,7 @@ namespace SmartLaundry.Controllers
                 return ControllerHelpers.Show404ErrorPage(this);
             }
 
-            var dormitory = _dormitoryRepo.GetSingleWithIncludes(id.Value);
+            var dormitory = _dormitoryRepo.GetSingleById(id.Value);
             if(dormitory == null)
             {
                 return ControllerHelpers.Show404ErrorPage(this);
@@ -362,7 +362,7 @@ namespace SmartLaundry.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var dormitory = _dormitoryRepo.GetSingleWithIncludes(id);
+            var dormitory = _dormitoryRepo.GetSingleById(id);
 
             await _userManager.RemoveFromRoleAsync(dormitory.Manager, "Manager");
 
@@ -387,7 +387,7 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumPorter")]
         public async Task<IActionResult> Rooms(int id)
         {
-            var dormitory = _dormitoryRepo.GetDormitoryWithRooms(id);
+            var dormitory = _dormitoryRepo.GetSingleById(id);
             if(!await _authHelpers.CheckDormitoryMembership(User, dormitory))
             {
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
@@ -423,9 +423,9 @@ namespace SmartLaundry.Controllers
                 return ControllerHelpers.ShowAccessDeniedErrorPage(this);
             }
 
-            if(_dormitoryRepo.DormitoryHasRoom(roomNumber, dormitoryId))
+            if(_dormitoryRepo.IsRoomInDormitory(roomNumber, dormitoryId))
             {
-                var dormitory = _dormitoryRepo.GetDormitoryWithRooms(dormitoryId);
+                var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
                 var model = CreateRoomsViewModel(dormitoryId, dormitory);
                 model.ErrorMessage = "There is a room with the same number.";
                 model.RoomToAdd.Number = roomNumber;
@@ -441,7 +441,7 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumManager")]
         public async Task<IActionResult> DeleteRoom(int id)
         {
-            var room = _roomRepo.GetRoomWithOccupants(id);
+            var room = _roomRepo.GetRoomById(id);
 
             if(room == null)
             {

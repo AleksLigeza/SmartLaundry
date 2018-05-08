@@ -35,6 +35,7 @@ namespace SmartLaundry
                 services.AddDbContext<ApplicationDbContext>(optionsBuilder =>
                     optionsBuilder
                         .UseInMemoryDatabase(CurrentEnvironment.EnvironmentName)
+                        .UseLazyLoadingProxies()
                 );
 
                 services.AddTransient<IEmailSender, FakeEmailSender>();
@@ -43,6 +44,7 @@ namespace SmartLaundry
             {
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options
+                        .UseLazyLoadingProxies()
                         .UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
                 services.AddTransient<IEmailSender, EmailSender>();

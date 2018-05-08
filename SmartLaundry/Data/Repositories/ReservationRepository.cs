@@ -63,8 +63,7 @@ namespace SmartLaundry.Data.Repositories
                              && (x.StartTime - DateTime.Now).TotalMinutes > 15)
                 );
         }
-
-
+        
         public Reservation GetHourReservation(int machineId, DateTime startTime)
         {
             return _context.Reservations
@@ -97,7 +96,7 @@ namespace SmartLaundry.Data.Repositories
 
         public bool IsFaultAtTimeAtDay(int machineId, DateTime dateTime)
         {
-            var machine = _context.WashingMachines.Where(x => x.Id == machineId).Include(x => x.Laundry).Single();
+            var machine = _context.WashingMachines.Single(x => x.Id == machineId);
             dateTime = LaundryTimeHelper.GetClosestStartTime(dateTime, machine.Laundry.startTime,
                 machine.Laundry.shiftTime, machine.Laundry.shiftCount);
 
@@ -125,8 +124,6 @@ namespace SmartLaundry.Data.Repositories
             var dictionary = new Dictionary<int, Reservation>();
             var laundires = _context.Laundries
                 .Where(x => x.DormitoryId == id)
-                .Include(x => x.WashingMachines)
-                .ThenInclude(x => x.Reservations)
                 .ToList();
             foreach (var laundry in laundires)
             {

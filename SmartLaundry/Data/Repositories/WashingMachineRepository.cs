@@ -44,19 +44,15 @@ namespace SmartLaundry.Data.Repositories
             if (washingMachine == null) return;
             var machine = washingMachine;
             washingMachine = _context.WashingMachines
-                .Where(x => x.Id == machine.Id)
-                .Include(x => x.Reservations)
-                .Single();
+                .Single(x => x.Id == machine.Id);
             _context.WashingMachines.Remove(washingMachine);
             _context.SaveChanges();
         }
 
         public WashingMachine DisableWashingMachine(int id)
         {
-            var machine = _context.WashingMachines.Where(x => x.Id == id)
-                .Include(x => x.Reservations)
-                .Include(x => x.Laundry)
-                .Single();
+            var machine = _context.WashingMachines
+                .Single(x => x.Id == id);
 
             var startTime = DateTime.Now;
             startTime = LaundryTimeHelper.GetClosestStartTime(
@@ -88,9 +84,8 @@ namespace SmartLaundry.Data.Repositories
 
         public WashingMachine EnableWashingMachine(int id)
         {
-            var machine = _context.WashingMachines.Where(x => x.Id == id)
-                .Include(x => x.Reservations)
-                .SingleOrDefault();
+            var machine = _context.WashingMachines
+                .SingleOrDefault(x => x.Id == id);
 
             if (machine == null)
             {

@@ -13,7 +13,6 @@ namespace SmartLaundry.Data.Interfaces
         Laundry AddLaundry(int dormitoryId, int position);
         void RemoveLaundry(Laundry laundry);
         Laundry GetLaundryById(int id);
-        Laundry GetLaundryWithIncludedEntities(int laundryId);
         List<Laundry> GetDormitoryLaundriesWithEntitiesAtDay(int dormitoryId, DateTime date);
         void UpdateLaundry(Laundry laundry);
     }

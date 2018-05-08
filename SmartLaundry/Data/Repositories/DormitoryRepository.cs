@@ -32,20 +32,11 @@ namespace SmartLaundry.Data.Repositories
 
         public List<Dormitory> GetAll()
         {
-            return _context.Dormitories.Include(x => x.Rooms).OrderBy(x => x.Name).ToList();
+            return _context.Dormitories.OrderBy(x => x.Name).ToList();
         }
 
-        public Dormitory GetSingleById(int id)
-        {
-            return _context.Dormitories.Where(x => x.DormitoryId == id).SingleOrDefault();
-        }
-
-        public Dormitory GetSingleWithIncludes(int id)
-        {
-            return _context.Dormitories.Include(x => x.Laundries)
-                .Include(x => x.Manager).Include(x => x.Porters)
-                .Include(x => x.Rooms).SingleOrDefault(x => x.DormitoryId == id);
-        }
+        public Dormitory GetSingleById(int id) => _context.Dormitories.SingleOrDefault(x => x.DormitoryId == id);
+        
 
         public Dormitory UpdateSingle(Dormitory source)
         {
@@ -63,13 +54,7 @@ namespace SmartLaundry.Data.Repositories
             return _context.Users.Find(user.Id).DormitoryManager;
         }
 
-        public Dormitory GetDormitoryWithRooms(int id)
-        {
-            return _context.Dormitories.Where(x => x.DormitoryId == id).Include(x => x.Rooms)
-                .ThenInclude(x => x.Occupants).SingleOrDefault();
-        }
-
-        public bool DormitoryHasRoom(int roomNumber, int dormiotryId) =>
+        public bool IsRoomInDormitory(int roomNumber, int dormiotryId) =>
             _context.Rooms.Any(x => x.DormitoryId == dormiotryId && x.Number == roomNumber);
     }
 }

@@ -59,9 +59,6 @@ namespace SmartLaundry.Data.Repositories
         }
 
         public Room GetRoomById(int id) =>
-            _context.Rooms.Where(x => x.Id == id).Include(x => x.Dormitory).SingleOrDefault();
-
-        public Room GetRoomWithOccupants(int id) => _context.Rooms.Where(x => x.Id == id).Include(x => x.Occupants)
-            .Include(x => x.Dormitory).SingleOrDefault();
+            _context.Rooms.SingleOrDefault(x => x.Id == id);
     }
 }

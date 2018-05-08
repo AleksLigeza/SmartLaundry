@@ -45,36 +45,17 @@ namespace SmartLaundry.Data.Repositories
             _context.SaveChanges();
         }
 
-        public Laundry GetLaundryWithIncludedEntities(int laundryId)
-        {
-            return _context.Laundries
-                .Where(x => x.Id == laundryId)
-                .Include(x => x.WashingMachines)
-                .ThenInclude(x => x.Reservations)
-                .SingleOrDefault();
-        }
-
         public void RemoveLaundry(Laundry laundry)
         {
             if (laundry == null) return;
-            laundry = _context.Laundries.Where(x => x.Id == laundry.Id)
-                .Include(x => x.WashingMachines)
-                .ThenInclude(x => x.Reservations)
-                .Single();
+            laundry = _context.Laundries
+                .Single(x => x.Id == laundry.Id);
             _context.Laundries.Remove(laundry);
             _context.SaveChanges();
         }
 
         public List<Laundry> GetDormitoryLaundriesWithEntitiesAtDay(int dormitoryId, DateTime date)
         {
-            //return _context.Laundries
-            //    .Where(x => x.DormitoryId == dormitoryId)
-            //    .Include(x => x.WashingMachines)
-            //    .ThenInclude(x => x.Reservations)
-            //    .ThenInclude(x => x.Room)
-            //    .OrderBy(x => x.Position)
-            //    .ToList();
-
             return _context.Laundries
                 .Select(n => new Laundry
                 {

@@ -53,9 +53,7 @@ namespace SmartLaundry.Controllers
                 var userId = _userManager.GetUserId(User);
                 var user = _userRepo.GetUserById(userId);
 
-                int? dormitoryId = null;
-
-                dormitoryId = user.Room?.DormitoryId ?? user.DormitoryManagerId ?? user.DormitoryPorterId;
+                int? dormitoryId = user.Room?.DormitoryId ?? user.DormitoryManagerId ?? user.DormitoryPorterId;
 
                 if(dormitoryId != null)
                 {
