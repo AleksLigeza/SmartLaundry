@@ -7,6 +7,8 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
+<p>@Localizer["Hello"]</p>
+
 <br />
 
 @if(SignInManager.IsSignedIn(User))
@@ -17,7 +19,7 @@
                 <div class="form-top-simple">
                     <div class="form-top-full">
                         <h3>
-                            <h>Your id: @UserManager.GetUserId(User)</h>
+                            <b>Your id: @UserManager.GetUserId(User)</b>
                         </h3>
                     </div>
                 </div>
@@ -27,7 +29,6 @@
             </div>
         </div>
     </div>
-
 
     if(Model.DayViewModel != null)
     {

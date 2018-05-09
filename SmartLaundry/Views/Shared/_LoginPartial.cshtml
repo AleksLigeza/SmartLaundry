@@ -11,6 +11,9 @@
         <ul class="nav navbar-nav">
             @if(SignInManager.IsSignedIn(User))
             {
+                <li>@Html.ActionLink("PL", "ChangeCulture", "Home", new { lang = "pl-PL", returnUrl = Context.Request.Path }, null)</li>
+                <li>@Html.ActionLink("EN", "ChangeCulture", "Home", new { lang = "en-US", returnUrl = Context.Request.Path }, null)</li>
+
                 <li>
                     <a asp-area="" asp-controller="Dormitory" asp-action="Index">Dormitories</a>
                 </li>

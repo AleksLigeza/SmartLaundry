@@ -48,7 +48,7 @@ namespace SmartLaundry.Controllers
             return RedirectToDay(id, DateTime.Now.Date);
         }
 
-        [HttpGet("/[controller]/[action]/{id}/{year}/{month}/{day}")]
+        [HttpGet("/{culture}/[controller]/[action]/{id}/{year}/{month}/{day}")]
         [Authorize(Policy = "MinimumOccupant")]
         public async Task<IActionResult> Day(int id, int year, int month, int day)
         {

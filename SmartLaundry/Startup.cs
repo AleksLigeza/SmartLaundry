@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
@@ -11,7 +14,11 @@ using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Data.Repositories;
 using SmartLaundry.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Routing;
 using SmartLaundry.Controllers.Helpers;
 
 namespace SmartLaundry
@@ -76,7 +83,14 @@ namespace SmartLaundry
 
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddLocalization(o =>
+            {
+                o.ResourcesPath = "Resources";
+            });
+
+            services.AddMvc()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddAuthorization(options =>
             {
@@ -107,11 +121,33 @@ namespace SmartLaundry
             app.UseStaticFiles();
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
+            IList<CultureInfo> supportedCultures = new List<CultureInfo>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                new CultureInfo("en-US"),
+                new CultureInfo("pl-PL"),
+            };
+            var localizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("pl-PL"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            };
+            var requestProvider = new RouteDataRequestCultureProvider();
+            localizationOptions.RequestCultureProviders.Insert(0, requestProvider);
+
+            app.UseRouter(routes =>
+            {
+                routes.MapMiddlewareRoute("{culture=pl-PL}/{*mvcRoute}", subApp =>
+                {
+                    subApp.UseRequestLocalization(localizationOptions);
+
+                    subApp.UseMvc(mvcRoutes =>
+                    {
+                        mvcRoutes.MapRoute(
+                            name: "default",
+                            template: "{culture=pl-PL}/{controller=Home}/{action=Index}/{id?}");
+                    });
+                });
             });
 
             RolesData.SeedRoles(app.ApplicationServices, Configuration).Wait();

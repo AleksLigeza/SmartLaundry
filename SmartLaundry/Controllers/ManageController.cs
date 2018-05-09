@@ -13,7 +13,6 @@ using SmartLaundry.Services;
 namespace SmartLaundry.Controllers
 {
     [Authorize]
-    [Route("[controller]/[action]")]
     public class ManageController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

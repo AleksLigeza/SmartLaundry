@@ -168,6 +168,17 @@ namespace SmartLaundry.Controllers
             return View(model);
         }
 
+
+        public IActionResult ChangeCulture(string lang, string returnUrl)
+        {
+            if (returnUrl.Contains("pl-PL") || returnUrl.Contains("en-US"))
+            {
+                returnUrl = returnUrl.Substring(6);
+            }
+
+            return Redirect("/" + lang + returnUrl);
+        }
+
         private void AddErrors(IdentityResult result)
         {
             foreach(var error in result.Errors)
