@@ -1,4 +1,5 @@
-﻿@using SmartLaundry.Authorization
+﻿@using Castle.Core.Internal
+@using SmartLaundry.Authorization
 @using Microsoft.AspNetCore.Authorization
 @using SmartLaundry.Models.DormitoryViewModels
 @inject IAuthorizationService AuthorizationService
@@ -9,94 +10,119 @@
     ViewData["Title"] = "Details";
 }
 
-<h2>Details</h2>
+@await Html.PartialAsync("_announcementsPartial", new AnnouncementsList(Model.Announcements, Model.Dormitory))
 
-<div>
-    <h4>Dormitory</h4>
 
-    @await Html.PartialAsync("_announcementsPartial", new AnnouncementsList(Model.Announcements, Model.Dormitory))
+<div class="row">
+    <div class="col-md-12 col-centered">
+        <div class="form-box">
+            <div class="form-top-simple">
+                <div class="form-top-full">
+                    <h3>
+                        <b>Details</b>
+                    </h3>
+                </div>
+            </div>
+            <div class="form-bottom">
+                <div>
 
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Dormitory.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Dormitory.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Dormitory.Address)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Dormitory.Address)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Dormitory.ZipCode)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Dormitory.ZipCode)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Dormitory.City)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Dormitory.City)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Manager)
-        </dt>
-        <dd>
-            @if(Model.Manager != null)
-            {
-                @Html.Raw(Model.Manager.Firstname + Model.Manager.Lastname)
-            }
-        </dd>
-        <dt>
-            Porters
-        </dt>
-        @foreach(var item in Model.Porters)
-        {
-            <dd>
-                @item.Firstname @item.Lastname
-            </dd>
-        }
-        <dt>
-            Laundries
-        </dt>
-        @foreach(var item in Model.Laundries)
-        {
-            <dd>
-                @item.Id
-            </dd>
-        }
-    </dl>
-</div>
-<div>
-    @if((await AuthorizationService.AuthorizeAsync(User, Model.Dormitory, AuthPolicies.DormitoryMembership)).Succeeded)
-    {
-        if(User.IsInRole("Administrator"))
-        {
-            <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryId">Edit</a>
-            @Html.Raw("|")
-            ;
-            <a asp-action="Delete" asp-route-id="@Model.Dormitory.DormitoryId">Delete</a>
-            @Html.Raw("|")
-            ;
-        }
-        if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
-        {
-            <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryId">Manage users</a>
-            @Html.Raw("|")
-            ;
-            <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryId">Rooms</a>
-            @Html.Raw("|")
-            ;
-        }
-        if((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
-        {
-            <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryId">Laundries</a>
-            @Html.Raw("|")
-            ;
-        }
-    }
-    <a asp-action="Index">Back to List</a>
+                    <h3>Dormitory</h3>
+
+                    <dl class="dl-horizontal">
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Dormitory.Name)
+                        </dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.Dormitory.Name)
+                        </dd>
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Dormitory.Address)
+                        </dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.Dormitory.Address)
+                        </dd>
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Dormitory.ZipCode)
+                        </dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.Dormitory.ZipCode)
+                        </dd>
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Dormitory.City)
+                        </dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.Dormitory.City)
+                        </dd>
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Manager)
+                        </dt>
+                        <dd>
+                            @if(Model.Manager != null)
+                            {
+                                @Html.Raw(Model.Manager.Firstname + Model.Manager.Lastname)
+                            }
+                            else
+                            {
+                                @Html.Raw(" --- ")
+                            }
+                        </dd>
+                        <dt>
+                            Porters
+                        </dt>
+                        @if(Model.Porters.IsNullOrEmpty())
+                        {
+                            <dd>
+                                @Html.Raw(" --- ")
+                            </dd>
+                        }
+                        @foreach(var item in Model.Porters)
+                        {
+                            <dd>
+                                @item.Firstname @item.Lastname
+                            </dd>
+                        }
+                        <dt>
+                            Laundries
+                        </dt>
+                        @foreach(var item in Model.Laundries)
+                        {
+                            <dd>
+                                @item.Id
+                            </dd>
+                        }
+                    </dl>
+                </div>
+                <div>
+                    @if((await AuthorizationService.AuthorizeAsync(User, Model.Dormitory, AuthPolicies.DormitoryMembership)).Succeeded)
+                    {
+                        if(User.IsInRole("Administrator"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryId">Edit</a>
+                            @Html.Raw("|")
+                            ;
+                            <a asp-action="Delete" asp-route-id="@Model.Dormitory.DormitoryId">Delete</a>
+                            @Html.Raw("|")
+                            ;
+                        }
+                        if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                        {
+                            <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryId">Manage users</a>
+                            @Html.Raw("|")
+                            ;
+                            <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryId">Rooms</a>
+                            @Html.Raw("|")
+                            ;
+                        }
+                        if((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
+                        {
+                            <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryId">Laundries</a>
+                            @Html.Raw("|")
+                            ;
+                        }
+                    }
+                    <a asp-action="Index">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

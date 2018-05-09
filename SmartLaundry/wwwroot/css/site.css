@@ -154,3 +154,7 @@ h2 {
 .form-button-small {
     padding: 3px 0px;   
 }
+
+.button-margin {
+    margin: 5px 0;
+}

@@ -8,90 +8,105 @@
     ViewBag.Title = "Manage Dormitory Users";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="row">
+    <div class="col-md-12 col-centered">
+        <div class="form-box">
+            <div class="form-top-simple">
+                <div class="form-top-full">
+                    <h3>
+                        <h>@ViewBag.Title</h>
+                    </h3>
+                </div>
+            </div>
+            <div class="form-bottom">
 
-<form asp-action="ManageDormitoryUsers" method="get">
-    <div class="form-actions no-color">
-        <p>
-            Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]"/>
-            <button type="submit" class="btn btn-default">Search</button>|
-            <a asp-action="ManageDormitoryUsers">Back to Full List</a>
-        </p>
+                <form asp-action="ManageDormitoryUsers" method="get" class="form-group-border">
+                    <div class="form-actions no-color">
+                        <p>
+                            Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" class="form-control"/>
+                            <button type="submit" class="btn btn-info button-margin">Search</button>
+                            <a asp-action="ManageDormitoryUsers">Back to Full List</a>
+                        </p>
+                    </div>
+                </form>
+                <br/>
+                <a asp-action="Details" asp-route-id=@Model.Dormitory.DormitoryId>Back to details</a>
+                <hr/>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Dormitory: @Model.Dormitory.Name
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var item in Model.Users)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Email)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Firstname)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Lastname)
+                                </td>
+                                <td>
+                                    @if(item.DormitoryManagerId != Model.Dormitory.DormitoryId && User.IsInRole("Administrator"))
+                                    {
+                                        <form method="POST" asp-action="AssignManager">
+                                            <input type="hidden" name="managerEmail" value="@item.Email" />
+                                            <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId" />
+                                            <button type="submit" class="btn btn-info button-margin">Assign manager</button>
+                                        </form>
+                                    }
+                                    @if(item.DormitoryPorterId == null && item.DormitoryManagerId != Model.Dormitory.DormitoryId && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                                    {
+                                        <form method="POST" asp-action="AssignPorter">
+                                            <input type="hidden" name="porterEmail" value="@item.Email" />
+                                            <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId" />
+                                            <button type="submit" class="btn btn-info button-margin">Assign porter</button>
+                                        </form>
+                                    }
+                                    @if(item.DormitoryPorterId == Model.Dormitory.DormitoryId && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                                    {
+                                        <form method="POST" asp-action="RemovePorter">
+                                            <input type="hidden" name="porterEmail" value="@item.Email" />
+                                            <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId" />
+                                            <button type="submit" class="btn btn-warning button-margin">Remove porter</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+                @{
+                    var prevDisabled = !Model.Users.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.Users.HasNextPage ? "disabled" : "";
+                }
+
+                <a asp-action="ManageDormitoryUsers"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-page="@(Model.Users.PageIndex - 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-default @prevDisabled">
+                    Previous
+                </a>
+                <a asp-action="ManageDormitoryUsers"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-page="@(Model.Users.PageIndex + 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-default @nextDisabled">
+                    Next
+                </a>
+            </div>
+        </div>
     </div>
-</form>
+</div>
 
-<a asp-action="Details" asp-route-id=@Model.Dormitory.DormitoryId>Back to details</a>
-
-<table class="table">
-    <thead>
-    <tr>
-        <th>
-            Dormitory: @Model.Dormitory.Name
-        </th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model.Users)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Firstname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Lastname)
-            </td>
-            <td>
-                @if (item.DormitoryManagerId != Model.Dormitory.DormitoryId && User.IsInRole("Administrator"))
-                {
-                    <form method="POST" asp-action="AssignManager">
-                        <input type="hidden" name="managerEmail" value="@item.Email"/>
-                        <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId"/>
-                        <button type="submit" class="btn btn-default">Assign manager</button>
-                    </form>
-                }
-                @if (item.DormitoryPorterId == null && item.DormitoryManagerId != Model.Dormitory.DormitoryId && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
-                {
-                    <form method="POST" asp-action="AssignPorter">
-                        <input type="hidden" name="porterEmail" value="@item.Email"/>
-                        <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId"/>
-                        <button type="submit" class="btn btn-default">Assign porter</button>
-                    </form>
-                }
-                @if (item.DormitoryPorterId == Model.Dormitory.DormitoryId && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
-                {
-                    <form method="POST" asp-action="RemovePorter">
-                        <input type="hidden" name="porterEmail" value="@item.Email"/>
-                        <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId"/>
-                        <button type="submit" class="btn btn-default">Remove porter</button>
-                    </form>
-                }
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-
-@{
-    var prevDisabled = !Model.Users.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.Users.HasNextPage ? "disabled" : "";
-}
-
-<a asp-action="ManageDormitoryUsers"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-page="@(Model.Users.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @prevDisabled">
-    Previous
-</a>
-<a asp-action="ManageDormitoryUsers"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-page="@(Model.Users.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @nextDisabled">
-    Next
-</a>

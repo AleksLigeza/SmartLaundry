@@ -1,58 +1,64 @@
-﻿@using SmartLaundry.Authorization
+﻿@using Castle.Core.Internal
+@using SmartLaundry.Authorization
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService AuthorizationService
 
 @model SmartLaundry.Models.DormitoryViewModels.AnnouncementsList
 
-<div class="row">
-    <div class="col-md-12 col-centered">
-        <div class="form-box">
-            <div class="form-top-simple">
-                <div class="form-top-full">
-                    <h3>
-                        <b>Announcements</b>
-                    </h3>
+@if(!Model.Announcements.IsNullOrEmpty()
+    || (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded
+    && (await AuthorizationService.AuthorizeAsync(User, Model.Dormitory, AuthPolicies.DormitoryMembership)).Succeeded)
+{
+    <div class="row">
+        <div class="col-md-12 col-centered">
+            <div class="form-box">
+                <div class="form-top-simple">
+                    <div class="form-top-full">
+                        <h3>
+                            <b>Announcements</b>
+                        </h3>
+                    </div>
                 </div>
-            </div>
-            <div class="form-bottom">
-                @foreach(var item in Model.Announcements)
-                {
-                    if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded
+                <div class="form-bottom">
+                    @foreach(var item in Model.Announcements)
+                    {
+                        if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded
+                            && (await AuthorizationService.AuthorizeAsync(User, Model.Dormitory, AuthPolicies.DormitoryMembership)).Succeeded)
+                        {
+                            <p class="announcement-left">
+                                <b>@item.Message</b> --- @item.PublishingDate
+                            </p>
+                            <form method="POST" asp-action="RemoveAnnouncement" asp-controller="Dormitory" class="announcement-right">
+                                <input type="hidden" name="announcementId" value="@item.Id" />
+                                <button type="submit" class="btn btn-danger">Remove Announcement</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <p>
+                                <b>@item.Message</b> --- @item.PublishingDate
+                            </p>
+                        }
+                        <br />
+                        <hr />
+                    }
+                    @if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded
                         && (await AuthorizationService.AuthorizeAsync(User, Model.Dormitory, AuthPolicies.DormitoryMembership)).Succeeded)
                     {
-                        <p class="announcement-left">
-                            <b>@item.Message</b> --- @item.PublishingDate
-                        </p>
-                        <form method="POST" asp-action="RemoveAnnouncement" asp-controller="Dormitory" class="announcement-right">
-                            <input type="hidden" name="announcementId" value="@item.Id" />
-                            <button type="submit" class="btn btn-danger">Remove Announcement</button>
+                        <form method="POST" asp-action="AddAnnouncement" asp-controller="Dormitory" class="form-group-border">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            <input type="hidden" asp-for="@Model.AnnouncementToAdd.DormitoryId" />
+                            <div class="form-group">
+                                <label asp-for="@Model.AnnouncementToAdd.Message"></label>
+                                <input asp-for="@Model.AnnouncementToAdd.Message" class="form-control" />
+                                <span asp-validation-for="@Model.AnnouncementToAdd.Message" class="text-danger"></span>
+                            </div>
+                            <button type="submit" class="btn btn-info">Add announcement</button>
                         </form>
                     }
-                    else
-                    {
-                        <p>
-                            <b>@item.Message</b> --- @item.PublishingDate
-                        </p>
-                    }
-                    <br/>
-                    <hr/>
-                }
-                @if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded
-                   && (await AuthorizationService.AuthorizeAsync(User, Model.Dormitory, AuthPolicies.DormitoryMembership)).Succeeded)
-                {
-                    <form method="POST" asp-action="AddAnnouncement" asp-controller="Dormitory" class="form-group-border">
-                        <div asp-validation-summary="All" class="text-danger"></div>
-                        <input type="hidden" asp-for="@Model.AnnouncementToAdd.DormitoryId" />
-                        <div class="form-group">
-                            <label asp-for="@Model.AnnouncementToAdd.Message"></label>
-                            <input asp-for="@Model.AnnouncementToAdd.Message" class="form-control" />
-                            <span asp-validation-for="@Model.AnnouncementToAdd.Message" class="text-danger"></span>
-                        </div>
-                        <button type="submit" class="btn btn-info">Add announcement</button>
-                    </form>
-                }
+                </div>
             </div>
         </div>
     </div>
-</div>
 
+}

@@ -7,87 +7,102 @@
     ViewBag.Title = "Manage Room Users";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="row">
+    <div class="col-md-12 col-centered">
+        <div class="form-box">
+            <div class="form-top-simple">
+                <div class="form-top-full">
+                    <h3>
+                        <h>@ViewBag.Title</h>
+                    </h3>
+                </div>
+            </div>
+            <div class="form-bottom">
 
-@if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
-{
-    <form asp-action="ManageRoomUsers" method="get">
-        <div class="form-actions no-color">
-            <p>
-                Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]"/>
-                <button type="submit" class="btn btn-default">Search</button>
-                <a asp-action="ManageRoomUsers">Back to Full List</a>
-            </p>
-        </div>
-    </form>
-}
-<a asp-action="Rooms" asp-route-id=@Model.Room.DormitoryId>Back to rooms list</a>
-
-<table class="table">
-    <thead>
-    <tr>
-        <th>
-            Room: @Model.Room.Number
-        </th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model.Users)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Firstname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Lastname)
-            </td>
-            <td>
-                @if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                @if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
                 {
-                    if (Model.Room.Occupants.SingleOrDefault(x => x.Id == item.Id) != null)
-                    {
-                        <form method="POST" asp-action="RemoveOccupant">
-                            <input type="hidden" name="userId" value="@item.Id"/>
-                            <input type="hidden" name="roomId" value="@Model.Room.Id"/>
-                            <button type="submit" class="btn btn-default">Remove occupant</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form method="POST" asp-action="AssignOccupant">
-                            <input type="hidden" name="userId" value="@item.Id"/>
-                            <input type="hidden" name="roomId" value="@Model.Room.Id"/>
-                            <button type="submit" class="btn btn-default">Assign occupant</button>
-                        </form>
-                    }
+                    <form asp-action="ManageRoomUsers" method="get" class="form-group-border">
+                        <div class="form-actions no-color">
+                            <p>
+                                Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" class="form-control"/>
+                                <button type="submit" class="btn btn-info button-margin">Search</button>
+                                <a asp-action="ManageRoomUsers">Back to Full List</a>
+                            </p>
+                        </div>
+                    </form>
                 }
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+                <a asp-action="Rooms" asp-route-id=@Model.Room.DormitoryId>Back to rooms list</a>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Room: @Model.Room.Number
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var item in Model.Users)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Email)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Firstname)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Lastname)
+                                </td>
+                                <td>
+                                    @if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                                    {
+                                        if(Model.Room.Occupants.SingleOrDefault(x => x.Id == item.Id) != null)
+                                        {
+                                            <form method="POST" asp-action="RemoveOccupant">
+                                                <input type="hidden" name="userId" value="@item.Id" />
+                                                <input type="hidden" name="roomId" value="@Model.Room.Id" />
+                                                <button type="submit" class="btn btn-warning">Remove occupant</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form method="POST" asp-action="AssignOccupant">
+                                                <input type="hidden" name="userId" value="@item.Id" />
+                                                <input type="hidden" name="roomId" value="@Model.Room.Id" />
+                                                <button type="submit" class="btn btn-success">Assign occupant</button>
+                                            </form>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
 
 
-@{
-    var prevDisabled = !Model.Users.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.Users.HasNextPage ? "disabled" : "";
-}
+                @{
+                    var prevDisabled = !Model.Users.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.Users.HasNextPage ? "disabled" : "";
+                }
 
-<a asp-action="ManageDormitoryUsers"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-page="@(Model.Users.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @prevDisabled">
-    Previous
-</a>
-<a asp-action="ManageDormitoryUsers"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-page="@(Model.Users.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @nextDisabled">
-    Next
-</a>
+                <a asp-action="ManageDormitoryUsers"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-page="@(Model.Users.PageIndex - 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-default @prevDisabled">
+                    Previous
+                </a>
+                <a asp-action="ManageDormitoryUsers"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-page="@(Model.Users.PageIndex + 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-default @nextDisabled">
+                    Next
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+

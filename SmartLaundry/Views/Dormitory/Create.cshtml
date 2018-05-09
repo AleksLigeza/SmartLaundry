@@ -4,47 +4,56 @@
     ViewData["Title"] = "Create";
 }
 
-<h2>Create</h2>
-
-<h4>Dormitory</h4>
-<hr/>
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control"/>
-                <span asp-validation-for="Name" class="text-danger"></span>
+    <div class="col-md-12 col-centered">
+        <div class="form-box">
+            <div class="form-top-simple">
+                <div class="form-top-full">
+                    <h3>
+                        <h>Create</h>
+                    </h3>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Address" class="control-label"></label>
-                <input asp-for="Address" class="form-control"/>
-                <span asp-validation-for="Address" class="text-danger"></span>
+            <div class="form-bottom">
+                <h4>Dormitory</h4>
+                <hr />
+                <form asp-action="Create">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Address" class="control-label"></label>
+                        <input asp-for="Address" class="form-control" />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ZipCode" class="control-label"></label>
+                        <input asp-for="ZipCode" class="form-control" />
+                        <span asp-validation-for="ZipCode" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="City" class="control-label"></label>
+                        <input asp-for="City" class="form-control" />
+                        <span asp-validation-for="City" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-success">Create</button>
+                </form>
+                <div>
+                    <a asp-action="Index">Back to List</a>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="ZipCode" class="control-label"></label>
-                <input asp-for="ZipCode" class="form-control"/>
-                <span asp-validation-for="ZipCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="City" class="control-label"></label>
-                <input asp-for="City" class="form-control"/>
-                <span asp-validation-for="City" class="text-danger"></span>
-            </div>
-            <button type="submit" class="btn btn-default">Create</button>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-@Html.AntiForgeryToken()
-    
+
+
 @section Scripts {
 
-@{
-    await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-                                                               }
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

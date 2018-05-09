@@ -7,61 +7,75 @@
     ViewData["Title"] = "Dormitory List";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="row">
+    <div class="col-md-12 col-centered">
+        <div class="form-box">
+            <div class="form-top-simple">
+                <div class="form-top-full">
+                    <h3>
+                        <h>@ViewData["Title"]</h>
+                    </h3>
+                </div>
+            </div>
+            <div class="form-bottom">
 
-@if (User.IsInRole("Administrator"))
-{
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
-}
-<table class="table">
-    <thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Name)
-        </th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @if ((await AuthorizationService.AuthorizeAsync(User, item, AuthPolicies.DormitoryMembership)).Succeeded)
+                @if(User.IsInRole("Administrator"))
                 {
-                    if (User.IsInRole("Administrator"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.DormitoryId">Edit</a>
-                        @Html.Raw("|")
-                        ;
-                        <a asp-action="Delete" asp-route-id="@item.DormitoryId">Delete</a>
-                        @Html.Raw("|")
-                        ;
-                    }
-                    if ((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
-                    {
-                        <a asp-action="ManageDormitoryUsers" asp-route-id="@item.DormitoryId">Manage users</a>
-                        @Html.Raw("|")
-                        ;
-                        <a asp-action="Rooms" asp-route-id="@item.DormitoryId">Rooms</a>
-                        @Html.Raw("|")
-                        ;
-                    }
-                    if ((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
-                    {
-                        <a asp-controller="Laundry" asp-action="Index" asp-route-id="@item.DormitoryId">Laundries</a>
-                        @Html.Raw("|")
-                        ;
-                    }
+                    <p>
+                        <a asp-action="Create">Create New</a>
+                    </p>
                 }
-                <a asp-action="Details" asp-route-id="@item.DormitoryId">Details</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Name)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @if((await AuthorizationService.AuthorizeAsync(User, item, AuthPolicies.DormitoryMembership)).Succeeded)
+                                    {
+                                        if(User.IsInRole("Administrator"))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.DormitoryId">Edit</a>
+                                            @Html.Raw("|")
+                                            ;
+                                            <a asp-action="Delete" asp-route-id="@item.DormitoryId">Delete</a>
+                                            @Html.Raw("|")
+                                            ;
+                                        }
+                                        if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                                        {
+                                            <a asp-action="ManageDormitoryUsers" asp-route-id="@item.DormitoryId">Manage users</a>
+                                            @Html.Raw("|")
+                                            ;
+                                            <a asp-action="Rooms" asp-route-id="@item.DormitoryId">Rooms</a>
+                                            @Html.Raw("|")
+                                            ;
+                                        }
+                                        if((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
+                                        {
+                                            <a asp-controller="Laundry" asp-action="Index" asp-route-id="@item.DormitoryId">Laundries</a>
+                                            @Html.Raw("|")
+                                            ;
+                                        }
+                                    }
+                                    <a asp-action="Details" asp-route-id="@item.DormitoryId">Details</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

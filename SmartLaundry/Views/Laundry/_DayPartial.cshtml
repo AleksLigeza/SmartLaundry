@@ -144,11 +144,11 @@
 
                             <hr />
                         }
-                        <div class="form-group-border">
-                            <table class="table">
+                        <div class="form-group-border" style="overflow-x: auto;">
+                            <table class="table" style="text-align: center">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        <th style="min-width:130px">
 
                                         </th>
                                         @foreach(var item in washingMachines)
@@ -189,7 +189,7 @@
                                         var startTime = Model.date.Add(laundry.startTime + laundry.shiftTime * shift);
                                         var endTime = Model.date.Add(laundry.startTime + laundry.shiftTime * (shift + 1));
                                         <tr>
-                                            <td>
+                                            <td style="min-width:130px">
                                                 @startTime.Hour.ToString("00"):@startTime.Minute.ToString("00") - @endTime.Hour.ToString("00"):@endTime.Minute.ToString("00")
                                             </td>
                                             @foreach(var item in washingMachines)
