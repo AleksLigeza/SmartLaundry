@@ -7,6 +7,7 @@ using SmartLaundry.Services;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Models;
 using SmartLaundry.Models.LaundryViewModels;
@@ -52,11 +53,6 @@ namespace SmartLaundry.Controllers.Helpers
             return controller.RedirectToAction(nameof(HomeController.Error), "Home", new { message = message, title = title });
         }
 
-        public static IActionResult Show404ErrorPage(ControllerBase controller)
-        {
-            return ShowErrorPage(controller, "The resource can not be found", "404 - Page not found");
-        }
-
         public static IActionResult ShowAccessDeniedErrorPage(ControllerBase controller)
         {
             return controller.RedirectToAction(nameof(AccountController.AccessDenied), "Account");
@@ -89,6 +85,13 @@ namespace SmartLaundry.Controllers.Helpers
             }
 
             return model;
+        }
+
+        public static IActionResult Show404ErrorPage(ControllerBase controller, IStringLocalizer<LangResources> localizer)
+        {
+            return ShowErrorPage(controller,
+                localizer["CantFindResource"],
+                localizer["Error404"]);
         }
     }
 }

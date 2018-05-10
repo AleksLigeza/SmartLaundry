@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using SmartLaundry.Authorization;
 using SmartLaundry.Controllers.Helpers;
 using SmartLaundry.Data.Interfaces;
@@ -22,6 +23,7 @@ namespace SmartLaundry.Controllers
         private readonly IWashingMachineRepository _washingMachineRepo;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDormitoryRepository _dormitoryRepo;
+        private readonly IStringLocalizer<LangResources> _localizer;
 
         private readonly AuthHelpers _authHelpers;
 
@@ -29,7 +31,7 @@ namespace SmartLaundry.Controllers
             ILaundryRepository laundryRepository, IReservationRepository reservationRepository,
             IUserRepository userRepository, IWashingMachineRepository washingMachineRepo,
             UserManager<ApplicationUser> userManager, IAuthorizationService authorizationService,
-            IDormitoryRepository dormitoryRepository)
+            IDormitoryRepository dormitoryRepository, IStringLocalizer<LangResources> localizer)
         {
             _laundryRepo = laundryRepository;
             _reservationRepo = reservationRepository;
@@ -37,6 +39,7 @@ namespace SmartLaundry.Controllers
             _userManager = userManager;
             _washingMachineRepo = washingMachineRepo;
             _dormitoryRepo = dormitoryRepository;
+            _localizer = localizer;
 
             _authHelpers = new AuthHelpers(authorizationService, dormitoryRepository);
         }
@@ -59,7 +62,7 @@ namespace SmartLaundry.Controllers
 
             if(!DateTime.TryParse(year+"/"+month+"/"+day, out var value))
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             var model = CreateDayViewModel(id, new DateTime(year, month, day));
@@ -70,7 +73,7 @@ namespace SmartLaundry.Controllers
         [Authorize(Policy = "MinimumOccupant")]
         public IActionResult Day(DayViewModel model)
         {
-            return model.DormitoryId == 0 ? ControllerHelpers.Show404ErrorPage(this) : View(model);
+            return model.DormitoryId == 0 ? ControllerHelpers.Show404ErrorPage(this, _localizer) : View(model);
         }
 
         [ValidateAntiForgeryToken]
@@ -182,7 +185,7 @@ namespace SmartLaundry.Controllers
 
             if(machine == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             if(!await _authHelpers.CheckDormitoryMembership(User, machine.Laundry.Dormitory))
@@ -203,7 +206,7 @@ namespace SmartLaundry.Controllers
 
             if(!await _authHelpers.CheckDormitoryMembership(User, reservation.WashingMachine.Laundry.Dormitory))
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             var userId = _userManager.GetUserId(User);
@@ -214,7 +217,7 @@ namespace SmartLaundry.Controllers
                 || reservation.StartTime < DateTime.Now
                 || roomId != reservation.RoomId && roomId != null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             // ReSharper disable once PossibleNullReferenceException
@@ -252,12 +255,12 @@ namespace SmartLaundry.Controllers
                 || faultAtTime
                 || reservation.StartTime < DateTime.Now)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             if(_reservationRepo.IsCurrentlyFault(machineId))
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             if(roomId != null)
@@ -270,7 +273,7 @@ namespace SmartLaundry.Controllers
                 }
                 else if(roomReservation != null)
                 {
-                    return ControllerHelpers.Show404ErrorPage(this);
+                    return ControllerHelpers.Show404ErrorPage(this, _localizer);
                 }
             }
 
@@ -287,7 +290,7 @@ namespace SmartLaundry.Controllers
             var machine = _washingMachineRepo.GetWashingMachineById(machineId);
             if(machine == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             if(!await _authHelpers.CheckDormitoryMembership(User, machine.Laundry.Dormitory))
@@ -297,7 +300,7 @@ namespace SmartLaundry.Controllers
 
             if(!_reservationRepo.IsCurrentlyFault(machineId))
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             _washingMachineRepo.EnableWashingMachine(machineId);
@@ -313,7 +316,7 @@ namespace SmartLaundry.Controllers
             var machine = _washingMachineRepo.GetWashingMachineById(machineId);
             if(machine == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             if(!await _authHelpers.CheckDormitoryMembership(User, machine.Laundry.Dormitory))
@@ -323,7 +326,7 @@ namespace SmartLaundry.Controllers
 
             if(_reservationRepo.IsCurrentlyFault(machineId))
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             _washingMachineRepo.DisableWashingMachine(machineId);
@@ -347,7 +350,7 @@ namespace SmartLaundry.Controllers
                 || reservation.Confirmed
                 || reservation.StartTime < DateTime.Now)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             reservation.ToRenew = false;

@@ -7,7 +7,7 @@
 @model SmartLaundry.Models.DormitoryViewModels.DormitoryDetailsViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Localizer["Details"];
 }
 
 @await Html.PartialAsync("_announcementsPartial", new AnnouncementsList(Model.Announcements, Model.Dormitory))
@@ -19,14 +19,14 @@
             <div class="form-top-simple">
                 <div class="form-top-full">
                     <h3>
-                        <b>Details</b>
+                        <b>@Localizer["Details"]</b>
                     </h3>
                 </div>
             </div>
             <div class="form-bottom">
                 <div>
 
-                    <h3>Dormitory</h3>
+                    <h3>@Localizer["DormitoryTitle"]</h3>
 
                     <dl class="dl-horizontal">
                         <dt>
@@ -67,7 +67,7 @@
                             }
                         </dd>
                         <dt>
-                            Porters
+                            @Localizer["Porters"]
                         </dt>
                         @if(Model.Porters.IsNullOrEmpty())
                         {
@@ -81,9 +81,9 @@
                                 @item.Firstname @item.Lastname
                             </dd>
                         }
-                        <dt>
-                            Laundries
-                        </dt>
+                            <dt>
+                                @Localizer["Laundries"]
+                            </dt>
                         @foreach(var item in Model.Laundries)
                         {
                             <dd>
@@ -97,30 +97,30 @@
                     {
                         if(User.IsInRole("Administrator"))
                         {
-                            <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryId">Edit</a>
+                    <a asp-action="Edit" asp-route-id="@Model.Dormitory.DormitoryId">@Localizer["Edit"]</a>
                             @Html.Raw("|")
                             ;
-                            <a asp-action="Delete" asp-route-id="@Model.Dormitory.DormitoryId">Delete</a>
+                    <a asp-action="Delete" asp-route-id="@Model.Dormitory.DormitoryId">@Localizer["Delete"]</a>
                             @Html.Raw("|")
                             ;
                         }
                         if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
                         {
-                            <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryId">Manage users</a>
+                    <a asp-action="ManageDormitoryUsers" asp-route-id="@Model.Dormitory.DormitoryId">@Localizer["ManageUsers"]</a>
                             @Html.Raw("|")
                             ;
-                            <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryId">Rooms</a>
+                    <a asp-action="Rooms" asp-route-id="@Model.Dormitory.DormitoryId">@Localizer["Rooms"]</a>
                             @Html.Raw("|")
                             ;
                         }
                         if((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
                         {
-                            <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryId">Laundries</a>
+                    <a asp-controller="Laundry" asp-action="Index" asp-route-id="@Model.Dormitory.DormitoryId">@Localizer["Laundries"]</a>
                             @Html.Raw("|")
                             ;
                         }
                     }
-                    <a asp-action="Index">Back to List</a>
+                    <a asp-action="Index">@Localizer["BackToList"]</a>
                 </div>
             </div>
         </div>

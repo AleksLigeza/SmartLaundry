@@ -1,7 +1,7 @@
 ﻿@model SmartLaundry.Models.Dormitory
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = Localizer["CreateTitle"];
 }
 
 <div class="row">
@@ -10,12 +10,12 @@
             <div class="form-top-simple">
                 <div class="form-top-full">
                     <h3>
-                        <b>Create</b>
+                        <b>@Localizer["CreateTitle"]</b>
                     </h3>
                 </div>
             </div>
             <div class="form-bottom">
-                <h4>Dormitory</h4>
+                <h4>@Localizer["DormitoryTitle"]</h4>
                 <hr />
                 <form asp-action="Create">
                     @Html.AntiForgeryToken()
@@ -40,10 +40,10 @@
                         <input asp-for="City" class="form-control" />
                         <span asp-validation-for="City" class="text-danger"></span>
                     </div>
-                    <button type="submit" class="btn btn-success">Create</button>
+                    <button type="submit" class="btn btn-success">@Localizer["Create"]</button>
                 </form>
                 <div>
-                    <a asp-action="Index">Back to List</a>
+                    <a asp-action="Index">@Localizer["BackToList"]</a>
                 </div>
             </div>
         </div>

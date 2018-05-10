@@ -4,7 +4,7 @@
 @model SmartLaundry.Models.DormitoryViewModels.ManageRoomUsersViewModel
 
 @{
-    ViewBag.Title = "Manage Room Users";
+    ViewBag.Title = Localizer["ManageRoomUsers"];
 }
 
 <div class="row">
@@ -24,20 +24,20 @@
                     <form asp-action="ManageRoomUsers" method="get" class="form-group-border">
                         <div class="form-actions no-color">
                             <p>
-                                Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" class="form-control"/>
-                                <button type="submit" class="btn btn-info button-margin">Search</button>
-                                <a asp-action="ManageRoomUsers">Back to Full List</a>
+                                Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" class="form-control" />
+                                <button type="submit" class="btn btn-info button-margin">@Localizer["Search"]</button>
+                                <a asp-action="ManageRoomUsers">@Localizer["RemoveFilter"]</a>
                             </p>
                         </div>
                     </form>
                 }
-                <a asp-action="Rooms" asp-route-id=@Model.Room.DormitoryId>Back to rooms list</a>
+                    <a asp-action="Rooms" asp-route-id=@Model.Room.DormitoryId>@Localizer["BackToRoomsList"]</a>
 
                 <table class="table">
                     <thead>
                         <tr>
                             <th>
-                                Room: @Model.Room.Number
+                                @Localizer["Room"]: @Model.Room.Number
                             </th>
                             <th></th>
                         </tr>
@@ -63,7 +63,7 @@
                                             <form method="POST" asp-action="RemoveOccupant">
                                                 <input type="hidden" name="userId" value="@item.Id" />
                                                 <input type="hidden" name="roomId" value="@Model.Room.Id" />
-                                                <button type="submit" class="btn btn-warning">Remove occupant</button>
+                                                <button type="submit" class="btn btn-warning">@Localizer["RemoveOccupant"]</button>
                                             </form>
                                         }
                                         else
@@ -71,7 +71,7 @@
                                             <form method="POST" asp-action="AssignOccupant">
                                                 <input type="hidden" name="userId" value="@item.Id" />
                                                 <input type="hidden" name="roomId" value="@Model.Room.Id" />
-                                                <button type="submit" class="btn btn-success">Assign occupant</button>
+                                                <button type="submit" class="btn btn-success">@Localizer["AssignOccupant"]</button>
                                             </form>
                                         }
                                     }
@@ -92,14 +92,14 @@
                    asp-route-page="@(Model.Users.PageIndex - 1)"
                    asp-route-currentFilter="@ViewData["CurrentFilter"]"
                    class="btn btn-default @prevDisabled">
-                    Previous
+                    @Localizer["PreviousPage"]
                 </a>
                 <a asp-action="ManageDormitoryUsers"
                    asp-route-sortOrder="@ViewData["CurrentSort"]"
                    asp-route-page="@(Model.Users.PageIndex + 1)"
                    asp-route-currentFilter="@ViewData["CurrentFilter"]"
                    class="btn btn-default @nextDisabled">
-                    Next
+                    @Localizer["NextPage"]
                 </a>
             </div>
         </div>

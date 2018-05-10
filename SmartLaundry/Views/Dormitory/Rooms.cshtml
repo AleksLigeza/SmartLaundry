@@ -3,7 +3,7 @@
 @inject IAuthorizationService AuthorizationService
 
 @{
-    ViewData["Title"] = "Rooms";
+    ViewData["Title"] = Localizer["Rooms"];
 }
 
 <div class="row">
@@ -12,13 +12,13 @@
             <div class="form-top-simple">
                 <div class="form-top-full">
                     <h3>
-                        <b>Rooms</b>
+                        <b>@Localizer["Rooms"]</b>
                     </h3>
                 </div>
             </div>
             <div class="form-bottom">
 
-                <a asp-action="Details" asp-route-id=@Model.Dormitory.DormitoryId>Back to details</a>
+                <a asp-action="Details" asp-route-id=@Model.Dormitory.DormitoryId>@Localizer["BackToDetails"]</a>
 
                 @if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
                 {
@@ -52,7 +52,7 @@
                                 <input asp-for="RoomToAdd.Number" class="form-control" />
                                 <span asp-validation-for="RoomToAdd.Number" class="text-danger"></span>
                             </div>
-                            <button type="submit" class="btn btn-info">Add room</button>
+                            <button type="submit" class="btn btn-info">@Localizer["AddRoom"]</button>
                         </form>
                     </p>
                 }
@@ -60,7 +60,7 @@
                     <thead>
                         <tr>
                             <th>
-                                Dormitory: @Model.Dormitory.Name
+                                @Localizer["Dormitory"]: @Model.Dormitory.Name
                             </th>
                             <th colspan="2"></th>
                         </tr>
@@ -75,14 +75,14 @@
                                 <td>
                                     <p class="button-margin" style="text-align: left">
 
-                                            <a asp-action="ManageRoomUsers" asp-route-id="@item.Id">Manage occupants</a>
+                                        <a asp-action="ManageRoomUsers" asp-route-id="@item.Id">@Localizer["ManageOccupants"]</a>
 
                                     </p>
                                 </td>
                                 <td>
                                     <form method="post" asp-action="DeleteRoom">
                                         <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="btn btn-danger">Remove room</button>
+                                        <button type="submit" class="btn btn-danger">@Localizer["RemoveRoom"]</button>
                                     </form>
                                 </td>
 
@@ -97,7 +97,7 @@
                                         <form method="POST" asp-action="RemoveOccupant">
                                             <input type="hidden" name="userId" value="@occupant.Id" />
                                             <input type="hidden" name="roomId" value="@item.Id" />
-                                            <button type="submit" class="btn btn-warning">Remove occupant</button>
+                                            <button type="submit" class="btn btn-warning">@Localizer["RemoveOccupant"]</button>
                                         </form>
                                     </td>
                                 </tr>

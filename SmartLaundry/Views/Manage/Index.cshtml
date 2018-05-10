@@ -1,6 +1,6 @@
 ﻿@model IndexViewModel
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = Localizer["Profile"];
     ViewData.AddActivePage(ManageNavPages.Index);
 }
 
@@ -40,7 +40,7 @@
                 }
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-info">Save</button>
+            <button type="submit" class="btn btn-info">@Localizer["Save"]</button>
         </form>
     </div>
 </div>

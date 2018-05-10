@@ -1,7 +1,7 @@
 ﻿@model SmartLaundry.Models.Dormitory
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = @Localizer["Delete"];
 }
 
 <div class="row">
@@ -10,12 +10,12 @@
             <div class="form-top-simple">
                 <div class="form-top-full">
                     <h3>
-                        <b>Delete</b>
+                        <b>@Localizer["Delete"]</b>
                     </h3>
                 </div>
             </div>
             <div class="form-bottom">
-                <h3>Are you sure you want to delete this?</h3>
+                <h3>@Localizer["DeleteMessage"]</h3>
                 <div>
                     <h4>Dormitory</h4>
                     <hr/>
@@ -48,8 +48,8 @@
 
                     <form asp-action="Delete">
                         <input type="hidden" asp-for="DormitoryId"/>
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                        <a asp-action="Index">Back to List</a>
+                        <button type="submit" class="btn btn-danger">@Localizer["Delete"]</button>
+                        <a asp-action="Index">@Localizer["DeleteMessage"]</a>
                     </form>
                 </div>
             </div>

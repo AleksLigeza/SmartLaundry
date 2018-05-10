@@ -4,7 +4,7 @@
 @inject IAuthorizationService AuthorizationService
 
 @{
-    ViewData["Title"] = "Dormitory List";
+    ViewData["Title"] = Localizer["DormitoryList"];
 }
 
 <div class="row">
@@ -22,7 +22,7 @@
                 @if(User.IsInRole("Administrator"))
                 {
                     <p>
-                        <a asp-action="Create">Create New</a>
+                        <a asp-action="Create">@Localizer["CreateNew"]</a>
                     </p>
                 }
                 <table class="table">
@@ -46,30 +46,30 @@
                                     {
                                         if(User.IsInRole("Administrator"))
                                         {
-                                            <a asp-action="Edit" asp-route-id="@item.DormitoryId">Edit</a>
+                                    <a asp-action="Edit" asp-route-id="@item.DormitoryId">@Localizer["Edit"]</a>
                                             @Html.Raw("|")
                                             ;
-                                            <a asp-action="Delete" asp-route-id="@item.DormitoryId">Delete</a>
+                                    <a asp-action="Delete" asp-route-id="@item.DormitoryId">@Localizer["Delete"]</a>
                                             @Html.Raw("|")
                                             ;
                                         }
                                         if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
                                         {
-                                            <a asp-action="ManageDormitoryUsers" asp-route-id="@item.DormitoryId">Manage users</a>
+                                    <a asp-action="ManageDormitoryUsers" asp-route-id="@item.DormitoryId">@Localizer["ManageUsers"]</a>
                                             @Html.Raw("|")
                                             ;
-                                            <a asp-action="Rooms" asp-route-id="@item.DormitoryId">Rooms</a>
+                                    <a asp-action="Rooms" asp-route-id="@item.DormitoryId">@Localizer["Rooms"]</a>
                                             @Html.Raw("|")
                                             ;
                                         }
                                         if((await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
                                         {
-                                            <a asp-controller="Laundry" asp-action="Index" asp-route-id="@item.DormitoryId">Laundries</a>
+                                    <a asp-controller="Laundry" asp-action="Index" asp-route-id="@item.DormitoryId">@Localizer["Laundries"]</a>
                                             @Html.Raw("|")
                                             ;
                                         }
                                     }
-                                    <a asp-action="Details" asp-route-id="@item.DormitoryId">Details</a>
+                                    <a asp-action="Details" asp-route-id="@item.DormitoryId">@Localizer["Details"]</a>
                                 </td>
                             </tr>
                         }

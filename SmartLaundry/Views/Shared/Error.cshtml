@@ -1,9 +1,9 @@
 ﻿@model ErrorViewModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = @Localizer["Error"];
 }
 
 <h1 class="text-danger">@Model.Title</h1>
 <h2 class="text-danger">@Model.Message</h2>
 <br/>
-<p><a asp-action="Index" asp-controller="Home">Go back to the home page.</a></p>
+<p><a asp-action="Index" asp-controller="Home">@Localizer["GoBackToIndex"]</a></p>

@@ -117,7 +117,296 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccessDeniedMessage" xml:space="preserve">
+    <value>Nie masz udzielonego dostępu do tego zasobu.</value>
+  </data>
+  <data name="AccessDeniedTitle" xml:space="preserve">
+    <value>Brak dostępu</value>
+  </data>
+  <data name="AddAnnouncement" xml:space="preserve">
+    <value>Dodaj ogłoszenie</value>
+  </data>
+  <data name="AddLaundry" xml:space="preserve">
+    <value>Dodaj pralnię</value>
+  </data>
+  <data name="AddRoom" xml:space="preserve">
+    <value>Dodaj pokój</value>
+  </data>
+  <data name="AddWashingMachine" xml:space="preserve">
+    <value>Dodaj pralkę</value>
+  </data>
+  <data name="AnnouncementsTitle" xml:space="preserve">
+    <value>Ogłoszenia</value>
+  </data>
+  <data name="AssignManager" xml:space="preserve">
+    <value>Dodaj kierownika</value>
+  </data>
+  <data name="AssignOccupant" xml:space="preserve">
+    <value>Dodaj lokatora</value>
+  </data>
+  <data name="AssignPorter" xml:space="preserve">
+    <value>Dodaj portiera</value>
+  </data>
+  <data name="BackToDetails" xml:space="preserve">
+    <value>Powróć do szczegółów</value>
+  </data>
+  <data name="BackToList" xml:space="preserve">
+    <value>Powróć do listy</value>
+  </data>
+  <data name="BackToRoomsList" xml:space="preserve">
+    <value>Powróć do listy pokoi</value>
+  </data>
+  <data name="CancelReservation" xml:space="preserve">
+    <value>Anuluj</value>
+  </data>
+  <data name="CantFindResource" xml:space="preserve">
+    <value>Zasób nie może zostać odnaleziony</value>
+  </data>
+  <data name="ChangedPasswordMessage" xml:space="preserve">
+    <value>Twoje hasło zostało zmienione.</value>
+  </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Zmiana hasła</value>
+  </data>
+  <data name="ChangePasswordTitle" xml:space="preserve">
+    <value>Zmień hasło</value>
+  </data>
+  <data name="ConfirmEmailMessage" xml:space="preserve">
+    <value>Dziękujemy za potwierdzenie adresu email.</value>
+  </data>
+  <data name="ConfirmEmailTitle" xml:space="preserve">
+    <value>Potwierdź email</value>
+  </data>
+  <data name="ConfirmReservation" xml:space="preserve">
+    <value>Potwierdź</value>
+  </data>
+  <data name="CreateButton" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>Dodaj nowy</value>
+  </data>
+  <data name="CreateTitle" xml:space="preserve">
+    <value>Dodawanie</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
+  <data name="DeleteMessage" xml:space="preserve">
+    <value>Czy na pewno chcesz to usunąć?</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Szczegóły</value>
+  </data>
+  <data name="DisableWashingMachine" xml:space="preserve">
+    <value>Zatrzymaj rezerwacje</value>
+  </data>
+  <data name="Dormitories" xml:space="preserve">
+    <value>Akademiki</value>
+  </data>
+  <data name="Dormitory" xml:space="preserve">
+    <value>Akademik</value>
+  </data>
+  <data name="DormitoryList" xml:space="preserve">
+    <value>Lista akademików</value>
+  </data>
+  <data name="DormitoryTitle" xml:space="preserve">
+    <value>Akademik</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edytuj</value>
+  </data>
+  <data name="EmailSendMessage" xml:space="preserve">
+    <value>Email weryfikacyjny został wysłany. Proszę sprawdzić swoją pocztę.</value>
+  </data>
+  <data name="EnableWashingMachine" xml:space="preserve">
+    <value>Uruchom rezerwacje</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="Error404" xml:space="preserve">
+    <value>Błąd 404 - Strona nie znaleziona</value>
+  </data>
+  <data name="Fault" xml:space="preserve">
+    <value>Zepsuta</value>
+  </data>
+  <data name="ForgotPasswordConfirmMessage" xml:space="preserve">
+    <value>Sprawdź swoją skrzynkę email w celu resetu hasła.</value>
+  </data>
+  <data name="ForgotPasswordConfirmTitle" xml:space="preserve">
+    <value>Potwierdzenie odzyskiwania hasła</value>
+  </data>
+  <data name="ForgotPasswordLink" xml:space="preserve">
+    <value>Zapomniałeś hasła?</value>
+  </data>
+  <data name="ForgotPasswordMessage" xml:space="preserve">
+    <value>Wprowadź swój email.</value>
+  </data>
+  <data name="ForgotPasswordTitle" xml:space="preserve">
+    <value>Zapomniałeś hasła?</value>
+  </data>
+  <data name="GoBackToIndex" xml:space="preserve">
+    <value>Wróć do strony głównej.</value>
+  </data>
+  <data name="GoToTodaysReservations" xml:space="preserve">
+    <value>Przejdź do dzisiejszych rezerwacji.</value>
+  </data>
+  <data name="GoToTomorrowReservations" xml:space="preserve">
+    <value>Przejdź do jutrzejszych rezerwacji.</value>
+  </data>
   <data name="Hello" xml:space="preserve">
-    <value>Witaj!</value>
+    <value>Witaj</value>
+  </data>
+  <data name="Laundries" xml:space="preserve">
+    <value>Pralki</value>
+  </data>
+  <data name="Laundry" xml:space="preserve">
+    <value>Pralnia</value>
+  </data>
+  <data name="LoginLink" xml:space="preserve">
+    <value>Zaloguj się</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Zaloguj się</value>
+  </data>
+  <data name="ManageDormitoryUsers" xml:space="preserve">
+    <value>Zarządzaj lokatorami</value>
+  </data>
+  <data name="ManageMessage" xml:space="preserve">
+    <value>Zmień ustawienia konta</value>
+  </data>
+  <data name="ManageOccupants" xml:space="preserve">
+    <value>Zarządaj lokatorami</value>
+  </data>
+  <data name="ManageRoomUsers" xml:space="preserve">
+    <value>Zarządzaj lokatorami</value>
+  </data>
+  <data name="ManageTitle" xml:space="preserve">
+    <value>Zarządzaj kontem</value>
+  </data>
+  <data name="ManageUsers" xml:space="preserve">
+    <value>Zarządzaj użytkownikami</value>
+  </data>
+  <data name="NextDayReservationMessage" xml:space="preserve">
+    <value>Z powodu awarii pralki możesz dodać rezerwację na kolejny dzień.</value>
+  </data>
+  <data name="NextPage" xml:space="preserve">
+    <value>Następna</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Hasło</value>
+  </data>
+  <data name="PasswordSetMessage" xml:space="preserve">
+    <value>Twoje hasło zostało ustalone.</value>
+  </data>
+  <data name="Personel" xml:space="preserve">
+    <value>Personel</value>
+  </data>
+  <data name="Porters" xml:space="preserve">
+    <value>Portierzy</value>
+  </data>
+  <data name="PreviousPage" xml:space="preserve">
+    <value>Poprzednia</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="RegisterButton" xml:space="preserve">
+    <value>Zarejestruj się</value>
+  </data>
+  <data name="RegisterTitle" xml:space="preserve">
+    <value>Utwórz nowe konto</value>
+  </data>
+  <data name="RegistrationConfirmMessage" xml:space="preserve">
+    <value>Dziękujemy za rejestrację. Proszę potwierdź swój email.</value>
+  </data>
+  <data name="RegistrationConfirmTitle" xml:space="preserve">
+    <value>Potwierdzenie rejestracji</value>
+  </data>
+  <data name="RemoveAnnouncement" xml:space="preserve">
+    <value>Usuń ogłoszenie</value>
+  </data>
+  <data name="RemoveFilter" xml:space="preserve">
+    <value>Usuń filtr</value>
+  </data>
+  <data name="RemoveLaundry" xml:space="preserve">
+    <value>Usuń pralnię</value>
+  </data>
+  <data name="RemoveOccupant" xml:space="preserve">
+    <value>Usuń lokatora</value>
+  </data>
+  <data name="RemovePorter" xml:space="preserve">
+    <value>Usuń portiera</value>
+  </data>
+  <data name="RemoveRoom" xml:space="preserve">
+    <value>Usuń pokój</value>
+  </data>
+  <data name="RemoveWashingMachine" xml:space="preserve">
+    <value>Usuń pralkę</value>
+  </data>
+  <data name="Reserve" xml:space="preserve">
+    <value>Rezerwuj</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Resetuj</value>
+  </data>
+  <data name="ResetPasswordConfirmMessage1" xml:space="preserve">
+    <value>Twoje hasło zostało zresetowane. Proszę</value>
+  </data>
+  <data name="ResetPasswordConfirmMessage2" xml:space="preserve">
+    <value>kliknij tutaj aby się zalogować</value>
+    <comment>link part, without dot on end</comment>
+  </data>
+  <data name="ResetPasswordConfirmTitle" xml:space="preserve">
+    <value>Potwierdzenie zresetowania hasła</value>
+  </data>
+  <data name="ResetPasswordMessage" xml:space="preserve">
+    <value>Zresetuj swoje hasło</value>
+  </data>
+  <data name="ResetPasswordTitle" xml:space="preserve">
+    <value>Reset hasła</value>
+  </data>
+  <data name="Room" xml:space="preserve">
+    <value>Pokój</value>
+  </data>
+  <data name="Rooms" xml:space="preserve">
+    <value>Pokoje</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Zapisz</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Szukaj</value>
+  </data>
+  <data name="SetPasswordButton" xml:space="preserve">
+    <value>Zapisz</value>
+  </data>
+  <data name="SetPasswordTitle" xml:space="preserve">
+    <value>Ustal hasło</value>
+  </data>
+  <data name="SetYourPassword" xml:space="preserve">
+    <value>Ustal nowe hasło</value>
+  </data>
+  <data name="SignedOutMessage" xml:space="preserve">
+    <value>Zostałeś pomyślnie wylogowany</value>
+  </data>
+  <data name="SignedOutTitle" xml:space="preserve">
+    <value>Wylogowano</value>
+  </data>
+  <data name="Submit" xml:space="preserve">
+    <value>Wyślij</value>
+  </data>
+  <data name="ToConfirm" xml:space="preserve">
+    <value>do potwierdzenia</value>
+  </data>
+  <data name="UpdatedProfileMessage" xml:space="preserve">
+    <value>Twój profil został zaktualizowany.</value>
+  </data>
+  <data name="UpdatePasswordButton" xml:space="preserve">
+    <value>Zmień</value>
+  </data>
+  <data name="WashingMachine" xml:space="preserve">
+    <value>Pralka</value>
   </data>
 </root>

@@ -10,7 +10,7 @@
             <div class="form-top-simple">
                 <div class="form-top-full">
                     <h3>
-                        <b>Laundries - @Model.date.ToShortDateString()</b>
+                        <b>@Localizer["Laundries"] - @Model.date.ToShortDateString()</b>
                     </h3>
                 </div>
             </div>
@@ -20,26 +20,26 @@
                 {
                     if(Model.hasReservationToRenew)
                     {
-                        <h2 class="text-danger">
-                            You can make reservation for the next day duo to washing machine failure.
-                        </h2>
+                <h2 class="text-danger">
+                    @Localizer["NextDayReservationMessage"]
+                </h2>
                     }
                     if(Model.hasReservationToRenew || (await AuthorizationService.AuthorizeAsync(User, "MinimumPorter")).Succeeded)
                     {
-                        <a asp-action="Day" asp-controller="Laundry" asp-route-id="@Model.DormitoryId"
-                           asp-route-year="@DateTime.Today.AddDays(1).Year" asp-route-month="@DateTime.Today.AddDays(1).Month"
-                           asp-route-day="@DateTime.Today.AddDays(1).Day">
-                            Go to the tomorrow's reservations.
-                        </a>
+                <a asp-action="Day" asp-controller="Laundry" asp-route-id="@Model.DormitoryId"
+                   asp-route-year="@DateTime.Today.AddDays(1).Year" asp-route-month="@DateTime.Today.AddDays(1).Month"
+                   asp-route-day="@DateTime.Today.AddDays(1).Day">
+                    @Localizer["GoToTomorrowReservations"]
+                </a>
                     }
                 }
                 else
                 {
-                    <a asp-action="Day" asp-controller="Laundry" asp-route-id="@Model.DormitoryId"
-                       asp-route-year="@DateTime.Today.Date.Year" asp-route-month="@DateTime.Today.Date.Month"
-                       asp-route-day="@DateTime.Today.Date.Day">
-                        Go to the todays's reservations.
-                    </a>
+                <a asp-action="Day" asp-controller="Laundry" asp-route-id="@Model.DormitoryId"
+                   asp-route-year="@DateTime.Today.Date.Year" asp-route-month="@DateTime.Today.Date.Month"
+                   asp-route-day="@DateTime.Today.Date.Day">
+                    @Localizer["GoToTodaysReservations"]
+                </a>
                 }
 
                 @if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
@@ -99,7 +99,7 @@
                             <input asp-for="LaundryToAdd.shiftCount" class="form-control" />
                             <span asp-validation-for="LaundryToAdd.shiftCount" class="text-danger"></span>
                         </div>
-                        <button type="submit" class="btn btn-success">Add laundry</button>
+                        <button type="submit" class="btn btn-success">@Localizer["AddLaundry"]</button>
                     </form>
 
                 }
@@ -112,13 +112,13 @@
 
                     <div class="form-group-border">
 
-                        <h3><b>Laundry @laundry.Position</b></h3>
+                        <h3><b>@Localizer["Laundry"] @laundry.Position</b></h3>
 
                         @if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
                         {
                             <form method="post" asp-action="DeleteLaundry" asp-controller="Laundry" class="form-button">
                                 <input type="hidden" name="id" value="@laundry.Id" />
-                                <button type="submit" class="btn btn-danger">Remove laundry</button>
+                                <button type="submit" class="btn btn-danger">@Localizer["RemoveLaundry"]</button>
                             </form>
 
                             var newMachine = new WashingMachine();
@@ -153,33 +153,33 @@
                                         </th>
                                         @foreach(var item in washingMachines)
                                         {
-                                            <th>
-                                                Washing machine @item.Position
-                                                @if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                                        <th>
+                                            @Localizer["WashingMachine"] @item.Position
+                                            @if((await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
+                                            {
+                                                <form method="POST" asp-action="RemoveWashingMachine" asp-controller="Laundry" class="form-button-small">
+                                                    <input type="hidden" name="machineId" value="@item.Id" />
+                                                    <button type="submit" class="btn btn-danger">@Localizer["RemoveWashingMachine"]</button>
+                                                </form>
+                                            }
+                                            @if((await AuthorizationService.AuthorizeAsync(User, "MinimumPorter")).Succeeded)
+                                            {
+                                                if(Model.isCurrentlyFault(item.Id))
                                                 {
-                                                    <form method="POST" asp-action="RemoveWashingMachine" asp-controller="Laundry" class="form-button-small">
+                                                    <form method="POST" asp-action="EnableWashingMachine" asp-controller="Laundry" class="form-button-small">
                                                         <input type="hidden" name="machineId" value="@item.Id" />
-                                                        <button type="submit" class="btn btn-danger">Remove washing machine</button>
+                                                        <button type="submit" class="btn btn-info">@Localizer["EnableWashingMachine"]</button>
                                                     </form>
                                                 }
-                                                @if((await AuthorizationService.AuthorizeAsync(User, "MinimumPorter")).Succeeded)
+                                                else
                                                 {
-                                                    if(Model.isCurrentlyFault(item.Id))
-                                                    {
-                                                        <form method="POST" asp-action="EnableWashingMachine" asp-controller="Laundry" class="form-button-small">
-                                                            <input type="hidden" name="machineId" value="@item.Id" />
-                                                            <button type="submit" class="btn btn-info">Enable washing machine</button>
-                                                        </form>
-                                                    }
-                                                    else
-                                                    {
-                                                        <form method="POST" asp-action="DisableWashingMachine" asp-controller="Laundry" class="form-button-small">
-                                                            <input type="hidden" name="machineId" value="@item.Id" />
-                                                            <button type="submit" class="btn btn-warning">Disable washing machine</button>
-                                                        </form>
-                                                    }
+                                                    <form method="POST" asp-action="DisableWashingMachine" asp-controller="Laundry" class="form-button-small">
+                                                        <input type="hidden" name="machineId" value="@item.Id" />
+                                                        <button type="submit" class="btn btn-warning">@Localizer["DisableWashingMachine"]</button>
+                                                    </form>
                                                 }
-                                            </th>
+                                            }
+                                        </th>
                                         }
                                     </tr>
                                 </thead>
@@ -214,12 +214,12 @@
                                                         }
                                                         else
                                                         {
-                                                            <b>Personel</b>
+                                                            <b>@Localizer["Personel"]</b>
                                                         }
                                                     }
                                                     @if(Model.IsFaultAtTime(item, startTime))
                                                     {
-                                                        <b>FAULT</b>
+                                                            <b>@Localizer["Fault"]</b>
                                                     }
                                                     else if(DateTime.Now < startTime && (await AuthorizationService.AuthorizeAsync(User, "MinimumOccupant")).Succeeded)
                                                     {
@@ -227,11 +227,11 @@
                                                         {
                                                             if(reservationToConfirm.Room != null)
                                                             {
-                                                                <b>@reservationToConfirm.Room.Number - to confirm</b>
+                                                            <b>@reservationToConfirm.Room.Number - @Localizer["ToConfirm"]</b>
                                                             }
                                                             else
                                                             {
-                                                                <b>Personel - to confirm</b>
+                                                            <b>@Localizer["Personel"] - @Localizer["ToConfirm"]</b>
                                                             }
 
                                                             if(Model.currentRoomReservation != null && Model.currentRoomReservation.Id == reservationToConfirm.Id
@@ -239,7 +239,7 @@
                                                             {
                                                                 <form method="POST" asp-action="ConfirmReservation" asp-controller="Laundry" class="form-button-small">
                                                                     <input type="hidden" name="reservationId" value="@reservationToConfirm.Id" />
-                                                                    <button type="submit" class="btn btn-success">Confirm reservation</button>
+                                                                    <button type="submit" class="btn btn-success">@Localizer["ConfirmReservation"]</button>
                                                                 </form>
                                                             }
                                                         }
@@ -251,7 +251,7 @@
                                                             {
                                                                 <form method="POST" asp-action="CancelReservation" asp-controller="Laundry" class="form-button-small">
                                                                     <input type="hidden" name="reservationId" value="@reservation.Id" />
-                                                                    <button type="submit" class="btn btn-danger">Cancel reservation</button>
+                                                                    <button type="submit" class="btn btn-danger">@Localizer["CancelReservation"]</button>
                                                                 </form>
                                                             }
                                                             else if((Model.currentRoomReservation == null || !Model.currentRoomReservation.Confirmed)
@@ -262,7 +262,7 @@
                                                                 <form method="POST" asp-action="Reserve" asp-controller="Laundry" class="form-button-small">
                                                                     <input type="hidden" name="startTime" value="@startTime" />
                                                                     <input type="hidden" name="machineId" value="@item.Id" />
-                                                                    <button type="submit" class="btn btn-info">Reserve</button>
+                                                                    <button type="submit" class="btn btn-info">@Localizer["Reserve"]</button>
                                                                 </form>
                                                             }
                                                         }

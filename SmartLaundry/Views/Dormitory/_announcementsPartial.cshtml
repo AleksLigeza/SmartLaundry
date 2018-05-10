@@ -15,7 +15,7 @@
                 <div class="form-top-simple">
                     <div class="form-top-full">
                         <h3>
-                            <b>Announcements</b>
+                            <b>@Localizer["AnnouncementsTitle"]</b>
                         </h3>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                             </p>
                             <form method="POST" asp-action="RemoveAnnouncement" asp-controller="Dormitory" class="announcement-right">
                                 <input type="hidden" name="announcementId" value="@item.Id" />
-                                <button type="submit" class="btn btn-danger">Remove Announcement</button>
+                                <button type="submit" class="btn btn-danger">@Localizer["RemoveAnnouncement"]</button>
                             </form>
                         }
                         else
@@ -53,7 +53,7 @@
                                 <input asp-for="@Model.AnnouncementToAdd.Message" class="form-control" />
                                 <span asp-validation-for="@Model.AnnouncementToAdd.Message" class="text-danger"></span>
                             </div>
-                            <button type="submit" class="btn btn-info">Add announcement</button>
+                            <button type="submit" class="btn btn-info">@Localizer["AddAnnouncement"]</button>
                         </form>
                     }
                 </div>

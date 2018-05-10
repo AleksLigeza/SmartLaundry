@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using SmartLaundry.Authorization;
 using SmartLaundry.Controllers.Helpers;
 using SmartLaundry.Data.Interfaces;
@@ -21,20 +22,23 @@ namespace SmartLaundry.Controllers
         private readonly IRoomRepository _roomRepo;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAnnouncementRepository _announcementRepo;
+        private readonly IStringLocalizer<LangResources> _localizer;
 
         private readonly AuthHelpers _authHelpers;
 
         public DormitoryController(
             IDormitoryRepository dormitoryRepository, IUserRepository userRepository,
             IRoomRepository roomRepository, UserManager<ApplicationUser> userManager,
-            IAuthorizationService authorizationService, IAnnouncementRepository announcementRepo)
+            IAuthorizationService authorizationService, IAnnouncementRepository announcementRepo,
+            IStringLocalizer<LangResources> localizer)
         {
             _dormitoryRepo = dormitoryRepository;
             _userRepo = userRepository;
             _roomRepo = roomRepository;
             _userManager = userManager;
             _announcementRepo = announcementRepo;
- 
+            _localizer = localizer;
+
             _authHelpers = new AuthHelpers(authorizationService, _dormitoryRepo);
         }
 
@@ -89,7 +93,7 @@ namespace SmartLaundry.Controllers
 
             if(dormitory == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             int pageSize = 10;
@@ -108,7 +112,7 @@ namespace SmartLaundry.Controllers
             var room = _roomRepo.GetRoomById(id);
             if(room == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             if(!await _authHelpers.CheckDormitoryMembership(User, room.Dormitory))
@@ -192,7 +196,7 @@ namespace SmartLaundry.Controllers
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
             if(dormitory == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
             if(!await _authHelpers.CheckDormitoryMembership(User, dormitory))
             {
@@ -219,7 +223,7 @@ namespace SmartLaundry.Controllers
             var dormitory = _dormitoryRepo.GetSingleById(dormitoryId);
             if(dormitory == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
             if(!await _authHelpers.CheckDormitoryMembership(User, dormitory))
             {
@@ -240,13 +244,13 @@ namespace SmartLaundry.Controllers
         {
             if(id == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             var dormitory = _dormitoryRepo.GetSingleById(id.Value);
             if(dormitory == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             var model = new DormitoryDetailsViewModel
@@ -287,13 +291,13 @@ namespace SmartLaundry.Controllers
         {
             if(id == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             var dormitory = _dormitoryRepo.GetSingleById(id.Value);
             if(dormitory == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
             if(!await _authHelpers.CheckDormitoryMembership(User, dormitory))
             {
@@ -316,7 +320,7 @@ namespace SmartLaundry.Controllers
 
             if(id != dormitory.DormitoryId)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             if(ModelState.IsValid)
@@ -329,7 +333,7 @@ namespace SmartLaundry.Controllers
                 {
                     if(!DormitoryExists(dormitory.DormitoryId))
                     {
-                        return ControllerHelpers.Show404ErrorPage(this);
+                        return ControllerHelpers.Show404ErrorPage(this, _localizer);
                     }
                     else
                     {
@@ -349,12 +353,12 @@ namespace SmartLaundry.Controllers
         {
             if(id == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             var dormitory = _dormitoryRepo.GetSingleById(id.Value);
 
-            return dormitory == null ? ControllerHelpers.Show404ErrorPage(this) : View(dormitory);
+            return dormitory == null ? ControllerHelpers.Show404ErrorPage(this, _localizer) : View(dormitory);
         }
 
         [HttpPost, ActionName("Delete")]
@@ -404,7 +408,7 @@ namespace SmartLaundry.Controllers
         {
             if(!ModelState.IsValid)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             return View(model);
@@ -445,7 +449,7 @@ namespace SmartLaundry.Controllers
 
             if(room == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer);
             }
 
             if(!await _authHelpers.CheckDormitoryMembership(User, room.Dormitory))
@@ -462,7 +466,7 @@ namespace SmartLaundry.Controllers
 
             if(dormitoryId == null)
             {
-                return ControllerHelpers.Show404ErrorPage(this);
+                return ControllerHelpers.Show404ErrorPage(this, _localizer); 
             }
 
             return RedirectToAction(nameof(Rooms), new { id = dormitoryId });

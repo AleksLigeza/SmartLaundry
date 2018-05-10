@@ -9,5 +9,5 @@
         <input asp-for="@Model.Position" class="form-control" id="@(Model.LaundryId + Model.Position + "Position")" value="@Model.Position"/>
         <span asp-validation-for="@Model.Position" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-success">Add washing machine</button>
+    <button type="submit" class="btn btn-success">@Localizer["AddWashingMachine"]</button>
 </form>

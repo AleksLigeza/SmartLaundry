@@ -4,7 +4,7 @@
     <div class="form-top">
         <div class="form-top-full">
             <h3>
-                <b>Login with existing account.</b>
+                <b>@Localizer["LoginTitle"]</b>
             </h3>
         </div>
     </div>
@@ -32,9 +32,9 @@
                     </label>
                 </div>
             </div>
-            <button type="submit" class="btn btn-info">Log in</button>
+            <button type="submit" class="btn btn-info">@Localizer["LoginLink"]</button>
             <hr />
-            <a asp-action="ForgotPassword">Forgot your password?</a>
+            <a asp-action="ForgotPassword" asp-controller="Account">@Localizer["ForgotPasswordLink"]</a>
         </form>
     </div>
 </div>

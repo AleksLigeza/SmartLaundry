@@ -117,7 +117,302 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccessDeniedMessage" xml:space="preserve">
+    <value>You do not have access to this resource.</value>
+  </data>
+  <data name="AccessDeniedTitle" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
+  <data name="AddAnnouncement" xml:space="preserve">
+    <value>Add announcement</value>
+  </data>
+  <data name="AddLaundry" xml:space="preserve">
+    <value>Add laundry</value>
+  </data>
+  <data name="AddRoom" xml:space="preserve">
+    <value>Add room</value>
+  </data>
+  <data name="AddWashingMachine" xml:space="preserve">
+    <value>Add washing machine</value>
+  </data>
+  <data name="AnnouncementsTitle" xml:space="preserve">
+    <value>Announcements</value>
+  </data>
+  <data name="AssignManager" xml:space="preserve">
+    <value>Assign manager</value>
+  </data>
+  <data name="AssignOccupant" xml:space="preserve">
+    <value>Assign occupant</value>
+  </data>
+  <data name="AssignPorter" xml:space="preserve">
+    <value>Assign porter</value>
+  </data>
+  <data name="BackToDetails" xml:space="preserve">
+    <value>Back to details</value>
+  </data>
+  <data name="BackToList" xml:space="preserve">
+    <value>Back to list</value>
+  </data>
+  <data name="BackToRoomsList" xml:space="preserve">
+    <value>Back to rooms list</value>
+  </data>
+  <data name="CancelReservation" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CantFindResource" xml:space="preserve">
+    <value>The resource can not be found</value>
+  </data>
+  <data name="ChangedPasswordMessage" xml:space="preserve">
+    <value>Your password has been changed.</value>
+  </data>
+  <data name="ChangePasswordTitle" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="ConfirmEmailMessage" xml:space="preserve">
+    <value>Thank you for confirming your email.</value>
+  </data>
+  <data name="ConfirmEmailTitle" xml:space="preserve">
+    <value>Confirm email</value>
+  </data>
+  <data name="ConfirmReservation" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="CreateButton" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>Create new</value>
+  </data>
+  <data name="CreateTitle" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteMessage" xml:space="preserve">
+    <value>Are you sure you want to delete this?</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="DisableWashingMachine" xml:space="preserve">
+    <value>Disable washing machine</value>
+  </data>
+  <data name="Dormitories" xml:space="preserve">
+    <value>Dormitories</value>
+  </data>
+  <data name="Dormitory" xml:space="preserve">
+    <value>Dormitory</value>
+  </data>
+  <data name="DormitoryList" xml:space="preserve">
+    <value>Dormitory List</value>
+  </data>
+  <data name="DormitoryTitle" xml:space="preserve">
+    <value>Dormitory</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="EmailSendMessage" xml:space="preserve">
+    <value>Verification email sent. Please check your email.</value>
+  </data>
+  <data name="EnableWashingMachine" xml:space="preserve">
+    <value>Enable washing machine</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Error404" xml:space="preserve">
+    <value>Error 404 - Page not found</value>
+  </data>
+  <data name="Fault" xml:space="preserve">
+    <value>Out of order</value>
+  </data>
+  <data name="ForgotPasswordConfirmMessage" xml:space="preserve">
+    <value>Please check your email to reset your password.</value>
+  </data>
+  <data name="ForgotPasswordConfirmTitle" xml:space="preserve">
+    <value>Forgot password confirmation</value>
+  </data>
+  <data name="ForgotPasswordLink" xml:space="preserve">
+    <value>Forgot your password?</value>
+  </data>
+  <data name="ForgotPasswordMessage" xml:space="preserve">
+    <value>Enter your email.</value>
+  </data>
+  <data name="ForgotPasswordTitle" xml:space="preserve">
+    <value>Forgot your password?</value>
+  </data>
+  <data name="Go back to index" xml:space="preserve">
+    <value>Go back to the home page.</value>
+  </data>
+  <data name="GoToTodaysReservations" xml:space="preserve">
+    <value>Go to the todays's reservations.</value>
+  </data>
+  <data name="GoToTomorrowReservations" xml:space="preserve">
+    <value>Go to the tomorrow's reservations.</value>
+  </data>
   <data name="Hello" xml:space="preserve">
-    <value>Hello1</value>
+    <value>Hello</value>
+  </data>
+  <data name="Laundries" xml:space="preserve">
+    <value>Laundries</value>
+  </data>
+  <data name="Laundry" xml:space="preserve">
+    <value>Laundry</value>
+  </data>
+  <data name="LoginLink" xml:space="preserve">
+    <value>Log in</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Login with existing account.</value>
+  </data>
+  <data name="ManageDormitoryUsers" xml:space="preserve">
+    <value>Manage Dormitory Users</value>
+  </data>
+  <data name="ManageMessage" xml:space="preserve">
+    <value>Change your account settings</value>
+  </data>
+  <data name="ManageOccupants" xml:space="preserve">
+    <value>Manage occupants</value>
+  </data>
+  <data name="ManageRoomUsers" xml:space="preserve">
+    <value>Manage room users</value>
+  </data>
+  <data name="ManageTitle" xml:space="preserve">
+    <value>Manage your account</value>
+  </data>
+  <data name="ManageUsers" xml:space="preserve">
+    <value>Manage users</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NextDayReservationMessage" xml:space="preserve">
+    <value>You can make reservation for the next day due to washing machine failure.</value>
+  </data>
+  <data name="NextPage" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PasswordSetMessage" xml:space="preserve">
+    <value>Your password has been set.</value>
+  </data>
+  <data name="Personel" xml:space="preserve">
+    <value>Personel</value>
+  </data>
+  <data name="Porters" xml:space="preserve">
+    <value>Porters</value>
+  </data>
+  <data name="PreviousPage" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="RegisterButton" xml:space="preserve">
+    <value>Register</value>
+  </data>
+  <data name="RegisterTitle" xml:space="preserve">
+    <value>Create a new account</value>
+  </data>
+  <data name="RegistrationConfirmMessage" xml:space="preserve">
+    <value>Thank you for registering. Please verify your email.</value>
+  </data>
+  <data name="RegistrationConfirmTitle" xml:space="preserve">
+    <value>Registration confirmation</value>
+  </data>
+  <data name="RemoveAnnouncement" xml:space="preserve">
+    <value>Remove announcement</value>
+  </data>
+  <data name="RemoveFilter" xml:space="preserve">
+    <value>Remove filter</value>
+  </data>
+  <data name="RemoveLaundry" xml:space="preserve">
+    <value>Remove laundry</value>
+  </data>
+  <data name="RemoveOccupant" xml:space="preserve">
+    <value>Remove occupant</value>
+  </data>
+  <data name="RemovePorter" xml:space="preserve">
+    <value>Remove porter</value>
+  </data>
+  <data name="RemoveRoom" xml:space="preserve">
+    <value>Remove room</value>
+  </data>
+  <data name="RemoveWashingMachine" xml:space="preserve">
+    <value>Remove washing machine</value>
+  </data>
+  <data name="Reserve" xml:space="preserve">
+    <value>Reserve</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="ResetPasswordConfirmMessage1" xml:space="preserve">
+    <value>Your password has been reset. Please</value>
+  </data>
+  <data name="ResetPasswordConfirmMessage2" xml:space="preserve">
+    <value>click here to log in</value>
+    <comment>link part, without dot on end</comment>
+  </data>
+  <data name="ResetPasswordConfirmTitle" xml:space="preserve">
+    <value>Reset password confirmation</value>
+  </data>
+  <data name="ResetPasswordMessage" xml:space="preserve">
+    <value>Reset your password.</value>
+  </data>
+  <data name="ResetPasswordTitle" xml:space="preserve">
+    <value>Reset password</value>
+  </data>
+  <data name="Room" xml:space="preserve">
+    <value>Room</value>
+  </data>
+  <data name="Rooms" xml:space="preserve">
+    <value>Rooms</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="SetPasswordButton" xml:space="preserve">
+    <value>Set password</value>
+  </data>
+  <data name="SetPasswordTitle" xml:space="preserve">
+    <value>Set password</value>
+  </data>
+  <data name="SetYourPassword" xml:space="preserve">
+    <value>Set your password</value>
+  </data>
+  <data name="SignedOutMessage" xml:space="preserve">
+    <value>You have successfully signed out.</value>
+  </data>
+  <data name="SignedOutTitle" xml:space="preserve">
+    <value>Signed out</value>
+  </data>
+  <data name="Submit" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="ToConfirm" xml:space="preserve">
+    <value>to confirm</value>
+  </data>
+  <data name="UpdatedProfileMessage" xml:space="preserve">
+    <value>Your profile has been updated</value>
+  </data>
+  <data name="UpdatePasswordButton" xml:space="preserve">
+    <value>Update password</value>
+  </data>
+  <data name="WashingMachine" xml:space="preserve">
+    <value>Washing machine</value>
+  </data>
+  <data name="{0} is required" xml:space="preserve">
+    <value>{0} is required</value>
+  </data>
+  <data name="{0} must be a number between {1} and {2}" xml:space="preserve">
+    <value>{0} must be a number between {1} and {2}</value>
   </data>
 </root>

@@ -5,7 +5,7 @@
 @model ManageDormitoryUsersViewModel
 
 @{
-    ViewBag.Title = "Manage Dormitory Users";
+    ViewBag.Title = Localizer["ManageDormitoryUsers"];
 }
 
 <div class="row">
@@ -24,19 +24,19 @@
                     <div class="form-actions no-color">
                         <p>
                             Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" class="form-control"/>
-                            <button type="submit" class="btn btn-info button-margin">Search</button>
-                            <a asp-action="ManageDormitoryUsers">Back to Full List</a>
+                                           <button type="submit" class="btn btn-info button-margin">@Localizer["Search"]</button>
+                            <a asp-action="ManageDormitoryUsers">@Localizer["RemoveFilter"]</a>
                         </p>
                     </div>
                 </form>
                 <br/>
-                <a asp-action="Details" asp-route-id=@Model.Dormitory.DormitoryId>Back to details</a>
+                <a asp-action="Details" asp-route-id=@Model.Dormitory.DormitoryId>@Localizer["BackToDetails"]</a>
                 <hr/>
                 <table class="table">
                     <thead>
                         <tr>
                             <th>
-                                Dormitory: @Model.Dormitory.Name
+                                @Localizer["Dormitory"]: @Model.Dormitory.Name
                             </th>
                             <th></th>
                         </tr>
@@ -60,7 +60,7 @@
                                         <form method="POST" asp-action="AssignManager">
                                             <input type="hidden" name="managerEmail" value="@item.Email" />
                                             <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId" />
-                                            <button type="submit" class="btn btn-info button-margin">Assign manager</button>
+                                            <button type="submit" class="btn btn-info button-margin">@Localizer["AssignManager"]</button>
                                         </form>
                                     }
                                     @if(item.DormitoryPorterId == null && item.DormitoryManagerId != Model.Dormitory.DormitoryId && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
@@ -68,7 +68,7 @@
                                         <form method="POST" asp-action="AssignPorter">
                                             <input type="hidden" name="porterEmail" value="@item.Email" />
                                             <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId" />
-                                            <button type="submit" class="btn btn-info button-margin">Assign porter</button>
+                                            <button type="submit" class="btn btn-info button-margin">@Localizer["AssignPorter"]</button>
                                         </form>
                                     }
                                     @if(item.DormitoryPorterId == Model.Dormitory.DormitoryId && (await AuthorizationService.AuthorizeAsync(User, "MinimumManager")).Succeeded)
@@ -76,7 +76,7 @@
                                         <form method="POST" asp-action="RemovePorter">
                                             <input type="hidden" name="porterEmail" value="@item.Email" />
                                             <input type="hidden" name="DormitoryId" value="@Model.Dormitory.DormitoryId" />
-                                            <button type="submit" class="btn btn-warning button-margin">Remove porter</button>
+                                            <button type="submit" class="btn btn-warning button-margin">@Localizer["RemovePorter"]</button>
                                         </form>
                                     }
                                 </td>
@@ -96,14 +96,14 @@
                    asp-route-page="@(Model.Users.PageIndex - 1)"
                    asp-route-currentFilter="@ViewData["CurrentFilter"]"
                    class="btn btn-default @prevDisabled">
-                    Previous
+                    @Localizer["PreviousPage"]
                 </a>
                 <a asp-action="ManageDormitoryUsers"
                    asp-route-sortOrder="@ViewData["CurrentSort"]"
                    asp-route-page="@(Model.Users.PageIndex + 1)"
                    asp-route-currentFilter="@ViewData["CurrentFilter"]"
                    class="btn btn-default @nextDisabled">
-                    Next
+                    @Localizer["NextPage"]
                 </a>
             </div>
         </div>

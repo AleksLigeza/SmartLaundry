@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using SmartLaundry.Controllers.Helpers;
 using SmartLaundry.Models;
@@ -20,6 +21,7 @@ namespace SmartLaundry.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
+        private readonly IStringLocalizer<LangResources> _localizer;
 
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
@@ -28,13 +30,15 @@ namespace SmartLaundry.Controllers
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ILogger<ManageController> logger,
-            UrlEncoder urlEncoder)
+            UrlEncoder urlEncoder,
+            IStringLocalizer<LangResources> localizer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
             _urlEncoder = urlEncoder;
+            _localizer = localizer;
         }
 
         [TempData]
@@ -95,7 +99,7 @@ namespace SmartLaundry.Controllers
                 await _userManager.UpdateAsync(user);
             }
 
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = _localizer["UpdatedProfileMessage"];
             return RedirectToAction(nameof(Index));
         }
 
@@ -119,7 +123,7 @@ namespace SmartLaundry.Controllers
             var email = user.Email;
             await ControllerHelpers.SendEmailConfirmationAsync(_emailSender, email, callbackUrl);
 
-            StatusMessage = "Verification email sent. Please check your email.";
+            StatusMessage = _localizer["EmailSendMessage"];
             return RedirectToAction(nameof(Index));
         }
 
@@ -167,7 +171,7 @@ namespace SmartLaundry.Controllers
 
             await _signInManager.SignInAsync(user, isPersistent: false);
             _logger.LogInformation("User changed their password successfully.");
-            StatusMessage = "Your password has been changed.";
+            StatusMessage = _localizer["ChangedPasswordMessage"];
 
             return RedirectToAction(nameof(ChangePassword));
         }
@@ -215,7 +219,7 @@ namespace SmartLaundry.Controllers
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            StatusMessage = "Your password has been set.";
+            StatusMessage = _localizer["PasswordSetMessage"];
 
             return RedirectToAction(nameof(SetPassword));
         }

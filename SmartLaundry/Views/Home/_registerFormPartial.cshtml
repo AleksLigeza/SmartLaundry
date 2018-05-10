@@ -3,7 +3,7 @@
     <div class="form-top">
         <div class="form-top-full">
             <h3>
-                <b>Create a new account</b>
+                <b>@Localizer["RegisterTitle"]</b>
             </h3>
         </div>
         <div class="form-top-right">
@@ -40,7 +40,7 @@
                 <input asp-for="ConfirmPassword" class="form-control" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-info">Register</button>
+            <button type="submit" class="btn btn-info">@Localizer["RegisterButton"]</button>
         </form>
     </div>
 </div>

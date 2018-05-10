@@ -6,9 +6,6 @@
 }
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-
-<p>@Localizer["Hello"]</p>
-
 <br />
 
 @if(SignInManager.IsSignedIn(User))
@@ -19,7 +16,7 @@
                 <div class="form-top-simple">
                     <div class="form-top-full">
                         <h3>
-                            <b>Your id: @UserManager.GetUserId(User)</b>
+                            <b>@Localizer["Hello"] @UserManager.GetUserName(User)</b>
                         </h3>
                     </div>
                 </div>

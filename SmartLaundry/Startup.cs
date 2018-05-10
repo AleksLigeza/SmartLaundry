@@ -88,7 +88,9 @@ namespace SmartLaundry
                 o.ResourcesPath = "Resources";
             });
 
-            services.AddMvc()
+            services
+                .AddMvc()
+                .AddDataAnnotationsLocalization()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
