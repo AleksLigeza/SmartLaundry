@@ -12,25 +12,29 @@ namespace SmartLaundry.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        [Range(1, 10)]
+        [Required(ErrorMessage = "{0} is required")]
+        [Range(1, 10, ErrorMessage = "{0} must be a number between {1} and {2}")]
         [DefaultValue(1)]
+        [Display(Name = "Position")]
         public int Position { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         [DataType(DataType.Time)]
+        [Display(Name = "Start time")]
         public TimeSpan startTime { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         [DataType(DataType.Time)]
+        [Display(Name = "Shift length")]
         public TimeSpan shiftTime { get; set; }
 
-        [Required]
-        [Range(1, 24)]
+        [Required(ErrorMessage = "{0} is required")]
+        [Range(1, 24, ErrorMessage = "{0} must be a number between {1} and {2}")]
         [DefaultValue(4)]
+        [Display(Name = "Shift count")]
         public int shiftCount { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         public int DormitoryId { get; set; }
 
         public virtual Dormitory Dormitory { get; set; }

@@ -11,15 +11,15 @@ namespace SmartLaundry.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         public bool Fault { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         public DateTime StartTime { get; set; }
 
         public DateTime? EndTime { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         public bool ToRenew { get; set; }
 
         public bool Confirmed
@@ -27,7 +27,7 @@ namespace SmartLaundry.Models
             get { return !ToRenew; }
         }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         public int WashingMachineId { get; set; }
 
         public virtual WashingMachine WashingMachine { get; set; }

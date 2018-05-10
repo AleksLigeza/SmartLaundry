@@ -11,10 +11,11 @@ namespace SmartLaundry.Models
         [Key]
         public int Id { get; set; }
 
-        [Required, Range(1, 2000)]
+        [Required(ErrorMessage = "{0} is required"), Range(1, 2000)]
+        [Display(Name = "Number")]
         public int Number { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         public int DormitoryId { get; set; }
 
         public virtual Dormitory Dormitory { get; set; }

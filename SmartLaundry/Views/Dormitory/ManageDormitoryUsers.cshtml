@@ -23,8 +23,8 @@
                 <form asp-action="ManageDormitoryUsers" method="get" class="form-group-border">
                     <div class="form-actions no-color">
                         <p>
-                            Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" class="form-control"/>
-                                           <button type="submit" class="btn btn-info button-margin">@Localizer["Search"]</button>
+                            @Localizer["FindByEmail"]: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" class="form-control" />
+                            <button type="submit" class="btn btn-info button-margin">@Localizer["Search"]</button>
                             <a asp-action="ManageDormitoryUsers">@Localizer["RemoveFilter"]</a>
                         </p>
                     </div>

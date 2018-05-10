@@ -8,7 +8,7 @@ namespace SmartLaundry.Models.DormitoryViewModels
 {
     public class RoomsViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         public Dormitory Dormitory { get; set; }
 
         public Room RoomToAdd { get; set; }

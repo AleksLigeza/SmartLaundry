@@ -8,12 +8,13 @@ namespace SmartLaundry.Models.AccountViewModels
 {
     public class LoginViewModel
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "{0} is required")]
+        [EmailAddress(ErrorMessage = "The {0} field is not a valid e-mail address.")]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         [DataType(DataType.Password)]
+        [Display(Name = "Password")]
         public string Password { get; set; }
 
         [Display(Name = "Remember me?")]

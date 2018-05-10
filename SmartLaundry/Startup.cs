@@ -90,7 +90,13 @@ namespace SmartLaundry
 
             services
                 .AddMvc()
-                .AddDataAnnotationsLocalization()
+                .AddDataAnnotationsLocalization(o =>
+                    {
+                        o.DataAnnotationLocalizerProvider = (type, factory) =>
+                        {
+                            return factory.Create(typeof(LangResources));
+                        };
+                    })
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 

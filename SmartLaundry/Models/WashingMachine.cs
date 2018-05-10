@@ -11,11 +11,12 @@ namespace SmartLaundry.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        [Range(1, 10)]
+        [Required(ErrorMessage = "{0} is required")]
+        [Range(1, 10, ErrorMessage = "{0} must be a number between {1} and {2}")]
+        [Display(Name = "Position")]
         public int Position { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required")]
         public int LaundryId { get; set; }
 
         public virtual Laundry Laundry { get; set; }

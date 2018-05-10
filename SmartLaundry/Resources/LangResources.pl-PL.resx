@@ -129,11 +129,17 @@
   <data name="AddLaundry" xml:space="preserve">
     <value>Dodaj pralnię</value>
   </data>
+  <data name="Address" xml:space="preserve">
+    <value>Adres</value>
+  </data>
   <data name="AddRoom" xml:space="preserve">
     <value>Dodaj pokój</value>
   </data>
   <data name="AddWashingMachine" xml:space="preserve">
     <value>Dodaj pralkę</value>
+  </data>
+  <data name="An error occurred while processing your request." xml:space="preserve">
+    <value>Wystąpił błąd podczas przetwarzania Twojego żądania.</value>
   </data>
   <data name="AnnouncementsTitle" xml:space="preserve">
     <value>Ogłoszenia</value>
@@ -171,6 +177,15 @@
   <data name="ChangePasswordTitle" xml:space="preserve">
     <value>Zmień hasło</value>
   </data>
+  <data name="City" xml:space="preserve">
+    <value>Miasto</value>
+  </data>
+  <data name="Confirm new password" xml:space="preserve">
+    <value>Potwierdź nowe hasło</value>
+  </data>
+  <data name="Confirm password" xml:space="preserve">
+    <value>Potwierdź hasło</value>
+  </data>
   <data name="ConfirmEmailMessage" xml:space="preserve">
     <value>Dziękujemy za potwierdzenie adresu email.</value>
   </data>
@@ -188,6 +203,9 @@
   </data>
   <data name="CreateTitle" xml:space="preserve">
     <value>Dodawanie</value>
+  </data>
+  <data name="Current password" xml:space="preserve">
+    <value>Obecne hasło</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Usuń</value>
@@ -231,6 +249,12 @@
   <data name="Fault" xml:space="preserve">
     <value>Zepsuta</value>
   </data>
+  <data name="FindByEmail" xml:space="preserve">
+    <value>Wyszukiwanie za pomocą adresu email</value>
+  </data>
+  <data name="Firstname" xml:space="preserve">
+    <value>Imię</value>
+  </data>
   <data name="ForgotPasswordConfirmMessage" xml:space="preserve">
     <value>Sprawdź swoją skrzynkę email w celu resetu hasła.</value>
   </data>
@@ -258,6 +282,12 @@
   <data name="Hello" xml:space="preserve">
     <value>Witaj</value>
   </data>
+  <data name="IsEmailConfirmed" xml:space="preserve">
+    <value>Czy email jest potwierdzony?</value>
+  </data>
+  <data name="Lastname" xml:space="preserve">
+    <value>Nazwisko</value>
+  </data>
   <data name="Laundries" xml:space="preserve">
     <value>Pralki</value>
   </data>
@@ -270,14 +300,20 @@
   <data name="LoginTitle" xml:space="preserve">
     <value>Zaloguj się</value>
   </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>Wyloguj</value>
+  </data>
   <data name="ManageDormitoryUsers" xml:space="preserve">
-    <value>Zarządzaj lokatorami</value>
+    <value>Zarządzaj użytkownikami</value>
   </data>
   <data name="ManageMessage" xml:space="preserve">
     <value>Zmień ustawienia konta</value>
   </data>
   <data name="ManageOccupants" xml:space="preserve">
     <value>Zarządaj lokatorami</value>
+  </data>
+  <data name="Manager" xml:space="preserve">
+    <value>Kierownik</value>
   </data>
   <data name="ManageRoomUsers" xml:space="preserve">
     <value>Zarządzaj lokatorami</value>
@@ -288,11 +324,23 @@
   <data name="ManageUsers" xml:space="preserve">
     <value>Zarządzaj użytkownikami</value>
   </data>
+  <data name="Message" xml:space="preserve">
+    <value>Wiadomość</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nazwa</value>
+  </data>
+  <data name="New password" xml:space="preserve">
+    <value>Nowe hasło</value>
+  </data>
   <data name="NextDayReservationMessage" xml:space="preserve">
     <value>Z powodu awarii pralki możesz dodać rezerwację na kolejny dzień.</value>
   </data>
   <data name="NextPage" xml:space="preserve">
     <value>Następna</value>
+  </data>
+  <data name="Number" xml:space="preserve">
+    <value>Numer</value>
   </data>
   <data name="Password" xml:space="preserve">
     <value>Hasło</value>
@@ -305,6 +353,9 @@
   </data>
   <data name="Porters" xml:space="preserve">
     <value>Portierzy</value>
+  </data>
+  <data name="Position" xml:space="preserve">
+    <value>Pozycja</value>
   </data>
   <data name="PreviousPage" xml:space="preserve">
     <value>Poprzednia</value>
@@ -323,6 +374,9 @@
   </data>
   <data name="RegistrationConfirmTitle" xml:space="preserve">
     <value>Potwierdzenie rejestracji</value>
+  </data>
+  <data name="Remember me?" xml:space="preserve">
+    <value>Zapamiętaj mnie</value>
   </data>
   <data name="RemoveAnnouncement" xml:space="preserve">
     <value>Usuń ogłoszenie</value>
@@ -388,14 +442,44 @@
   <data name="SetYourPassword" xml:space="preserve">
     <value>Ustal nowe hasło</value>
   </data>
+  <data name="Shift count" xml:space="preserve">
+    <value>Ilość zmian na dobę</value>
+  </data>
+  <data name="Shift length" xml:space="preserve">
+    <value>Długość zmiany</value>
+  </data>
   <data name="SignedOutMessage" xml:space="preserve">
     <value>Zostałeś pomyślnie wylogowany</value>
   </data>
   <data name="SignedOutTitle" xml:space="preserve">
     <value>Wylogowano</value>
   </data>
+  <data name="Start time" xml:space="preserve">
+    <value>Czas startu</value>
+  </data>
   <data name="Submit" xml:space="preserve">
     <value>Wyślij</value>
+  </data>
+  <data name="The field {0} is not valid." xml:space="preserve">
+    <value>Pole {0} nie zawiera prawidłowych danych.</value>
+  </data>
+  <data name="The field {0} must be a valid zip code." xml:space="preserve">
+    <value>Pole {0} musi być prawidłowym kodem pocztowym.</value>
+  </data>
+  <data name="The field {0} must be at max {1} characters long." xml:space="preserve">
+    <value>Pole {0} musi posiadać maksymalnie {1} znaków.</value>
+  </data>
+  <data name="The new password and confirmation password do not match." xml:space="preserve">
+    <value>Nowe hasło i jego potwierdzenie się nie zgadzają</value>
+  </data>
+  <data name="The password and confirmation password do not match." xml:space="preserve">
+    <value>Hasło i jego potwierdzenie nie zgadzają się.</value>
+  </data>
+  <data name="The {0} field is not a valid e-mail address." xml:space="preserve">
+    <value>Wartość pola {0} nie jest poprawnym adresem email.</value>
+  </data>
+  <data name="The {0} must be at least {2} and at max {1} characters long." xml:space="preserve">
+    <value>Wartość pola {0} musi zawierać od {2} do {1} znaków.</value>
   </data>
   <data name="ToConfirm" xml:space="preserve">
     <value>do potwierdzenia</value>
@@ -406,7 +490,19 @@
   <data name="UpdatePasswordButton" xml:space="preserve">
     <value>Zmień</value>
   </data>
+  <data name="Username" xml:space="preserve">
+    <value>Nazwa użytkownika</value>
+  </data>
   <data name="WashingMachine" xml:space="preserve">
     <value>Pralka</value>
+  </data>
+  <data name="ZipCode" xml:space="preserve">
+    <value>Kod pocztowy</value>
+  </data>
+  <data name="{0} is required" xml:space="preserve">
+    <value>Pole {0} jest wymagane</value>
+  </data>
+  <data name="{0} must be a number between {1} and {2}" xml:space="preserve">
+    <value>Wartość pola {0} musi być z przedziału od {1} do {2}</value>
   </data>
 </root>

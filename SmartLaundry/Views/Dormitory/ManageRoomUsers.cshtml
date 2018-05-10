@@ -24,7 +24,7 @@
                     <form asp-action="ManageRoomUsers" method="get" class="form-group-border">
                         <div class="form-actions no-color">
                             <p>
-                                Find by email: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" class="form-control" />
+                                @Localizer["FindByEmail"]: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" class="form-control" />
                                 <button type="submit" class="btn btn-info button-margin">@Localizer["Search"]</button>
                                 <a asp-action="ManageRoomUsers">@Localizer["RemoveFilter"]</a>
                             </p>
