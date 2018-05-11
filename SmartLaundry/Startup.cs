@@ -124,6 +124,7 @@ namespace SmartLaundry
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
             app.UseHsts();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -158,7 +159,10 @@ namespace SmartLaundry
                 });
             });
 
-            RolesData.SeedRoles(app.ApplicationServices, Configuration).Wait();
+            if(!CurrentEnvironment.IsEnvironment("Testing") && !CurrentEnvironment.IsEnvironment("SingleTest"))
+            {
+                RolesData.SeedRoles(app.ApplicationServices, Configuration).Wait();
+            }
         }
     }
 }

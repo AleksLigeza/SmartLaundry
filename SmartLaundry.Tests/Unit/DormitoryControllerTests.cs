@@ -1,12 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Moq;
+using SmartLaundry.Authorization;
 using SmartLaundry.Controllers;
 using SmartLaundry.Data.Interfaces;
 using SmartLaundry.Data.Mock;
 using SmartLaundry.Models;
+using SmartLaundry.Models.DormitoryViewModels;
 using Xunit;
 
 namespace SmartLaundry.Tests.Unit
@@ -17,15 +22,29 @@ namespace SmartLaundry.Tests.Unit
 
         public DormitoryControllerTests()
         {
-            var _dormitoryRepo = new MockDormitoryRepo();
-            var _userRepo = new Mock<IUserRepository>().Object;
-            var _roomRepo = new Mock<IRoomRepository>().Object;
-            var _userManager = new Mock<UserManager<ApplicationUser>>().Object;
-            var _authService = new Mock<IAuthorizationService>().Object;
-            var _announcementRepo = new Mock<IAnnouncementRepository>().Object;
+            _controller = createController(null);
+        }
 
-            _controller = new DormitoryController(_dormitoryRepo, _userRepo, _roomRepo, _userManager, _authService,
-                _announcementRepo);
+        private DormitoryController createController(IDormitoryRepository dormitoryRepo)
+        {
+            if(dormitoryRepo == null)
+                dormitoryRepo = new MockDormitoryRepo();
+
+            var userRepo = new MockUserRepo();
+            var roomRepo = new MockRoomRepo();
+            var userManager = new Mock<MockUserManager>().Object;
+
+            var authService = new Mock<IAuthorizationService>();
+            authService
+                .Setup(x => x.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<object>(), It.IsAny<IEnumerable<IAuthorizationRequirement>>()))
+                .Returns(Task.FromResult(AuthorizationResult.Success()));
+
+            var announcementRepo = new Mock<IAnnouncementRepository>().Object;
+            var localizer = new Mock<IStringLocalizer<LangResources>>().Object;
+
+            return new DormitoryController(dormitoryRepo, userRepo, 
+                roomRepo, userManager, authService.Object,
+                announcementRepo, localizer);
         }
 
         [Fact]
@@ -41,6 +60,36 @@ namespace SmartLaundry.Tests.Unit
             var viewResult = Assert.IsType<ViewResult>(result);
             var collection = Assert.IsType<List<Dormitory>>(viewResult.Model);
             Assert.Equal(3, collection.Count);
+        }
+
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async void ManageDormitoryUsersReturnsPaginatedList()
+        {
+            //Arrange
+
+            //Act
+            var result = await _controller.ManageDormitoryUsers(1, "", "", 1);
+
+            //Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsType<ManageDormitoryUsersViewModel>(viewResult.Model);
+            Assert.Equal(4, model.Users.Count);
+        }
+
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async void ManageRoomUsersReturnsPaginatedList()
+        {
+            //Arrange
+
+            //Act
+            var result = await _controller.ManageRoomUsers(1, "", "", 1);
+
+            //Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsType<ManageRoomUsersViewModel>(viewResult.Model);
+            Assert.Equal(2, model.Users.Count);
         }
     }
 }

@@ -9,11 +9,13 @@ namespace SmartLaundry.Data.Mock
 {
     public class MockDormitoryRepo : IDormitoryRepository
     {
+        private List<Dormitory> _dormitories;
         public IEnumerable<Dormitory> Dormitories
         {
             get
             {
-                return new List<Dormitory>
+                if (_dormitories != null) return _dormitories;
+                return _dormitories = new List<Dormitory>
                 {
                     new Dormitory
                     {
@@ -21,7 +23,16 @@ namespace SmartLaundry.Data.Mock
                         DormitoryId = 1,
                         Address = "Akademicka 1",
                         City = "Rzeszów",
-                        ZipCode = "35-084"
+                        ZipCode = "35-084",
+                        Porters = new List<ApplicationUser>(),
+                        Rooms = new List<Room>()
+                        {
+                            new Room()
+                            {
+                                Id = 1,
+                                Number = 1
+                            }
+                        }
                     },
                     new Dormitory
                     {
@@ -29,7 +40,8 @@ namespace SmartLaundry.Data.Mock
                         DormitoryId = 2,
                         Address = "Akademicka 5",
                         City = "Rzeszów",
-                        ZipCode = "35-084"
+                        ZipCode = "35-084",
+                        Porters = new List<ApplicationUser>()
                     },
                     new Dormitory
                     {
@@ -37,7 +49,8 @@ namespace SmartLaundry.Data.Mock
                         DormitoryId = 3,
                         Address = "Akademicka 3",
                         City = "Rzeszów",
-                        ZipCode = "35-084"
+                        ZipCode = "35-084",
+                        Porters = new List<ApplicationUser>()
                     },
                 };
             }
@@ -45,47 +58,52 @@ namespace SmartLaundry.Data.Mock
 
         public Dormitory AddSingle(Dormitory source)
         {
-            throw new NotImplementedException();
+            var maxId = Dormitories.Max(x => x.DormitoryId);
+            source.DormitoryId = maxId + 1;
+
+            _dormitories.Add(source);
+
+            return source;
         }
 
         public Dormitory AssignManager(ApplicationUser user, Dormitory dormitory)
         {
-            throw new NotImplementedException();
+            dormitory.Manager = user;
+            user.DormitoryManager = dormitory;
+            user.DormitoryManagerId = dormitory.DormitoryId;
+            return dormitory;
         }
 
         public void DeleteSingle(Dormitory source)
         {
-            throw new NotImplementedException();
+            _dormitories.Remove(source);
+            //((IDisposable)source).Dispose();
         }
 
         public bool IsRoomInDormitory(int roomNumber, int dormitoryId)
         {
-            throw new NotImplementedException();
+            var dormitory = Dormitories.SingleOrDefault(x => x.DormitoryId == dormitoryId);
+            if (dormitory == null) return false;
+            return dormitory.Rooms.Any(x => x.Number == roomNumber);
         }
 
         public List<Dormitory> GetAll()
         {
-            throw new NotImplementedException();
-        }
-
-        public Dormitory GetDormitoryWithRooms(int id)
-        {
-            throw new NotImplementedException();
+            return Dormitories.ToList();
         }
 
         public Dormitory GetSingleById(int id)
         {
-            throw new NotImplementedException();
-        }
-
-        public Dormitory GetSingleWithIncludes(int id)
-        {
-            throw new NotImplementedException();
+            return Dormitories.SingleOrDefault(x => x.DormitoryId == id);
         }
 
         public Dormitory UpdateSingle(Dormitory source)
         {
-            throw new NotImplementedException();
+            var dormitory = Dormitories.SingleOrDefault(x => x.DormitoryId == source.DormitoryId);
+            if (dormitory == null) return null;
+            _dormitories.Remove(dormitory);
+            _dormitories.Add(source);
+            return source;
         }
     }
 }

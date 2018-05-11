@@ -87,7 +87,7 @@ namespace SmartLaundry.Controllers
             var thisDormitoryUsers = users
                 .Where(x => x.DormitoryPorterId == dormitory.DormitoryId
                             || x.DormitoryManagerId == dormitory.DormitoryId
-                            && dormitory.Rooms.Any(z => z.Id == x.RoomId))
+                            || dormitory.Rooms.Any(z => z.Id == x.RoomId))
                 .ToList();
             users = usersWithoutDormitory.Concat(thisDormitoryUsers).ToList();
 
@@ -137,11 +137,13 @@ namespace SmartLaundry.Controllers
 
             var dormitory = room.Dormitory;
 
+            var adminEmail = RolesData.AdminEmail ?? "ADMIN@ADMIN.ADMIN";
+
             var usersWithoutDormitory = users
                 .Where(x => x.DormitoryManagerId == null
                             && x.DormitoryPorterId == null
                             && x.RoomId == null
-                            && !x.NormalizedEmail.Equals(RolesData.AdminEmail))
+                            && !x.NormalizedEmail.Equals(adminEmail))
                 .ToList();
             var thisDormitoryUsers = users
                 .Where(x => x.DormitoryPorterId == null
