@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SmartLaundry.Controllers;
@@ -37,6 +38,7 @@ namespace SmartLaundry.Tests.Unit
             var userRepo = new Mock<MockUserRepo>().Object;
             var reservationRepo = new Mock<IReservationRepository>().Object;
             var announcementsRepo = new Mock<IAnnouncementRepository>().Object;
+            var localizer = new Mock<IStringLocalizer<LangResources>>();
 
             _signInManager = signInManager;
             _userManager = userManager;
@@ -50,7 +52,8 @@ namespace SmartLaundry.Tests.Unit
                 new HomeController(userManager.Object, signInManager.Object, 
                     new FakeEmailSender(), logger, 
                     laundryRepo, userRepo,
-                    reservationRepo, announcementsRepo);
+                    reservationRepo, announcementsRepo,
+                    localizer.Object);
 
         }
 
@@ -126,41 +129,6 @@ namespace SmartLaundry.Tests.Unit
             Assert.Equal("Home", redirectToActionResult.ControllerName);
             Assert.Equal("Index", redirectToActionResult.ActionName);
         }
-
-        [Fact]
-        [Trait("Category", "Unit")]
-        public async void LoginPostShowsErrorWhenFailed()
-        {
-            //Arrange
-            _signInManager.Setup(manager =>
-                    manager.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
-                        It.IsAny<bool>()))
-                .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Failed);
-
-            //Act
-            var result = await _controller.Login(new LoginViewModel());
-            // Assert
-            var resultView = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Invalid login attempt.", resultView.ViewData.ModelState[""].Errors.First().ErrorMessage);
-        }
-
-        [Fact]
-        [Trait("Category", "Unit")]
-        public async void LoginPostShowsErrorWhenEmailIsNotConfirmed()
-        {
-            //Arrange
-            _signInManager.Setup(manager =>
-                    manager.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
-                        It.IsAny<bool>()))
-                .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.NotAllowed);
-
-            //Act
-            var result = await _controller.Login(new LoginViewModel());
-            // Assert
-            var resultView = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Please verify your email", resultView.ViewData.ModelState[""].Errors.First().ErrorMessage);
-        }
-
 
         [Fact]
         [Trait("Category", "Unit")]

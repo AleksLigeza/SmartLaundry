@@ -23,11 +23,11 @@ namespace SmartLaundry.Authorization
             using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 // DISABLED APLYING MIGRATIONS
-                var dbContext = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
+                //var dbContext = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
 
-                if (dbContext.Database.GetPendingMigrations().Any())
-                {
-                    await dbContext.Database.MigrateAsync();
+                //if (dbContext.Database.GetPendingMigrations().Any())
+                //{
+                //    await dbContext.Database.MigrateAsync();
 
                     var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
@@ -46,14 +46,15 @@ namespace SmartLaundry.Authorization
                             Email = AdminEmail,
                             Firstname = "Admin",
                             Lastname = "Admin",
-                            EmailConfirmed = true
+                            EmailConfirmed = true,
+                            SecurityStamp = Guid.NewGuid().ToString()
                         };
 
                         await userManager.CreateAsync(user, configuration["AdminPassword"]);
 
                         await userManager.AddToRoleAsync(user, "Administrator");
                     }
-                }
+            //    }
             }
         }
     }

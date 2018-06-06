@@ -289,7 +289,7 @@
     <value>Nazwisko</value>
   </data>
   <data name="Laundries" xml:space="preserve">
-    <value>Pralki</value>
+    <value>Pralnie</value>
   </data>
   <data name="Laundry" xml:space="preserve">
     <value>Pralnia</value>
@@ -504,5 +504,11 @@
   </data>
   <data name="{0} must be a number between {1} and {2}" xml:space="preserve">
     <value>Wartość pola {0} musi być z przedziału od {1} do {2}</value>
+  </data>
+  <data name="Invalid login attempt." xml:space="preserve">
+    <value>Nieprawidłowa próba logowania</value>
+  </data>
+  <data name="Please verify your email" xml:space="preserve">
+    <value>Zweryfikuj swój email</value>
   </data>
 </root>

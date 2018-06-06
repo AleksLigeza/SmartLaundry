@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using SmartLaundry.Controllers.Helpers;
 using SmartLaundry.Data.Interfaces;
@@ -23,6 +24,7 @@ namespace SmartLaundry.Controllers
         private readonly IUserRepository _userRepo;
         private readonly IReservationRepository _reservationRepo;
         private readonly IAnnouncementRepository _announcementRepo;
+        private readonly IStringLocalizer<LangResources> _localizer;
 
         public HomeController(
             UserManager<ApplicationUser> userManager,
@@ -32,7 +34,9 @@ namespace SmartLaundry.Controllers
             ILaundryRepository laundryRepository,
             IUserRepository userRepository,
             IReservationRepository reservationRepository,
-            IAnnouncementRepository announcementRepo)
+            IAnnouncementRepository announcementRepo,
+            IStringLocalizer<LangResources> localizer
+            )
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -41,6 +45,7 @@ namespace SmartLaundry.Controllers
             _userRepo = userRepository;
             _reservationRepo = reservationRepository;
             _announcementRepo = announcementRepo;
+            _localizer = localizer;
         }
 
         [HttpGet]
@@ -96,12 +101,12 @@ namespace SmartLaundry.Controllers
                 }
                 else if(result.IsNotAllowed)
                 {
-                    ModelState.AddModelError(string.Empty, "Please verify your email");
+                    ModelState.AddModelError(string.Empty, _localizer["Please verify your email"]);
                     return ReturnIndexView(model);
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, _localizer["Invalid login attempt."]);
                     return ReturnIndexView(model);
                 }
             }

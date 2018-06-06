@@ -502,4 +502,10 @@
   <data name="{0} must be a number between {1} and {2}" xml:space="preserve">
     <value>{0} must be a number between {1} and {2}</value>
   </data>
+  <data name="Invalid login attempt." xml:space="preserve">
+    <value>Invalid login attempt.</value>
+  </data>
+  <data name="Please verify your email" xml:space="preserve">
+    <value>Please verify your email</value>
+  </data>
 </root>
